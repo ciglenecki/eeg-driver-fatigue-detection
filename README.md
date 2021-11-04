@@ -1,3 +1,10 @@
+<style>
+h2 {
+    color:red;
+}
+</style>
+
+
 # Driver fatigue detection through multiple entropy fusion analysis in an EEG-based system
 
 Paper: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
@@ -21,6 +28,7 @@ Should I implement all classifiers or only SVM/BP?
 Should I recalculate significant electrodes or caculate them again?
 
 How is autoregression used in this paper?
+
 
 
 # Code notes
