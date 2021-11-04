@@ -12,17 +12,6 @@ numpy
 
 # Questions:
 
-Do vašeg termina konzultacija morate napraviti sljedeće:
-
-    GitHub repozitorij i mene dodati u njega (username je IgorStancin)
-    Pročitati s razumijevanjem članak koji ste izabrali (preporučam pročitati nekoliko puta)
-    Preuzeti podatke koji su korišteni u članku
-    Napraviti „data survey“ Jupyter bilježnicu u kojoj ćete se upoznati s podatcima kojim baratate (tip podataka, distribucije, nedostajuće vrijednosti, stršeće vrijednosti, razne vizualizacije i slično)
-    Pripremiti kratki plan kako planirate replicirati odabrani članak (maksimalno 1 stranica teksta/natuknica) – iz teksta članka prepoznati sve bitne dijelove, odrediti redoslijed kojim ćete ih odrađivati, koje Python pakete ćete koristiti za koju potkomponentu i slično.
-
- 
-
-Na terminu konzultacija čete mi kratko prikazati najzanimljivije stvari iz navedene bilježnice i plan koji ste napravili. Sama bilježnica mora biti detaljna i cjelovita, ali prezentacija bilježnice mora biti samo za najzanimljivije stvari koje ste uočili u podatcima i ne smije biti duža od 3 minute. Prezentirani plan ćemo kratko prokomentirati i ja ću vam odgovoriti na sva vaša eventualna pitanja. Predviđeno trajanje konzultacija je maksimalno 15 minuta po studentu.
 
 
 
