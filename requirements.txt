@@ -1,3 +1,5 @@
+ipykernel
+scipy # reading mat files
 numpy
 mne
 pandas

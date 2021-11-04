@@ -23,8 +23,14 @@ Should I recalculate significant electrodes or caculate them again?
 How is autoregression used in this paper?
 
 
+# Code notes
+`ipython kernel install --user --name=eeg` to use venv
 
+# Data notes
 
+EEG data: This is the original EEG data of twelve healthy subjects for driver fatigue detection. Due to personal privacy, the digital number represents different participants. The .cnt files were created by a 40-channel Neuroscan amplifier, including the EEG data in two states in the process of driving.
+
+Entropy data: This is the four entropies of twelve healthy subjects for driver fatigue detection. Due to personal privacy, the digital number represents different participants. Each .mat file included five files, namely FE, SE, AE and PE described four entropy values in the training data and the corresponding label of class, which the number 1 represents the fatigue state and 0 represents the normal state in the process of driving.
 
 # Paper notes
 ## Goal
