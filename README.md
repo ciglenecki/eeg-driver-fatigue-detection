@@ -11,8 +11,8 @@
 - [ ] Split the dataset (train/test 50:50)
 	- use `is_normal_state_mask` you already created
 - [ ] Remove entropy outliers
-- [ ] Understand basics of EEG signals and how to interpret them
-- [ ] Remove noise from the signal
+- [ ] (?) Understand basics of EEG signals and how to interpret them
+- [ ] (?) Remove noise from the signal
 - [ ] (?) Process signals further
 - [ ] (?) Extract features from signals
 - [ ] Concatenate features into a final dataFrame
