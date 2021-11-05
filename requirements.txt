@@ -5,3 +5,6 @@ mne
 pandas
 matplotlib
 sklearn
+mne[data]
+tqdm
+PyQt5
