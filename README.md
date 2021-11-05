@@ -16,7 +16,7 @@
 - [ ] (?) Process signals further
 - [ ] (?) Extract features from signals
 - [ ] Concatenate features into a final dataFrame
-- [ ] Train the 
+- [ ] Train the dataset
 - [ ] Determine significant electrodes
 - [ ] Repeat training with significant electrodes
 - [ ] Visualize results 
