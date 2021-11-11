@@ -7,19 +7,30 @@
 
 
 # Todo:
+
 - [ ] Load entropy and signals for all users
+- [ ] Normalize across all participans and not single one
 - [ ] Split the dataset (train/test 50:50)
 	- use `is_normal_state_mask` you already created
 - [ ] Remove entropy outliers
-- [ ] (?) Understand basics of EEG signals and how to interpret them
-- [ ] (?) Remove noise from the signal
-- [ ] (?) Process signals further
-- [ ] (?) Extract features from signals
+- [ ] Apply filters to remove noise
+	- [ ] notch filter 
+	- [ ] band pass 0.15Hz to 40Hz ?
+- [ ] Epoch the signal using the window of 1 second
+- [ ] Calculate 4 different entropies for each 1 second epoch
+- [ ] Compare entropies with entropies from the paper
 - [ ] Concatenate features into a final dataFrame
-- [ ] Train the dataset
+- [ ] Train the dataset with (SVM, BP, KNN, RF)
+- [ ] Validate accuracy using testing set
+- [ ] Use cross-validation to get better results
 - [ ] Determine significant electrodes
+	- [ ] Add them to "bad channels"
 - [ ] Repeat training with significant electrodes
-- [ ] Visualize results 
+
+Optional:
+- [ ] Visualize training/testing error
+- [ ] Visualize weight-based topographies for each subject
+- [ ] Visualize weight-based topographies average
 
 # Requirements
 
@@ -53,16 +64,15 @@ How do I organize the final dataFrame. What are columns / rows?
 
 
 # Data structure
-| user_id | PE_01 | PE_02 | ... | PE_30 | SE_01 | SE_02 | ... | FE_30 |
-| ------- | ----- | ----- | --- | ----- | ----- | ----- | --- | ----- |
-| 01      | 0.3   | 0.23  | ... | 0.6   | 0.8   | 0.1   | ... | 0.2   |
-| 02      | 0.2   | ...   |
+| user_id | time | PE_01 | PE_02 | ... | PE_30 | SE_01 | SE_02 | ... | FE_30 |
+| ------- | ---- | ----- | ----- | --- | ----- | ----- | ----- | --- | ----- |
+| 01      | 0.1s | 0.3   | 0.23  | ... | 0.6   | 0.8   | 0.1   | ... | 0.2   |  |
+| 02      | 0.2s | 0.2   | ...   |     |
+
+broj redaka broj usera * uzoric vremena (epoha) = 3600
 
 
-| user_0 | user_1 | ... | user_12 | PE_01 | PE_02 | ... | PE_30 | SE_01 | SE_02 | ... | FE_30 |
-| ------ | ------ | --- | ------- | ----- | ----- | --- | ----- | ----- | ----- | --- | ----- |
-| 1      | 0      | ... | 0       | 0.6   | 0.8   | 0.1 | ...   | 0.2   | 0.2   | ... | 0.5   |
-| 0      | 1      | ... | 0       | 0.3   | ...   |
+
 
 # Dataset notes
 
