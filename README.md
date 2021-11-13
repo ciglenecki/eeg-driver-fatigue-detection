@@ -18,6 +18,7 @@
 	- [ ] band pass 0.15Hz to 40Hz ?
 - [ ] Epoch the signal using the window of 1 second
 - [ ] Calculate 4 different entropies for each 1 second epoch
+- [ ] Time window!? Timestamp can't be a feature
 - [ ] Compare entropies with entropies from the paper
 - [ ] Concatenate features into a final dataFrame
 - [ ] Train the dataset with (SVM, BP, KNN, RF)
