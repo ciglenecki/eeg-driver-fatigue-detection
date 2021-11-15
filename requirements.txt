@@ -1,5 +1,5 @@
 ipykernel
-scipy # reading mat files
+scipy
 numpy
 mne
 pandas
@@ -8,3 +8,5 @@ sklearn
 mne[data]
 tqdm
 PyQt5
+EntropyHub
+ipykernel

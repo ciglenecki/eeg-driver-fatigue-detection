@@ -5,6 +5,9 @@
 	<p align="center">Paper: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</p>
 </p>
 
+# Notes:
+
+Many channels are flatlined during the driving process and they spike only in some moments
 
 # Todo:
 
@@ -65,12 +68,16 @@ How do I organize the final dataFrame. What are columns / rows?
 
 
 # Data structure
-| user_id | time | PE_01 | PE_02 | ... | PE_30 | SE_01 | SE_02 | ... | FE_30 |
-| ------- | ---- | ----- | ----- | --- | ----- | ----- | ----- | --- | ----- |
-| 01      | 0.1s | 0.3   | 0.23  | ... | 0.6   | 0.8   | 0.1   | ... | 0.2   |  |
-| 02      | 0.2s | 0.2   | ...   |     |
 
-broj redaka broj usera * uzoric vremena (epoha) = 3600
+Here, we will calculate the entropy (4) for every channel (30) for every epoch. In the research paper, they also did that but reduced number of entropies from (30 * 4) to (4) by doing a "a feature-level fusion"
+| user_id | time | PE_CH01 | PE_CH02 | ... | PE_CH30 | SE_CH01 | SE_CH02 | ... | FE_CH30 |
+| ------- | ---- | ----- | ----- | --- | ----- | ----- | ----- | --- | ----- |
+| 01      | 1s | 0.3   | 0.23  | ... | 0.6   | 0.8   | 0.1   | ... | 0.2   |  |
+| 01      | 2s | 0.2   | ...   |     |
+
+broj redaka broj usera * uzoric vremena (epoha) = 3600 # testiranje
+
+
 
 
 
