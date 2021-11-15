@@ -10,3 +10,4 @@ tqdm
 PyQt5
 EntropyHub
 ipykernel
+antropy
