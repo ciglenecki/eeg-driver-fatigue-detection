@@ -1,6 +1,6 @@
 
 from mne.epochs import Epochs
-from unzip_data import unzip_data
+from preprocess_unzip_data import unzip_data
 from mne import make_fixed_length_epochs
 import argparse
 from time import time
@@ -22,11 +22,12 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 import sys
-from paths import *
-from env import *
-from utils import *
-from entropy import *
 from datetime import datetime
+
+from utils_paths import *
+from utils_env import *
+from utils_functions import *
+from utils_entropy import *
 
 set_option('display.max_columns', None)
 warnings.filterwarnings('ignore')
@@ -89,9 +90,6 @@ user_state_pairs = [(i_user, state) for i_user in range(
 
 arr_users = []
 entropy_order = ["PE", "AE", "SE", "FE"]
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode)
-                                  for entropy in entropy_order for electrode in elect_cols]
-
 
 for pair in user_state_pairs:
     print(pair)
@@ -113,7 +111,7 @@ for pair in user_state_pairs:
         df_electrodes = df_epoch[elect_cols]
 
         df_spectral_entropy = df_electrodes.apply(
-            func=lambda x: pd_spectral_entropy(x, standardize_input=True), axis=0)  # type: ignore
+            func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)  # type: ignore
         df_approximate_entropy = df_electrodes.apply(
             func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)  # type: ignore
         df_sample_entropy = df_electrodes.apply(
@@ -132,11 +130,12 @@ for pair in user_state_pairs:
         arr_users.append([label, *df_dict[entropy_order[0]], *df_dict[entropy_order[1]],
                          *df_dict[entropy_order[2]], *df_dict[entropy_order[3]]])
 
+entropy_electrode_combinations = ["{}_{}".format(entropy, electrode)
+                                  for entropy in entropy_order for electrode in elect_cols]
 
 columns = ["label"] + entropy_electrode_combinations
 df = DataFrame(arr_users, columns=columns)
-
-save_df_to_disk(df, is_complete_itteration)
+save_df_to_disk(df, is_complete_itteration, PATH_DATA_PCKL)
 
 
 def clean_df(df: DataFrame):

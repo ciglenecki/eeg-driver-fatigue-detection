@@ -4,8 +4,8 @@ from math import floor
 from mne.io import read_raw_cnt
 from pathlib import Path
 
-from paths import *
-from env import *
+from utils_paths import *
+from utils_env import *
 
 filename = str(Path(PATH_DATA_CNT, "2_fatigue.cnt"))
 eeg = read_raw_cnt(filename, verbose=False)

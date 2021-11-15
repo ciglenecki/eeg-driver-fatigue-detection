@@ -2,8 +2,7 @@ import antropy as an
 import EntropyHub as eh
 import numpy as np
 from pandas import Series
-from env import *
-from utils import *
+from utils_functions import *
 
 
 def fuzzy_entropy(x): return eh.FuzzEn(
@@ -14,8 +13,8 @@ def sample_entropy(x): return an.sample_entropy(x)
 
 
 # don't normalize because you have to normalze across all users and not based on 1 user and 1 sample
-def spectral_entropy(x): return an.spectral_entropy(
-    x, sf=FREQ, normalize=False)
+def spectral_entropy(x, freq: float): return an.spectral_entropy(
+    x, sf=freq, normalize=False)
 
 
 def approximate_entropy(x): return an.app_entropy(x, order=2)
@@ -37,12 +36,12 @@ def pd_sample_entropy(x: Series, standardize_input=False) -> float:
     return sample_entropy(x_np)
 
 
-def pd_spectral_entropy(x: Series, standardize_input=False) -> float:
+def pd_spectral_entropy(x: Series, freq: float, standardize_input=False) -> float:
     # standardization doesnt affect result!
     x_np = x.to_numpy()
     if standardize_input:
         x_np = standard_scaler_1d(x_np)
-    return spectral_entropy(x_np)
+    return spectral_entropy(x_np, freq)
 
 
 def pd_approximate_entropy(x: Series, standardize_input=False) -> float:

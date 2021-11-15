@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import TypeVar
 from sklearn import preprocessing
 from pandas import DataFrame
@@ -73,7 +74,7 @@ def glimpse_df(df: DataFrame):
     display(df.describe())
 
 
-def save_df_to_disk(df: DataFrame, is_complete_itteration: bool):
+def save_df_to_disk(df: DataFrame, is_complete_itteration: bool, dir: Path):
     df_filename = "main-" + datetime.today().strftime("%Y-%m-%d-%H-%M-%S") + \
         ".pkl" if is_complete_itteration else "tmp.pkl"
-    df.to_pickle(df_filename)
+    df.to_pickle(str(Path(dir, df_filename)))

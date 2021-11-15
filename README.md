@@ -1,15 +1,21 @@
 # Driver fatigue detection through multiple entropy fusion analysis in an EEG-based system
 
 <p align="center">
-	<img src="./image.png"/>
-	<p align="center">Paper: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</p>
+	<img src="./pics/header_image.png"/>
+	<a align="center" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756">Paper: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</a>
 </p>
+
+# Requirements
+
+[requirements.txt](requirements.txt)
+
 
 # Notes:
 
-1 Many channels are flatlined during the driving process and they spike only in some moments
-
+1. Many channels are flatlined during the driving process and they spike only in some moments
 2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
+3. `ipython kernel install --user --name=eeg` to use venv
+
 
 # Todo:
 
@@ -41,11 +47,7 @@ Optional:
 - [ ] Visualize weight-based topographies for each subject
 - [ ] Visualize weight-based topographies average
 
-# Requirements
 
-[requirements.txt](requirements.txt)
-
-`ipython kernel install --user --name=eeg` to use venv
 
 # Questions:
 

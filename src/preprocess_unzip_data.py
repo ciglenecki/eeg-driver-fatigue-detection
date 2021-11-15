@@ -1,5 +1,5 @@
 from zipfile import ZipFile
-from paths import *
+from utils_paths import *
 from pathlib import Path
 import os
 
