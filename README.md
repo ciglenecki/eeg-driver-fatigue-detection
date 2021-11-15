@@ -7,23 +7,27 @@
 
 # Notes:
 
-Many channels are flatlined during the driving process and they spike only in some moments
+1 Many channels are flatlined during the driving process and they spike only in some moments
+
+2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
 
 # Todo:
 
-- [ ] Load entropy and signals for all users
-- [ ] Normalize across all participans and not single one
-- [ ] Split the dataset (train/test 50:50)
+### Signal:
+- [x] Apply filters to remove noise
+	- [x] notch filter 
+	- [x] band pass 0.15Hz to 40Hz ?
+- [x] Load signal for all users
+- [x] Epoch the signal using the window of 1 second
+- [x] Calculate 4 different entropies for each 1 second epoch
+
+### Df: 
+- [x] Concatenate features into a final dataFrame
+- [x] Normalize across all participans and not single one
+- [x] Split the dataset (train/test 50:50)
 	- use `is_normal_state_mask` you already created
-- [ ] Remove entropy outliers
-- [ ] Apply filters to remove noise
-	- [ ] notch filter 
-	- [ ] band pass 0.15Hz to 40Hz ?
-- [ ] Epoch the signal using the window of 1 second
-- [ ] Calculate 4 different entropies for each 1 second epoch
-- [ ] Time window!? Timestamp can't be a feature
-- [ ] Compare entropies with entropies from the paper
-- [ ] Concatenate features into a final dataFrame
+<!-- - [ ] Remove entropy outliers -->
+### Train:
 - [ ] Train the dataset with (SVM, BP, KNN, RF)
 - [ ] Validate accuracy using testing set
 - [ ] Use cross-validation to get better results
@@ -32,6 +36,7 @@ Many channels are flatlined during the driving process and they spike only in so
 - [ ] Repeat training with significant electrodes
 
 Optional:
+- [ ] Compare entropies with entropies from the paper
 - [ ] Visualize training/testing error
 - [ ] Visualize weight-based topographies for each subject
 - [ ] Visualize weight-based topographies average
@@ -71,14 +76,24 @@ How do I organize the final dataFrame. What are columns / rows?
 
 Here, we will calculate the entropy (4) for every channel (30) for every epoch. In the research paper, they also did that but reduced number of entropies from (30 * 4) to (4) by doing a "a feature-level fusion"
 | user_id | time | PE_CH01 | PE_CH02 | ... | PE_CH30 | SE_CH01 | SE_CH02 | ... | FE_CH30 |
-| ------- | ---- | ----- | ----- | --- | ----- | ----- | ----- | --- | ----- |
-| 01      | 1s | 0.3   | 0.23  | ... | 0.6   | 0.8   | 0.1   | ... | 0.2   |  |
-| 01      | 2s | 0.2   | ...   |     |
+| ------- | ---- | ------- | ------- | --- | ------- | ------- | ------- | --- | ------- |
+| 01      | 1s   | 0.3     | 0.23    | ... | 0.6     | 0.8     | 0.1     | ... | 0.2     |
+| 01      | 2s   | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
+| ...     | ...  | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
+| 01      | 300s | 0.6     | 0.3     | ... | 0.1     | 0.2     | 0.5     | ... | 0.1     |
+| 02      | 1s   | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
+| ...     | ...  | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
 
-broj redaka broj usera * uzoric vremena (epoha) = 3600 # testiranje
+Number of rows: 
 
+```
+users (12) * epochs (300) * states (2) = 7200
+```
 
-
+Number of columns:
+```
+label (1) + entropies (4) * channels (30) = 121
+```
 
 
 
