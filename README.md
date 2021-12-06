@@ -36,7 +36,12 @@
 	- use `is_normal_state_mask` you already created
 <!-- - [ ] Remove entropy outliers -->
 ### Train:
-- [ ] Train the dataset with (SVM, BP, KNN, RF)
+- [ ] Create interface for training. Each model should use GridSearchCV and save the best f1 score model
+- [ ] Train the dataset with:
+	- [ ] SVM + Grid
+	- [ ] Neural network (BP) + Grid
+	- [ ] KNN + Grid
+	- [ ] Random Forest (RF)+ Grid
 - [ ] Validate accuracy using testing set
 - [ ] Use cross-validation to get better results
 - [ ] Determine significant electrodes

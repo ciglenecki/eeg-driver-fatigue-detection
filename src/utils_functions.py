@@ -1,12 +1,12 @@
-from pathlib import Path
+from itertools import chain, combinations
 from typing import TypeVar
 from sklearn import preprocessing
 from pandas import DataFrame
 from IPython.display import display
 from typing import Dict
 import numpy as np
-from datetime import datetime
-T = TypeVar('T')
+
+T = TypeVar("T")
 
 
 def dict_apply_procedture(old_dict: Dict[str, T], procedure) -> Dict[str, T]:
@@ -24,15 +24,15 @@ def standard_scale_dataframe(df: DataFrame):
 standard_scaler = preprocessing.StandardScaler().fit_transform
 
 
-def standard_scaler_1d(x: np.ndarray) -> np.ndarray: return standard_scaler(
-    x.reshape(-1, 1)).reshape(1, -1).squeeze()
+def standard_scaler_1d(x: np.ndarray) -> np.ndarray:
+    return standard_scaler(x.reshape(-1, 1)).reshape(1, -1).squeeze()
 
 
 min_max_scaler = preprocessing.MinMaxScaler((-1, 1)).fit_transform
 
 
-def min_max_scaler_1d(x): return min_max_scaler(
-    x.reshape(-1, 1)).reshape(1, -1).squeeze()
+def min_max_scaler_1d(x):
+    return min_max_scaler(x.reshape(-1, 1)).reshape(1, -1).squeeze()
 
 
 # Null and NaN are the same in Pandas :)
@@ -60,7 +60,8 @@ def get_tmin_tmax(start, duration, end_cutoff):
     return (start - end_cutoff, start + duration - end_cutoff)
 
 
-def to_numpy_reshape(x): return DataFrame.to_numpy(x).reshape(-1, 1)
+def to_numpy_reshape(x):
+    return DataFrame.to_numpy(x).reshape(-1, 1)
 
 
 def get_cnt_filename(i_user: int, state: str):
@@ -68,13 +69,40 @@ def get_cnt_filename(i_user: int, state: str):
 
 
 def glimpse_df(df: DataFrame):
+    display(df.describe())
     display(df.head(n=3))
     display(df.tail(n=3))
     display(df.sample(n=3))
-    display(df.describe())
 
 
-def save_df_to_disk(df: DataFrame, is_complete_itteration: bool, dir: Path):
-    df_filename = "main-" + datetime.today().strftime("%Y-%m-%d-%H-%M-%S") + \
-        ".pkl" if is_complete_itteration else "tmp.pkl"
-    df.to_pickle(str(Path(dir, df_filename)))
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
+
+
+# {a: 3, b: {c: 3, d: 4}}
+# [[a,3], [c,3], [d,4]]
+def get_dictionary_leaves(dictionary: dict):
+    def get_leaves(pair):
+        key, value = pair
+        if type(value) is dict:
+            return get_dictionary_leaves(value)
+        return [[key, value]]
+
+    result = []
+    for pair in dictionary.items():
+        result.extend(get_leaves(pair))
+    return result
+
+
+def dict_to_byte_metadata(dictionary: dict):
+    # a 3, b 2, c testtest
+    pairs = get_dictionary_leaves(dictionary)
+    return ",".join(map(lambda key_value: " ".join([str(key_value[0]), str(key_value[1])]), pairs)).encode()
+
+
+def dict_to_string(dictionary: dict):
+    # accuracy=73___method=net
+    pairs = get_dictionary_leaves(dictionary)
+    return "__".join(map(lambda key_value: "=".join([str(key_value[0]), str(key_value[1])]), pairs))
