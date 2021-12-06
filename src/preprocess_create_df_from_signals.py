@@ -99,32 +99,26 @@ arr_users = []
 for pair in user_state_pairs:
     print(pair)
     i_user, state = pair
-    filename = str(Path(PATH_DATA_CNT, get_cnt_filename(i_user + 1, state)))
-    epochs = get_epochs_from_signal(filename)
+
+    filename_user_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(i_user + 1, state)))
+    epochs = get_epochs_from_signal(filename_user_signal)
     df = get_df_from_epochs(epochs, state)
     label = 1 if state == FATIGUE_STR else 0
 
     for i_poch in range(0, signal_requested_seconds):
         # filter rows for current epoch
-        # calculate all entropies for all electrodes
-        # store them in a dictionary so they can be ordered correctly
-        # return list with label + ordered entropies
 
         df_dict = {}
         df_epoch = df.loc[df["epoch"] == i_poch].head(epoch_elems)
         df_electrodes = df_epoch[elect_cols]
 
-        df_spectral_entropy = df_electrodes.apply(
-            func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True),
-            axis=0,
-        )  # type: ignore
-        df_approximate_entropy = df_electrodes.apply(
-            func=lambda x: pd_approximate_entropy(x, standardize_input=True),
-            axis=0,
-        )  # type: ignore
-        df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)  # type: ignore
-        df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)  # type: ignore
+        # calculate all entropies for all electrodes
+        df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
+        df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
+        df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
+        df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
 
+        # store entropies in a dictionary so they can be ordered correctly by using the ENTROPIES array
         df_dict = {
             "PE": df_spectral_entropy,
             "AE": df_approximate_entropy,
@@ -132,6 +126,7 @@ for pair in user_state_pairs:
             "FE": df_fuzzy_entropy,
         }
 
+        # return list that contains the label and properly ordered entropies
         # [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
         arr_users.append(
             [

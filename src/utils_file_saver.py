@@ -15,7 +15,7 @@ def save_model(model, model_name, score, directory: Path, metadata={}, prefix=""
     timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
     metadata_string = dict_to_string(metadata)
 
-    name = "{model_name}{score:.4f}{prefix}{timestamp}{metadata}".format(model_name=model_name, prefix=prefix, score=score, timestamp=timestamp, metadata=metadata_string)
+    name = "{model_name}_{score:.4f}_{prefix}_{timestamp}_{metadata}".format(model_name=model_name, prefix=prefix, score=score, timestamp=timestamp, metadata=metadata_string).lower()
 
     filename = Path(directory, name)
     dump(pickle.dumps(model), filename)

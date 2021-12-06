@@ -4,12 +4,12 @@ import scipy.io
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from utils_paths import PATH_DATA_MAT
+from utils_paths import PATH_DATASET_MAT
 
 from utils_entropy import dict_apply_procedture, isnull_values_any
 from utils_functions import min_max_dataframe, standard_scale_dataframe
 
-mat = scipy.io.loadmat(Path(PATH_DATA_MAT, "1.mat"))
+mat = scipy.io.loadmat(Path(PATH_DATASET_MAT, "1.mat"))
 keys = [key for key in mat.keys() if not key.startswith("__")]
 
 [print(key, "with shape", mat[key].shape) for key in keys]

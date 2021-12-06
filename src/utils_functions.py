@@ -35,8 +35,8 @@ def min_max_scaler_1d(x):
     return min_max_scaler(x.reshape(-1, 1)).reshape(1, -1).squeeze()
 
 
-# Null and NaN are the same in Pandas :)
 def isnull_any(df):
+    # Null and NaN are the same in Pandas :)
     return df.isnull().any()
 
 
@@ -76,14 +76,16 @@ def glimpse_df(df: DataFrame):
 
 
 def powerset(iterable):
-    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    "[1,2,3] --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
 
 
-# {a: 3, b: {c: 3, d: 4}}
-# [[a,3], [c,3], [d,4]]
 def get_dictionary_leaves(dictionary: dict):
+    """
+    {a: 3, b: {c: 3, d: 4}} --> [[a,3], [c,3], [d,4]]
+    """
+
     def get_leaves(pair):
         key, value = pair
         if type(value) is dict:
@@ -97,12 +99,16 @@ def get_dictionary_leaves(dictionary: dict):
 
 
 def dict_to_byte_metadata(dictionary: dict):
-    # a 3, b 2, c testtest
+    """
+    {a:3, b:2, c:test} ---> "a 3, b 2, c test"
+    """
     pairs = get_dictionary_leaves(dictionary)
     return ",".join(map(lambda key_value: " ".join([str(key_value[0]), str(key_value[1])]), pairs)).encode()
 
 
 def dict_to_string(dictionary: dict):
-    # accuracy=73___method=net
+    """
+    {accuracy: 73, method: "net} ---> "accuracy=73___method=net"
+    """
     pairs = get_dictionary_leaves(dictionary)
     return "__".join(map(lambda key_value: "=".join([str(key_value[0]), str(key_value[1])]), pairs))
