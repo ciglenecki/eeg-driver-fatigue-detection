@@ -26,8 +26,7 @@ def save_model(model, model_name, score, directory: Path, metadata={}, prefix=""
 
 
 def save_df_to_disk(df: DataFrame, metadata: dict, dir: Path, name: str):
-    prefix = "full" if metadata["is_full_iter"] else "partial"
-    del metadata["is_full_iter"]
+    prefix = ""
 
     timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
     metadata_str = dict_to_string(metadata)

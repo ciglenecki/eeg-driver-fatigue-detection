@@ -19,27 +19,26 @@ set_option("display.max_columns", None)
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser(description="Process arguments")
-parser.add_argument("--users", metavar="N", type=int, help="Number of users that will be used (<= 12)")
-parser.add_argument("--electrodes", metavar="N", type=int, nargs=2, help="Range of electrodes that will be used (N <= 30)")
-parser.add_argument("--sig", metavar="N", type=int, help="Duration of signal (<= 300)")
-parser.add_argument("--epoch-elems", metavar="N", type=int, help="Duration of signal (<= 1000)")
-parser.add_argument("--unzip", metavar="N", type=bool, help="True/False")
-parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Precaculated entropy dataframe (the one that isn't cleaned and normalized)")
+parser.add_argument("--users", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
+parser.add_argument("--electrodes", metavar="N", type=int, nargs=2, help="Range of electrodes that will be used (0 >= N1 <= 30, N1 <= N2 <= 30)")
+parser.add_argument("--sig", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
+parser.add_argument("--epoch-elems", metavar="N", type=int, help="Reduce (cut off) epoch duration to N miliseconds (1 >= N <= 1000)")
+parser.add_argument("--unzip", metavar="N", type=bool, help="Unzip the dataset from zips (True/False)")
+parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precaculated entropy dataframe (the one that isn't cleaned and normalized)")
 args = parser.parse_args()
 
-
-is_full_iter = not any([args.users, args.electrodes, args.sig, args.epoch_elems])
+is_complete_train = not any([args.users, args.electrodes, args.sig, args.epoch_elems])
 user_count = args.users if (args.users) else USER_COUNT
 signal_requested_seconds = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS
+epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
 if args.electrodes:
     subset = elect_cols[args.electrodes[0] : args.electrodes[1]]
     elect_cols_ignore = [electrode for electrode in elect_cols if electrode not in subset]
     elect_cols = subset
 
-epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
 
 pickle_metadata = {
-    "is_full_iter": is_full_iter,
+    "is_complete_train": is_complete_train,
     "user_count": user_count,
     "sig_seconds": signal_requested_seconds,
     "electrodes_ignored": elect_cols_ignore,
@@ -71,7 +70,7 @@ def get_epochs_from_signal(filename: str):
     return make_fixed_length_epochs(eeg, duration=EPOCH_SECONDS, preload=False, verbose=False)
 
 
-def get_df_from_epochs(epochs: Epochs, state: str):
+def get_df_from_epochs(epochs: Epochs):
     df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1, mag=1, grad=1))
     df = df.drop(["time", "condition", *elect_cols_ignore], axis=1)
     return df
@@ -81,8 +80,9 @@ def normalize_df(df: DataFrame, columns_to_scale: list):
     # set to 0 if treshold is met
     # NaN entropies can be set to zero
     # standard scaler scales for each column independently
-    threshold = 1e-6
-    df[df < threshold] = 0
+
+    # threshold = 1e-6
+    # df[df < threshold] = 0
     df[df <= 0] = 0
     df = df.fillna(0)
     df[columns_to_scale] = min_max_scaler(df[columns_to_scale])
@@ -95,19 +95,18 @@ if args.df_checkpoint:
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
-arr_users = []
+rows = []
 for pair in user_state_pairs:
     print(pair)
     i_user, state = pair
 
     filename_user_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(i_user + 1, state)))
     epochs = get_epochs_from_signal(filename_user_signal)
-    df = get_df_from_epochs(epochs, state)
+    df = get_df_from_epochs(epochs)
     label = 1 if state == FATIGUE_STR else 0
 
     for i_poch in range(0, signal_requested_seconds):
         # filter rows for current epoch
-
         df_dict = {}
         df_epoch = df.loc[df["epoch"] == i_poch].head(epoch_elems)
         df_electrodes = df_epoch[elect_cols]
@@ -128,7 +127,7 @@ for pair in user_state_pairs:
 
         # return list that contains the label and properly ordered entropies
         # [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
-        arr_users.append(
+        rows.append(
             [
                 label,
                 *df_dict[ENTROPIES[0]],
@@ -140,10 +139,13 @@ for pair in user_state_pairs:
 
 
 columns = ["label"] + entropy_electrode_combinations
-df = DataFrame(arr_users, columns=columns)
+df = DataFrame(rows, columns=columns)
 df["label"] = df["label"].astype(int)
 
 # save both raw and normalized
+file_path = Path(PATH_DATA_DATAFRAME, "raw")
+df.to_pickle(str(file_path))
+
 save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, "raw")
 df = normalize_df(df, entropy_electrode_combinations)
 glimpse_df(df)

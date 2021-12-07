@@ -70,15 +70,21 @@ def get_cnt_filename(i_user: int, state: str):
 
 def glimpse_df(df: DataFrame):
     display(df.describe())
+
+    print("\nShowing first 3 data points\n")
     display(df.head(n=3))
+
+    print("\nShowing last 3 data points\n")
     display(df.tail(n=3))
+
+    print("\nShowing 3 radnom data points\n")
     display(df.sample(n=3))
 
 
 def powerset(iterable):
     "[1,2,3] --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(1, len(s) + 1))
+    return chain.from_iterable(combinations(s, r) for r in range(0, len(s) + 1))
 
 
 def get_dictionary_leaves(dictionary: dict):
