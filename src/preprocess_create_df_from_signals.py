@@ -1,3 +1,4 @@
+import mne
 from mne.epochs import Epochs
 from preprocess_unzip_data import unzip_data
 from mne import make_fixed_length_epochs
@@ -18,37 +19,30 @@ from utils_entropy import *
 set_option("display.max_columns", None)
 warnings.filterwarnings("ignore")
 
-parser = argparse.ArgumentParser(description="Process arguments")
+parser = argparse.ArgumentParser()
 parser.add_argument("--users", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
-parser.add_argument("--electrodes", metavar="N", type=int, nargs=2, help="Range of electrodes that will be used (0 >= N1 <= 30, N1 <= N2 <= 30)")
 parser.add_argument("--sig", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
 parser.add_argument("--epoch-elems", metavar="N", type=int, help="Reduce (cut off) epoch duration to N miliseconds (1 >= N <= 1000)")
 parser.add_argument("--unzip", metavar="N", type=bool, help="Unzip the dataset from zips (True/False)")
 parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precaculated entropy dataframe (the one that isn't cleaned and normalized)")
 args = parser.parse_args()
 
-is_complete_train = not any([args.users, args.electrodes, args.sig, args.epoch_elems])
+is_complete_train = not any([args.users, args.sig, args.epoch_elems])
 user_count = args.users if (args.users) else USER_COUNT
-signal_requested_seconds = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS
+signal_duration_target_s = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS
 epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
-if args.electrodes:
-    subset = elect_cols[args.electrodes[0] : args.electrodes[1]]
-    elect_cols_ignore = [electrode for electrode in elect_cols if electrode not in subset]
-    elect_cols = subset
-
 
 pickle_metadata = {
     "is_complete_train": is_complete_train,
     "user_count": user_count,
-    "sig_seconds": signal_requested_seconds,
-    "electrodes_ignored": elect_cols_ignore,
+    "sig_seconds": signal_duration_target_s,
     "epoch_elems": epoch_elems,
 }
 
 
 # {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
 user_state_pairs = [(i_user, state) for i_user in range(0, user_count) for state in [NORMAL_STR, FATIGUE_STR]]
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in ENTROPIES for electrode in elect_cols]
+entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in ENTROPIES for electrode in elect_good]
 
 
 if args.unzip:
@@ -56,23 +50,27 @@ if args.unzip:
 
 
 def get_epochs_from_signal(filename: str):
-    eeg = read_raw_cnt(
-        filename,
-        eog=["HEOL", "HEOR", "VEOU", "VEOL"],
-        preload=True,
-        verbose=False,
-    )
-    eeg_filtered = eeg.notch_filter(50).filter(l_freq=0.15, h_freq=40)
-    signal_seconds_floored = floor(len(eeg_filtered) / FREQ)
-    tmin = signal_seconds_floored - signal_requested_seconds - SAFETY_CUTOFF_SECONDS
-    tmax = signal_seconds_floored - SAFETY_CUTOFF_SECONDS
-    eeg_filtered = eeg_filtered.crop(tmin=tmin, tmax=tmax)
-    return make_fixed_length_epochs(eeg, duration=EPOCH_SECONDS, preload=False, verbose=False)
+
+    # eeg = read_raw_cnt(filename, eog=["HEOL", "HEOR", "VEOU", "VEOL"], preload=True, verbose=False)
+    # when comparing with and without eog, it changed data dramatically? this is what allowed me to sync data with S
+    eeg = read_raw_cnt(filename, preload=True, verbose=False)
+
+    # Exclude bad channels
+    eeg.info["bads"].extend(elect_bad)
+    eeg.pick_channels(elect_good)
+
+    # Crop and filter the data
+    signal_duration_s = floor(len(eeg) / FREQ)
+    tmin = signal_duration_s - signal_duration_target_s + signal_offset_s
+    tmax = signal_duration_s + signal_offset_s
+    eeg_filtered = eeg.crop(tmin=tmin, tmax=tmax).notch_filter(50).filter(l_freq=0.15, h_freq=40)
+
+    return make_fixed_length_epochs(eeg_filtered, duration=EPOCH_SECONDS, preload=True, verbose=False)
 
 
 def get_df_from_epochs(epochs: Epochs):
-    df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1, mag=1, grad=1))
-    df = df.drop(["time", "condition", *elect_cols_ignore], axis=1)
+    df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1))
+    df = df.drop(["time", "condition", *elect_ignore], axis=1)
     return df
 
 
@@ -103,16 +101,17 @@ for pair in user_state_pairs:
     filename_user_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(i_user + 1, state)))
     epochs = get_epochs_from_signal(filename_user_signal)
     df = get_df_from_epochs(epochs)
+
     label = 1 if state == FATIGUE_STR else 0
 
-    for i_poch in range(0, signal_requested_seconds):
+    for i_poch in range(0, signal_duration_target_s):
         # filter rows for current epoch
         df_dict = {}
         df_epoch = df.loc[df["epoch"] == i_poch].head(epoch_elems)
-        df_electrodes = df_epoch[elect_cols]
+        df_electrodes = df_epoch[elect_good]
 
         # calculate all entropies for all electrodes
-        df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
+        df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=False), axis=0)
         df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
         df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
         df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)

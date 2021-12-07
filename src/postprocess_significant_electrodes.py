@@ -4,53 +4,49 @@ import warnings
 from IPython.core.display import display
 from pandas import read_pickle
 from pandas._config.config import set_option
-from pandas.core.frame import DataFrame
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 import pickle
 from joblib import dump, load
-from utils_file_saver import save_model
-from utils_functions import glimpse_df, powerset, min_max_scaler
+from utils_file_saver import load_model, save_model
+from utils_functions import glimpse_df, powerset
 from utils_paths import PATH_DATA_MODEL
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
+
+
+"""
+get trained model
+get dataset
+refit model
+itterate over the electrode pairs and caculate acc
+"""
 
 set_option("display.max_columns", None)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
+parser.add_argument("--model", metavar="file", required=True, type=str, help="Model used for caclulating the accuracy")
 args = parser.parse_args()
 
 
-def normalize_df(df: DataFrame, columns_to_scale: list):
-    # set to 0 if treshold is met
-    # NaN entropies can be set to zero
-    # standard scaler scales for each column independently
+model: SVC = load_model(args.model).best_estimator_
+df = read_pickle(args.df)
+df["label"] = df["label"].astype(int)
 
-    # threshold = 1e-6
-    # df[df < threshold] = 0
-    df[df <= 0] = 0
-    df = df.fillna(0)
-    df[columns_to_scale] = min_max_scaler(df[columns_to_scale])
-    return df
-
-
-### Load dataframe
-df_org = read_pickle(args.df)
-df = normalize_df(df_org.loc[:, ~df_org.columns.isin(["label"])])
-df["label"] = df_org["label"].astype(int)
 
 ### Split to X Y train test
 X = df.loc[:, ~df.columns.isin(["label"])]
 y = df.loc[:, "label"]
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+### Hyperparameters are optimized in previous fitting
+model.fit(X_train, y_train)
 
-
-# scorings = ["accuracy", "f1"]
 scorings = ["accuracy"]
-models = [model_rfc, model_mlp, model_knn, model_svc]
+
 for pair in product(scorings, models):
     scoring, model = pair
 

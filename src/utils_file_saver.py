@@ -2,9 +2,10 @@ from datetime import datetime
 import os
 from pathlib import Path
 import pickle
-from joblib import dump
+from joblib import dump, load
 from pandas.core.frame import DataFrame
 from utils_functions import dict_to_byte_metadata, dict_to_string
+from sklearn.model_selection import GridSearchCV
 
 # show additional data in file explorer
 METADATA_FIELD_TAGS = "user.xdg.tags"
@@ -23,6 +24,10 @@ def save_model(model, model_name, score, directory: Path, metadata={}, prefix=""
 
     print("Model {} with score {} was saved.".format(model_name, score))
     print(filename)
+
+
+def load_model(path: Path) -> GridSearchCV:
+    return pickle.loads(load(path))
 
 
 def save_df_to_disk(df: DataFrame, metadata: dict, dir: Path, name: str):

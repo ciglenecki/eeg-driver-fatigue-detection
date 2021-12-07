@@ -19,8 +19,8 @@ from model import model_rfc, model_mlp, model_svc, model_knn
 
 set_option("display.max_columns", None)
 
-parser = argparse.ArgumentParser(description="Process some integers.")
-parser.add_argument("--df", metavar="df", required=True, type=str, help="Dataframe file used for training")
+parser = argparse.ArgumentParser()
+parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 args = parser.parse_args()
 
 

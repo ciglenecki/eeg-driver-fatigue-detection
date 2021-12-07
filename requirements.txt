@@ -1,6 +1,6 @@
 ipykernel
 scipy
-numpy
+numpy==1.20.3
 mne
 pandas
 matplotlib
