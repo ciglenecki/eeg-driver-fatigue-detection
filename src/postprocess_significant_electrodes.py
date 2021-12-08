@@ -15,7 +15,7 @@ from utils_functions import glimpse_df, powerset
 from utils_paths import PATH_DATA_MODEL
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
-from utils_env import elect_good
+from utils_env import channels_good
 from itertools import combinations
 
 """
@@ -48,10 +48,10 @@ X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.90
 ### Fit again to avoid prediction on seen data
 model.scoring = "accuracy"
 
-elect_pairs = list(combinations(elect_good, 2))
+channels_pairs = list(combinations(channels_good, 2))
 channel_acc = {}
 
-for e in elect_good:
+for e in channels_good:
 
     X_train = X_train_org.loc[:, X_train_org.columns.str.contains(e)]
     X_test = X_test_org.loc[:, X_test_org.columns.str.contains(e)]
@@ -62,24 +62,24 @@ for e in elect_good:
 
 print(channel_acc)
 channel_weights = []
-for i, elect_i in enumerate(elect_good):
-    print("Dual progress", i / len(elect_good) * 100, "%")
+for i, channels_i in enumerate(channels_good):
+    print("Dual progress", i / len(channels_good) * 100, "%")
     acc_dual = 0
-    for elect_j in elect_good:
-        if elect_j == elect_i:
+    for channels_j in channels_good:
+        if channels_j == channels_i:
             break
 
-        X_train = X_train_org.loc[:, X_train_org.columns.str.contains("|".join([elect_i, elect_j]))]
-        X_test = X_test_org.loc[:, X_test_org.columns.str.contains("|".join([elect_i, elect_j]))]
+        X_train = X_train_org.loc[:, X_train_org.columns.str.contains("|".join([channels_i, channels_j]))]
+        X_test = X_test_org.loc[:, X_test_org.columns.str.contains("|".join([channels_i, channels_j]))]
 
         model.fit(X_train, y_train)
         y_test_pred = model.predict(X_test)
         acc_ij = accuracy_score(y_test, y_test_pred)
-        acc_dual += acc_ij + channel_acc[elect_i] - channel_acc[elect_j]
+        acc_dual += acc_ij + channel_acc[channels_i] - channel_acc[channels_j]
 
-    weight = (channel_acc[elect_i] + acc_dual) / len(elect_good)
-    channel_weights.append([elect_i, weight])
-    print(elect_i, weight)
+    weight = (channel_acc[channels_i] + acc_dual) / len(channels_good)
+    channel_weights.append([channels_i, weight])
+    print(channels_i, weight)
 
 channel_weights = sorted(channel_weights, key=lambda x: x[1], reverse=True)
 print(channel_weights)

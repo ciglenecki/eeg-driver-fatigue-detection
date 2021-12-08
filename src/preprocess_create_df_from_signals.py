@@ -39,7 +39,7 @@ pickle_metadata = {
 }
 
 
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in elect_good]
+entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in channels_good]
 
 
 def signal_to_epochs(filename: str):
@@ -56,8 +56,8 @@ def signal_to_epochs(filename: str):
     """
 
     eeg = read_raw_cnt(filename, preload=True, verbose=False)
-    eeg.info["bads"].extend(elect_bad)
-    eeg.pick_channels(elect_good)
+    eeg.info["bads"].extend(channels_bad)
+    eeg.pick_channels(channels_good)
 
     signal_total_duration = floor(len(eeg) / FREQ)
     start = signal_total_duration - signal_duration + signal_offset
@@ -73,7 +73,7 @@ def epochs_to_dataframe(epochs: Epochs):
     Useless columns are excluded.
     """
     df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1))
-    df = df.drop(["time", "condition", *elect_ignore, *elect_bad], axis=1)
+    df = df.drop(["time", "condition", *channels_ignore], axis=1)
     return df
 
 
@@ -98,7 +98,7 @@ if args.df_checkpoint:
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
-backup_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(elect_good)))
+backup_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(channels_good)))
 rows = []
 for user_id in range(0, num_users):
     for state in states:
@@ -121,7 +121,7 @@ for user_id in range(0, num_users):
 
             df_dict = {}
             df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
-            df_electrodes = df_epoch[elect_good]
+            df_electrodes = df_epoch[channels_good]
 
             df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
             df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)

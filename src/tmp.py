@@ -75,23 +75,23 @@ num_users = args.users if (args.users) else num_users
 signal_duration_target_s = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS_DEFAULT
 epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
 if args.electrodes:
-    subset = elect_all[args.electrodes[0] : args.electrodes[1]]
-    elect_ignore = [electrode for electrode in elect_all if electrode not in subset]
-    elect_all = subset
+    subset = channels_all[args.electrodes[0] : args.electrodes[1]]
+    channels_ignore = [electrode for electrode in channels_all if electrode not in subset]
+    channels_all = subset
 
 
 pickle_metadata = {
     "is_complete_train": is_complete_train,
     "num_users": num_users,
     "sig_seconds": signal_duration_target_s,
-    "electrodes_ignored": elect_ignore,
+    "electrodes_ignored": channels_ignore,
     "epoch_elems": epoch_elems,
 }
 
 
 # {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
 user_state_pairs = [(i_user, state) for i_user in range(0, num_users) for state in [NORMAL_STR, FATIGUE_STR]]
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in elect_all]
+entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in channels_all]
 
 
 if args.unzip:
@@ -120,7 +120,7 @@ def get_epochs_from_signal(filename: str):
 
 def get_df_from_epochs(epochs: Epochs):
     df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1, mag=1, grad=1))
-    df = df.drop(["time", "condition", *elect_ignore], axis=1)
+    df = df.drop(["time", "condition", *channels_ignore], axis=1)
     return df
 
 
@@ -169,7 +169,7 @@ for pair in user_state_pairs:
         # filter rows for current epoch
         df_dict = {}
         df_epoch = df.loc[df["epoch"] == i_poch].head(epoch_elems)
-        df_electrodes = df_epoch[elect_all]
+        df_electrodes = df_epoch[channels_all]
 
         # calculate all entropies for all electrodes
         df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
