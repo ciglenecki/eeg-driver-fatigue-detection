@@ -31,24 +31,28 @@ parser = argparse.ArgumentParser()
 # parser.add_argument("--model", metavar="model", required=True, type=str, help="Model")
 args = parser.parse_args()
 
-df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2021-12-08-09-48-01-.pkl")
 
-new_f = "/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-with-userid-2021-12-08-16-08-01-.pkl"
+print(np.load(Path(getcwd(), "TWO_ELECTRODE_SVM_ACCURACY_SCORE.npy"), allow_pickle=True))
 
 
-df["user_id"] = pd.Series(np.array([-1] * 7200))
-print(df["user_id"])
+# df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2021-12-08-09-48-01-.pkl")
+
+# new_f = "/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-with-userid-2021-12-08-16-08-01-.pkl"
+
+
+# df["user_id"] = pd.Series(np.array([-1] * 7200))
+# print(df["user_id"])
+# # glimpse_df(df)
+
+# # print(Path(getcwd(), args.model))
+
+# for i, user_index in enumerate(list(range(0, 7200, 600))):
+#     start = user_index
+#     end = user_index + 600
+#     print(start, end)
+#     df["user_id"][start:end] = i
+
+# save_df_to_disk(df, True, Path("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/datafram2es/"), "with_user_id", {})
 # glimpse_df(df)
 
-# print(Path(getcwd(), args.model))
-
-for i, user_index in enumerate(list(range(0, 7200, 600))):
-    start = user_index
-    end = user_index + 600
-    print(start, end)
-    df["user_id"][start:end] = i
-
-save_df_to_disk(df, True, Path("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/datafram2es/"), "with_user_id", {})
-glimpse_df(df)
-
-print(df.tail(n=7200 - 599).head(n=30))
+# print(df.tail(n=7200 - 599).head(n=30))

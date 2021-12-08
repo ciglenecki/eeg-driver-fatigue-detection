@@ -35,8 +35,9 @@ parser.add_argument("--mode", metavar="users/all", required=True, type=str, choi
 args = parser.parse_args()
 timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
 report_filename = Path(PATH_REPORT, "-".join(["significant-electrodes", args.mode, timestamp]) + ".txt")
+print(report_filename)
 stdout_to_file(report_filename)
-
+print("Results")
 model: SVC = load_model(args.svm).best_estimator_
 
 df = read_pickle(args.df)
@@ -45,8 +46,10 @@ y = df.loc[:, df.columns.isin(["label", "user_id"])]
 
 X_train_org, X_test_org, y_train_org, y_test_org = train_test_split(X, y, test_size=0.5, random_state=0)
 
+result = None
 if args.mode == "users":
-    caculate_mode_users(model, X_train_org, X_test_org, y_train_org, y_test_org, channels_good, num_users)
+    result = caculate_mode_users(model, X_train_org, X_test_org, y_train_org, y_test_org, channels_good, 1)
 else:
-    caculate_mode_all(model, X_train_org, X_test_org, y_train_org, y_test_org, channels_good)
+    result = caculate_mode_all(model, X_train_org, X_test_org, y_train_org, y_test_org, channels_good)
+print(result)
 sys.stdout.close()
