@@ -17,6 +17,7 @@ from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
 from utils_env import channels_good
 from itertools import combinations
+from tqdm import tqdm
 
 """
 get trained model
@@ -42,7 +43,7 @@ df["label"] = df["label"].astype(int)
 X = df.loc[:, ~df.columns.isin(["label"])]
 y = df.loc[:, "label"]
 
-X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.90, random_state=0)
+X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 ### Hyperparameters are optimized in previous fitting
 ### Fit again to avoid prediction on seen data
@@ -62,8 +63,7 @@ for e in channels_good:
 
 print(channel_acc)
 channel_weights = []
-for i, channels_i in enumerate(channels_good):
-    print("Dual progress", i / len(channels_good) * 100, "%")
+for i, channels_i in enumerate(tqdm(channels_good)):
     acc_dual = 0
     for channels_j in channels_good:
         if channels_j == channels_i:
@@ -79,7 +79,6 @@ for i, channels_i in enumerate(channels_good):
 
     weight = (channel_acc[channels_i] + acc_dual) / len(channels_good)
     channel_weights.append([channels_i, weight])
-    print(channels_i, weight)
 
 channel_weights = sorted(channel_weights, key=lambda x: x[1], reverse=True)
 print(channel_weights)

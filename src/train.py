@@ -16,6 +16,7 @@ from utils_functions import glimpse_df, powerset, min_max_scaler
 from utils_paths import PATH_DATA_MODEL
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
+from tqdm import tqdm
 
 set_option("display.max_columns", None)
 
@@ -23,32 +24,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 args = parser.parse_args()
 
-
-# def normalize_df(df: DataFrame, columns_to_scale: list):
-#     # set to 0 if treshold is met
-#     # NaN entropies can be set to zero
-#     # standard scaler scales for each column independently
-
-#     df[df <= 0] = 0
-#     df = df.fillna(0)
-#     df[columns_to_scale] = min_max_scaler(df[columns_to_scale])
-#     return df
-
-
-### Load dataframe
 df = read_pickle(args.df)
 glimpse_df(df)
-# df = normalize_df(df_org.loc[:, ~df_org.columns.isin(["label"])])
+
 df["label"] = df["label"].astype(int)
 
-### Split to X Y train test
 X = df.loc[:, ~df.columns.isin(["label"])]
+print(X.shape)
 y = df.loc[:, "label"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 
-# scorings = ["accuracy", "f1"]
-scorings = ["accuracy"]
+scorings = ["accuracy"]  # scorings = ["accuracy", "f1"]
 models = [model_rfc, model_mlp, model_knn, model_svc]
 for pair in product(scorings, models):
     scoring, model = pair
