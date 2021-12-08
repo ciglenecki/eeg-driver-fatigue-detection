@@ -31,13 +31,12 @@ def load_model(path: Path) -> GridSearchCV:
 
 
 def save_df_to_disk(df: DataFrame, metadata: dict, dir: Path, name: str):
-    prefix = ""
 
     timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
     metadata_str = dict_to_string(metadata)
     metadata_bytes = dict_to_byte_metadata(metadata)
 
-    df_filename = "-".join([prefix, name, timestamp, metadata_str + ".pkl"])
+    df_filename = "-".join([name, timestamp, metadata_str + ".pkl"])
 
     file_path = Path(dir, df_filename)
     df.to_pickle(str(file_path))

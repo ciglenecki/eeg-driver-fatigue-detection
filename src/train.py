@@ -29,8 +29,6 @@ def normalize_df(df: DataFrame, columns_to_scale: list):
     # NaN entropies can be set to zero
     # standard scaler scales for each column independently
 
-    # threshold = 1e-6
-    # df[df < threshold] = 0
     df[df <= 0] = 0
     df = df.fillna(0)
     df[columns_to_scale] = min_max_scaler(df[columns_to_scale])

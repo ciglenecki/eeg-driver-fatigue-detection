@@ -6,7 +6,7 @@ from pandas import read_pickle
 from pandas._config.config import set_option
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 from sklearn.svm import SVC
 import pickle
 from joblib import dump, load
@@ -15,7 +15,8 @@ from utils_functions import glimpse_df, powerset
 from utils_paths import PATH_DATA_MODEL
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
-
+from utils_env import elect_good
+from itertools import combinations
 
 """
 get trained model
@@ -28,11 +29,11 @@ set_option("display.max_columns", None)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
-parser.add_argument("--model", metavar="file", required=True, type=str, help="Model used for caclulating the accuracy")
+parser.add_argument("--svm", metavar="file", required=True, type=str, help="SVM model used for caclulating the accuracy")
 args = parser.parse_args()
 
 
-model: SVC = load_model(args.model).best_estimator_
+model: SVC = load_model(args.svm).best_estimator_
 df = read_pickle(args.df)
 df["label"] = df["label"].astype(int)
 
@@ -41,36 +42,44 @@ df["label"] = df["label"].astype(int)
 X = df.loc[:, ~df.columns.isin(["label"])]
 y = df.loc[:, "label"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.90, random_state=0)
+
 ### Hyperparameters are optimized in previous fitting
-model.fit(X_train, y_train)
+### Fit again to avoid prediction on seen data
+model.scoring = "accuracy"
 
-scorings = ["accuracy"]
+elect_pairs = list(combinations(elect_good, 2))
+channel_acc = {}
 
-for pair in product(scorings, models):
-    scoring, model = pair
+for e in elect_good:
 
-    model_name = type(model.estimator).__name__
-    model.scoring = scoring
+    X_train = X_train_org.loc[:, X_train_org.columns.str.contains(e)]
+    X_test = X_test_org.loc[:, X_test_org.columns.str.contains(e)]
+
     model.fit(X_train, y_train)
-    save_model(model=model, model_name=model_name, score=model.best_score_, directory=PATH_DATA_MODEL, metadata=model.best_params_)
+    y_test_pred = model.predict(X_test)
+    channel_acc[e] = accuracy_score(y_test, y_test_pred)
 
-    print("=== Best model {} with accuracy {} and parameters {}\n\n".format(model_name, model.best_score_, model.best_params_))
-    print("Grid scores on test set:\n")
-    means = model.cv_results_["mean_test_score"]
-    stds = model.cv_results_["std_test_score"]
-    for mean, std, params in sorted(zip(means, stds, model.cv_results_["params"]), key=lambda x: x[0]):
-        print("%0.6f (+/-%0.6f) for %r" % (mean, std * 2, params))
+print(channel_acc)
+channel_weights = []
+for i, elect_i in enumerate(elect_good):
+    print("Dual progress", i / len(elect_good) * 100, "%")
+    acc_dual = 0
+    for elect_j in elect_good:
+        if elect_j == elect_i:
+            break
 
-    y_true_train, y_pred_train = y_train, model.predict(X_train)
-    y_true_test, y_pred_test = y_test, model.predict(X_test)
+        X_train = X_train_org.loc[:, X_train_org.columns.str.contains("|".join([elect_i, elect_j]))]
+        X_test = X_test_org.loc[:, X_test_org.columns.str.contains("|".join([elect_i, elect_j]))]
 
-    print("\nReport on train set:")
-    classification_report_string = classification_report(y_true_train, y_pred_train, digits=6)
-    print(classification_report_string)
+        model.fit(X_train, y_train)
+        y_test_pred = model.predict(X_test)
+        acc_ij = accuracy_score(y_test, y_test_pred)
+        acc_dual += acc_ij + channel_acc[elect_i] - channel_acc[elect_j]
 
-    print("Report on test set:")
-    classification_report_string = classification_report(y_true_test, y_pred_test, digits=6)
-    print(classification_report_string)
+    weight = (channel_acc[elect_i] + acc_dual) / len(elect_good)
+    channel_weights.append([elect_i, weight])
+    print(elect_i, weight)
 
-glimpse_df(df)
+channel_weights = sorted(channel_weights, key=lambda x: x[1], reverse=True)
+print(channel_weights)

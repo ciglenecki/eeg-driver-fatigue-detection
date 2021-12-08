@@ -1,19 +1,16 @@
+import argparse
 from zipfile import ZipFile
 from utils_paths import *
 from pathlib import Path
 import os
 
 
-def unzip_data():
-    unzip_cnt()
-    unzip_mat()
+def unzip_cnt(zip_path: Path, out_dir: Path):
+    subdir = Path(out_dir, "cnt")
+    with ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(subdir)
 
-
-def unzip_cnt():
-    with ZipFile(PATH_ZIP_CNT, "r") as zip_ref:
-        zip_ref.extractall(PATH_DATASET_CNT)
-
-    zips = [file for file in PATH_DATASET_CNT.iterdir() if str(file).endswith(".zip")]
+    zips = [file for file in subdir.iterdir() if str(file).endswith(".zip")]
     for zip_item in zips:
         if not str(zip_item).endswith(".zip"):
             continue
@@ -24,13 +21,31 @@ def unzip_cnt():
             state_name = Path(cnt_file).stem.lower().split(" ")[0]  # "Normal State" -> "normal"
             filename = Path(prefix_number + "_" + state_name + ".cnt")
 
-            with open(Path(PATH_DATASET_CNT, filename), "wb") as new_file:
+            with open(Path(subdir, filename), "wb") as new_file:
                 new_file.write(zip_ref.read(cnt_file))
     # Delete zips as they were temporary
     for zip_item in zips:
         os.remove(zip_item)
+    print("Unzipped cnt data to:")
+    print("")
 
 
-def unzip_mat():
-    with ZipFile(PATH_ZIP_MAT, "r") as zip_ref:
-        zip_ref.extractall(PATH_DATASET_MAT)
+def unzip_mat(zip_path: Path, out_dir: Path):
+    subdir = Path(out_dir, "mat")
+    with ZipFile(zip_path, "r") as zip_ref:
+        zip_ref.extractall(subdir)
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-d", "--dir", metavar="path", type=str, help="Directory where zips will be exported", default=PATH_DATASET)
+parser.add_argument("-m", "--mat", metavar="path", type=str, help="Zip with mat files", default=PATH_ZIP_MAT)
+parser.add_argument("-c", "--cnt", metavar="path", type=str, help="Zip with cnt files", default=PATH_ZIP_CNT)
+args = parser.parse_args()
+
+out_dir = Path(args.dir)
+out_dir.mkdir(parents=True, exist_ok=True)
+path_cnt = Path(args.cnt)
+path_mat = Path(args.mat)
+
+unzip_cnt(path_cnt, out_dir)
+unzip_mat(path_mat, out_dir)

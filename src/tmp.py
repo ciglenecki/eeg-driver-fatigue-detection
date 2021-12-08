@@ -34,7 +34,7 @@ from utils_functions import min_max_scaler
 # print(model.best_estimator_.coef_)
 
 
-# df = read_pickle(Path("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes", "full-cleaned-2021-12-02-16-24-49-user_count=12__sig_seconds=300__electrodes_ignored=[]__epoch_elems=1000.pkl"))
+# df = read_pickle(Path("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes", "full-cleaned-2021-12-02-16-24-49-num_users=12__sig_seconds=300__electrodes_ignored=[]__epoch_elems=1000.pkl"))
 
 # df = df.loc[:, df.columns.str.startswith("PE")]
 # print(df.describe())
@@ -71,8 +71,8 @@ parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precac
 args = parser.parse_args()
 
 is_complete_train = not any([args.users, args.electrodes, args.sig, args.epoch_elems])
-user_count = args.users if (args.users) else USER_COUNT
-signal_duration_target_s = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS
+num_users = args.users if (args.users) else num_users
+signal_duration_target_s = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS_DEFAULT
 epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
 if args.electrodes:
     subset = elect_all[args.electrodes[0] : args.electrodes[1]]
@@ -82,7 +82,7 @@ if args.electrodes:
 
 pickle_metadata = {
     "is_complete_train": is_complete_train,
-    "user_count": user_count,
+    "num_users": num_users,
     "sig_seconds": signal_duration_target_s,
     "electrodes_ignored": elect_ignore,
     "epoch_elems": epoch_elems,
@@ -90,7 +90,7 @@ pickle_metadata = {
 
 
 # {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
-user_state_pairs = [(i_user, state) for i_user in range(0, user_count) for state in [NORMAL_STR, FATIGUE_STR]]
+user_state_pairs = [(i_user, state) for i_user in range(0, num_users) for state in [NORMAL_STR, FATIGUE_STR]]
 entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in ENTROPIES for electrode in elect_all]
 
 
@@ -112,8 +112,8 @@ def get_epochs_from_signal(filename: str):
     print(eeg.info)
     eeg_filtered = eeg.notch_filter(np.arange(50, 251, 50), picks=picks_normal).filter(l_freq=0.15, h_freq=40)
     signal_seconds_floored = floor(len(eeg_filtered) / FREQ)
-    tmin = signal_seconds_floored - signal_duration_target_s - signal_offset_s
-    tmax = signal_seconds_floored - signal_offset_s
+    tmin = signal_seconds_floored - signal_duration_target_s - signal_offset
+    tmax = signal_seconds_floored - signal_offset
     eeg_filtered = eeg_filtered.crop(tmin=tmin, tmax=tmax)
     return make_fixed_length_epochs(eeg, duration=EPOCH_SECONDS, preload=False, verbose=False)
 

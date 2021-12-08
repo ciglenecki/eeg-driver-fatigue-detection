@@ -1,4 +1,4 @@
-import mne
+from datetime import datetime
 from mne.epochs import Epochs
 from preprocess_unzip_data import unzip_data
 from mne import make_fixed_length_epochs
@@ -22,37 +22,41 @@ warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser()
 parser.add_argument("--users", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
 parser.add_argument("--sig", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
-parser.add_argument("--epoch-elems", metavar="N", type=int, help="Reduce (cut off) epoch duration to N miliseconds (1 >= N <= 1000)")
-parser.add_argument("--unzip", metavar="N", type=bool, help="Unzip the dataset from zips (True/False)")
+parser.add_argument("--epoch-elems", metavar="N", type=int, help="Reduce (cut off) epoch duration to N miliseconds (11 >= N <= 1000)")
 parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precaculated entropy dataframe (the one that isn't cleaned and normalized)")
 args = parser.parse_args()
 
 is_complete_train = not any([args.users, args.sig, args.epoch_elems])
-user_count = args.users if (args.users) else USER_COUNT
-signal_duration_target_s = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS
+if is_complete_train:
+    print("Performing complete training")
+num_users = args.users if (args.users) else num_users
+signal_duration = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS_DEFAULT
 epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
 
 pickle_metadata = {
     "is_complete_train": is_complete_train,
-    "user_count": user_count,
-    "sig_seconds": signal_duration_target_s,
+    "num_users": num_users,
+    "sig_seconds": signal_duration,
     "epoch_elems": epoch_elems,
 }
 
 
-# {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
-user_state_pairs = [(i_user, state) for i_user in range(0, user_count) for state in [NORMAL_STR, FATIGUE_STR]]
 entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in ENTROPIES for electrode in elect_good]
 
 
-if args.unzip:
-    unzip_data()
+def signal_to_epochs(filename: str):
+    """
+    Load the signal
+    Exclude bad channels
+    Crops the filter the signal
+    Return epoches
 
+    Notes:
+    eeg = read_raw_cnt(filename, eog=["HEOL", "HEOR", "VEOU", "VEOL"], preload=True, verbose=False
 
-def get_epochs_from_signal(filename: str):
+    when comparing with and without eog, it changed data dramatically? this is what allowed me to sync data with S
+    """
 
-    # eeg = read_raw_cnt(filename, eog=["HEOL", "HEOR", "VEOU", "VEOL"], preload=True, verbose=False)
-    # when comparing with and without eog, it changed data dramatically? this is what allowed me to sync data with S
     eeg = read_raw_cnt(filename, preload=True, verbose=False)
 
     # Exclude bad channels
@@ -60,27 +64,30 @@ def get_epochs_from_signal(filename: str):
     eeg.pick_channels(elect_good)
 
     # Crop and filter the data
-    signal_duration_s = floor(len(eeg) / FREQ)
-    tmin = signal_duration_s - signal_duration_target_s + signal_offset_s
-    tmax = signal_duration_s + signal_offset_s
-    eeg_filtered = eeg.crop(tmin=tmin, tmax=tmax).notch_filter(50).filter(l_freq=0.15, h_freq=40)
+    signal_total_duration = floor(len(eeg) / FREQ)
+    start = signal_total_duration - signal_duration + signal_offset
+    end = signal_total_duration + signal_offset
+    eeg_filtered = eeg.crop(tmin=start, tmax=end).notch_filter(50).filter(l_freq=0.15, h_freq=40)
 
     return make_fixed_length_epochs(eeg_filtered, duration=EPOCH_SECONDS, preload=True, verbose=False)
 
 
-def get_df_from_epochs(epochs: Epochs):
+def epochs_to_dataframe(epochs: Epochs):
+    """
+    Returns epochs converted to dataframe.
+    Useless columns are excluded.
+    """
     df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1))
-    df = df.drop(["time", "condition", *elect_ignore], axis=1)
+    df = df.drop(["time", "condition", *elect_ignore, *elect_bad], axis=1)
     return df
 
 
 def normalize_df(df: DataFrame, columns_to_scale: list):
-    # set to 0 if treshold is met
-    # NaN entropies can be set to zero
-    # standard scaler scales for each column independently
-
-    # threshold = 1e-6
-    # df[df < threshold] = 0
+    """
+    Normalizes dataframe by replacing values and scaling them.
+    Standard scaler scales for each column independently.
+    """
+    df = df.replace([np.inf, -np.inf], np.nan)
     df[df <= 0] = 0
     df = df.fillna(0)
     df[columns_to_scale] = min_max_scaler(df[columns_to_scale])
@@ -88,35 +95,56 @@ def normalize_df(df: DataFrame, columns_to_scale: list):
 
 
 if args.df_checkpoint:
+    """
+    If checkpoint only action to perform is normalizing since entropies are already caculated
+    """
     df = normalize_df(read_pickle(Path(args.df_checkpoint)), entropy_electrode_combinations)
     save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, "normalized")
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
 rows = []
+backup_matrix = np.zeros(shape=(len(STATES), num_users, len(ENTROPIES), signal_duration, len(elect_good)))
+
+# {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
+user_state_pairs = [(user_id, state) for user_id in range(0, num_users) for state in [NORMAL_STR, FATIGUE_STR]]
+
+for user_id in range(0, num_users):
+    break
+    for state in [NORMAL_STR, FATIGUE_STR]:
+        break
+
+
 for pair in user_state_pairs:
     print(pair)
-    i_user, state = pair
+    user_id, state = pair
 
-    filename_user_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(i_user + 1, state)))
-    epochs = get_epochs_from_signal(filename_user_signal)
-    df = get_df_from_epochs(epochs)
-
+    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
+    epochs = signal_to_epochs(file_signal)
+    df = epochs_to_dataframe(epochs)
     label = 1 if state == FATIGUE_STR else 0
 
-    for i_poch in range(0, signal_duration_target_s):
-        # filter rows for current epoch
+    for epoch_id in range(0, signal_duration):
+        """
+        Filter dataframe rows that have the current epoch are selected.
+        Caculate entropy array for all channels. Shape (30,)
+        Create a simple dictionary and use to return append entropies in a proper.
+        Order of entropies is defined by list ENTROPIES.
+
+        Append to backup matrix
+        Append to list that contains the label and properly ordered entropies
+        e.g. [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
+        """
+
         df_dict = {}
-        df_epoch = df.loc[df["epoch"] == i_poch].head(epoch_elems)
+        df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
         df_electrodes = df_epoch[elect_good]
 
-        # calculate all entropies for all electrodes
-        df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=False), axis=0)
+        df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
         df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
         df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
         df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
 
-        # store entropies in a dictionary so they can be ordered correctly by using the ENTROPIES array
         df_dict = {
             "PE": df_spectral_entropy,
             "AE": df_approximate_entropy,
@@ -124,28 +152,38 @@ for pair in user_state_pairs:
             "FE": df_fuzzy_entropy,
         }
 
-        # return list that contains the label and properly ordered entropies
-        # [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
-        rows.append(
-            [
-                label,
-                *df_dict[ENTROPIES[0]],
-                *df_dict[ENTROPIES[1]],
-                *df_dict[ENTROPIES[2]],
-                *df_dict[ENTROPIES[3]],
-            ]
-        )
+        for i, e in enumerate(ENTROPIES):
+            backup_matrix[label][user_id][i][epoch_id] = np.array(df_dict[ENTROPIES[i]])
 
+        rows.append([label, *df_dict[ENTROPIES[0]], *df_dict[ENTROPIES[1]], *df_dict[ENTROPIES[2]], *df_dict[ENTROPIES[3]]])
 
+"""
+Create dataframe from rows and columns
+"""
 columns = ["label"] + entropy_electrode_combinations
 df = DataFrame(rows, columns=columns)
 df["label"] = df["label"].astype(int)
 
-# save both raw and normalized
-file_path = Path(PATH_DATA_DATAFRAME, "raw")
-df.to_pickle(str(file_path))
+"""
+Complete training - save instantly so no error with naming is possible
+"""
+if is_complete_train:
+    np.save(str(Path(PATH_DATA_DATAFRAME, "_raw_matrix")), backup_matrix)
+    df.to_pickle(str(Path(PATH_DATA_DATAFRAME, "_raw")))
 
-save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, "raw")
+
+prefix = ""
+if is_complete_train:
+    pickle_metadata = {}
+    prefix = "complete-"
+else:
+    prefix = "partial-"
+
+np.save(str(Path(PATH_DATA_DATAFRAME, "raw_matrix" + datetime.today().strftime("%Y-%m-%d-%H-%M-%S"))), backup_matrix)
+
+
+save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, prefix + "raw")
 df = normalize_df(df, entropy_electrode_combinations)
 glimpse_df(df)
-save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, "normalized")
+
+save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, prefix + "normalized")
