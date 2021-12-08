@@ -1,6 +1,5 @@
 from datetime import datetime
 from mne.epochs import Epochs
-from preprocess_unzip_data import unzip_data
 from mne import make_fixed_length_epochs
 import argparse
 from math import floor
@@ -10,7 +9,6 @@ from pathlib import Path
 import warnings
 import sys
 from utils_file_saver import save_df_to_disk
-
 from utils_paths import *
 from utils_env import *
 from utils_functions import *
@@ -41,7 +39,7 @@ pickle_metadata = {
 }
 
 
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in ENTROPIES for electrode in elect_good]
+entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in elect_good]
 
 
 def signal_to_epochs(filename: str):
@@ -58,12 +56,9 @@ def signal_to_epochs(filename: str):
     """
 
     eeg = read_raw_cnt(filename, preload=True, verbose=False)
-
-    # Exclude bad channels
     eeg.info["bads"].extend(elect_bad)
     eeg.pick_channels(elect_good)
 
-    # Crop and filter the data
     signal_total_duration = floor(len(eeg) / FREQ)
     start = signal_total_duration - signal_duration + signal_offset
     end = signal_total_duration + signal_offset
@@ -103,60 +98,50 @@ if args.df_checkpoint:
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
+backup_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(elect_good)))
 rows = []
-backup_matrix = np.zeros(shape=(len(STATES), num_users, len(ENTROPIES), signal_duration, len(elect_good)))
-
-# {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
-user_state_pairs = [(user_id, state) for user_id in range(0, num_users) for state in [NORMAL_STR, FATIGUE_STR]]
-
 for user_id in range(0, num_users):
-    break
-    for state in [NORMAL_STR, FATIGUE_STR]:
-        break
+    for state in states:
+        file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
+        epochs = signal_to_epochs(file_signal)
+        df = epochs_to_dataframe(epochs)
+        label = 1 if state == FATIGUE_STR else 0
 
+        for epoch_id in range(0, signal_duration):
+            """
+            Filter dataframe rows that have the current epoch are selected.
+            Caculate entropy array for all channels. Shape (30,)
+            Create a simple dictionary and use to return append entropies in a proper.
+            Order of entropies is defined by list entropy_names.
 
-for pair in user_state_pairs:
-    print(pair)
-    user_id, state = pair
+            Append to backup matrix
+            Append to list that contains the label and properly ordered entropies
+            e.g. [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
+            """
 
-    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
-    epochs = signal_to_epochs(file_signal)
-    df = epochs_to_dataframe(epochs)
-    label = 1 if state == FATIGUE_STR else 0
+            df_dict = {}
+            df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
+            df_electrodes = df_epoch[elect_good]
 
-    for epoch_id in range(0, signal_duration):
-        """
-        Filter dataframe rows that have the current epoch are selected.
-        Caculate entropy array for all channels. Shape (30,)
-        Create a simple dictionary and use to return append entropies in a proper.
-        Order of entropies is defined by list ENTROPIES.
+            df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
+            df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
+            df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
+            df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
 
-        Append to backup matrix
-        Append to list that contains the label and properly ordered entropies
-        e.g. [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
-        """
+            df_dict = {
+                "PE": df_spectral_entropy,
+                "AE": df_approximate_entropy,
+                "SE": df_sample_entropy,
+                "FE": df_fuzzy_entropy,
+            }
 
-        df_dict = {}
-        df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
-        df_electrodes = df_epoch[elect_good]
+            for i, e in enumerate(entropy_names):
+                backup_matrix[label][user_id][i][epoch_id] = np.array(df_dict[entropy_names[i]])
 
-        df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
-        df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
-        df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
-        df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
+            rows.append([label, *df_dict[entropy_names[0]], *df_dict[entropy_names[1]], *df_dict[entropy_names[2]], *df_dict[entropy_names[3]]])
 
-        df_dict = {
-            "PE": df_spectral_entropy,
-            "AE": df_approximate_entropy,
-            "SE": df_sample_entropy,
-            "FE": df_fuzzy_entropy,
-        }
-
-        for i, e in enumerate(ENTROPIES):
-            backup_matrix[label][user_id][i][epoch_id] = np.array(df_dict[ENTROPIES[i]])
-
-        rows.append([label, *df_dict[ENTROPIES[0]], *df_dict[ENTROPIES[1]], *df_dict[ENTROPIES[2]], *df_dict[ENTROPIES[3]]])
-
+        if is_complete_train:
+            np.save(str(Path(PATH_DATA_DATAFRAME, "_raw_matrix")), backup_matrix)
 """
 Create dataframe from rows and columns
 """

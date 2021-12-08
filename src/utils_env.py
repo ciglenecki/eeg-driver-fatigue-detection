@@ -24,6 +24,6 @@ PAPER_RFC_INPUT_VARIABLES = 22
 PAPER_BF_HIDDEN = 22
 
 
-ENTROPIES = ["PE", "AE", "SE", "FE"]
+entropy_names = ["PE", "AE", "SE", "FE"]
 
-STATES = [NORMAL_STR, FATIGUE_STR]
+states = [NORMAL_STR, FATIGUE_STR]

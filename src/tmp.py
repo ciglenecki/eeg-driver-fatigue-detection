@@ -91,7 +91,7 @@ pickle_metadata = {
 
 # {(0,normal), (0,fatigue), (1,normal)...(12,fatigue)}
 user_state_pairs = [(i_user, state) for i_user in range(0, num_users) for state in [NORMAL_STR, FATIGUE_STR]]
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in ENTROPIES for electrode in elect_all]
+entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in elect_all]
 
 
 if args.unzip:
@@ -183,7 +183,7 @@ for pair in user_state_pairs:
         df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
         df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
 
-        # store entropies in a dictionary so they can be ordered correctly by using the ENTROPIES array
+        # store entropies in a dictionary so they can be ordered correctly by using the entropy_names array
         df_dict = {
             "PE": df_spectral_entropy,
             "AE": df_approximate_entropy,
@@ -196,10 +196,10 @@ for pair in user_state_pairs:
         rows.append(
             [
                 label,
-                *df_dict[ENTROPIES[0]],
-                *df_dict[ENTROPIES[1]],
-                *df_dict[ENTROPIES[2]],
-                *df_dict[ENTROPIES[3]],
+                *df_dict[entropy_names[0]],
+                *df_dict[entropy_names[1]],
+                *df_dict[entropy_names[2]],
+                *df_dict[entropy_names[3]],
             ]
         )
         exit(1)

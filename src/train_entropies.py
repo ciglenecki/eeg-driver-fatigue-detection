@@ -10,7 +10,7 @@ from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 import pickle
 from joblib import dump, load
-from utils_env import ENTROPIES
+from utils_env import entropy_names
 from utils_file_saver import save_model
 from utils_functions import get_dictionary_leaves, glimpse_df, powerset
 from utils_paths import PATH_DATA_MODEL
@@ -34,7 +34,7 @@ y = df.loc[:, "label"]
 
 X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
-entropy_excluded_powerset = list(powerset(ENTROPIES))[:-1]  # Exclude last element where all entropies are mentioned
+entropy_excluded_powerset = list(powerset(entropy_names))[:-1]  # Exclude last element where all entropies are mentioned
 models = [model_svc]
 scorings = ["accuracy"]
 results = []
@@ -76,7 +76,7 @@ for i, pair in enumerate(product(scorings, models, entropy_excluded_powerset)):
     classification_report_string = classification_report(y_true_test, y_pred_test, digits=6, output_dict=True)
     # print(classification_report_string)
 
-    results.append([i, list(set(ENTROPIES) - set(entropies_exclude)), model.best_score_, get_dictionary_leaves(classification_report_string)])
+    results.append([i, list(set(entropy_names) - set(entropies_exclude)), model.best_score_, get_dictionary_leaves(classification_report_string)])
 
 for result in sorted(results, key=lambda x: x[2], reverse=True):
     print(result)
