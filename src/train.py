@@ -24,21 +24,22 @@ parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataf
 args = parser.parse_args()
 
 
-def normalize_df(df: DataFrame, columns_to_scale: list):
-    # set to 0 if treshold is met
-    # NaN entropies can be set to zero
-    # standard scaler scales for each column independently
+# def normalize_df(df: DataFrame, columns_to_scale: list):
+#     # set to 0 if treshold is met
+#     # NaN entropies can be set to zero
+#     # standard scaler scales for each column independently
 
-    df[df <= 0] = 0
-    df = df.fillna(0)
-    df[columns_to_scale] = min_max_scaler(df[columns_to_scale])
-    return df
+#     df[df <= 0] = 0
+#     df = df.fillna(0)
+#     df[columns_to_scale] = min_max_scaler(df[columns_to_scale])
+#     return df
 
 
 ### Load dataframe
-df_org = read_pickle(args.df)
-df = normalize_df(df_org.loc[:, ~df_org.columns.isin(["label"])])
-df["label"] = df_org["label"].astype(int)
+df = read_pickle(args.df)
+glimpse_df(df)
+# df = normalize_df(df_org.loc[:, ~df_org.columns.isin(["label"])])
+df["label"] = df["label"].astype(int)
 
 ### Split to X Y train test
 X = df.loc[:, ~df.columns.isin(["label"])]

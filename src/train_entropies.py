@@ -26,7 +26,6 @@ args = parser.parse_args()
 
 ### Load dataframe
 df: DataFrame = read_pickle(args.df)
-df["label"] = df["label"].astype(int)
 
 ### Split to X Y train test
 X = df.loc[:, ~df.columns.isin(["label"])]
@@ -43,10 +42,7 @@ results = []
 for i, pair in enumerate(product(scorings, models, entropy_excluded_powerset)):
     scoring, model, entropies_exclude = pair
 
-    X_train, X_test, = (
-        X_train_org.copy(),
-        X_test_org.copy(),
-    )
+    (X_train, X_test) = (X_train_org.copy(), X_test_org.copy())
 
     for entropy in entropies_exclude:
         X_train = X_train.loc[:, ~X_train.columns.str.startswith(entropy)]
@@ -68,16 +64,9 @@ for i, pair in enumerate(product(scorings, models, entropy_excluded_powerset)):
     y_true_train, y_pred_train = y_train, model.predict(X_train)
     y_true_test, y_pred_test = y_test, model.predict(X_test)
 
-    # print("\nReport on train set:")
-    classification_report_string = classification_report(y_true_train, y_pred_train, digits=6, output_dict=True)
-    # print(classification_report_string)
-
-    # print("Report on test set:")
     classification_report_string = classification_report(y_true_test, y_pred_test, digits=6, output_dict=True)
-    # print(classification_report_string)
 
     results.append([i, list(set(entropy_names) - set(entropies_exclude)), model.best_score_, get_dictionary_leaves(classification_report_string)])
 
 for result in sorted(results, key=lambda x: x[2], reverse=True):
     print(result)
-    print()

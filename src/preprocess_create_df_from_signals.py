@@ -102,6 +102,7 @@ backup_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), sign
 rows = []
 for user_id in range(0, num_users):
     for state in states:
+        print(user_id, state)
         file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
         epochs = signal_to_epochs(file_signal)
         df = epochs_to_dataframe(epochs)
