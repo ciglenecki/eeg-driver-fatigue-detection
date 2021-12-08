@@ -8,7 +8,7 @@ from pandas import DataFrame, set_option, read_pickle
 from pathlib import Path
 import warnings
 import sys
-from utils_file_saver import save_df_to_disk
+from utils_file_saver import save_df_to_disk, save_npy_to_disk
 from utils_paths import *
 from utils_env import *
 from utils_functions import *
@@ -25,13 +25,14 @@ parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precac
 args = parser.parse_args()
 
 is_complete_train = not any([args.users, args.sig, args.epoch_elems])
+is_complete_train = True
 if is_complete_train:
     print("Performing complete training")
 num_users = args.users if (args.users) else num_users
 signal_duration = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS_DEFAULT
 epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
 
-pickle_metadata = {
+train_metadata = {
     "is_complete_train": is_complete_train,
     "num_users": num_users,
     "sig_seconds": signal_duration,
@@ -39,15 +40,12 @@ pickle_metadata = {
 }
 
 
-entropy_electrode_combinations = ["{}_{}".format(entropy, electrode) for entropy in entropy_names for electrode in channels_good]
-
-
 def signal_to_epochs(filename: str):
     """
-    Load the signal
-    Exclude bad channels
-    Crops the filter the signal
-    Return epoches
+    Load the signal.
+    Exclude bad channels.
+    Crops the filter the signal.
+    Return epoches.
 
     Notes:
     eeg = read_raw_cnt(filename, eog=["HEOL", "HEOR", "VEOU", "VEOL"], preload=True, verbose=False
@@ -89,16 +87,19 @@ def normalize_df(df: DataFrame, columns_to_scale: list):
     return df
 
 
+# [PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
+entropy_channel_combinations = ["{}_{}".format(entropy, channel) for entropy in entropy_names for channel in channels_good]
+
 if args.df_checkpoint:
     """
     If checkpoint only action to perform is normalizing since entropies are already caculated
     """
-    df = normalize_df(read_pickle(Path(args.df_checkpoint)), entropy_electrode_combinations)
-    save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, "normalized")
+    df = normalize_df(read_pickle(Path(args.df_checkpoint)), entropy_channel_combinations)
+    save_df_to_disk(df, train_metadata, PATH_DATA_DATAFRAME, "normalized")
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
-backup_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(channels_good)))
+npy_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(channels_good)))
 rows = []
 for user_id in range(0, num_users):
     for state in states:
@@ -122,12 +123,12 @@ for user_id in range(0, num_users):
 
             df_dict = {}
             df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
-            df_electrodes = df_epoch[channels_good]
+            df_channels = df_epoch[channels_good]
 
-            df_spectral_entropy = df_electrodes.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
-            df_approximate_entropy = df_electrodes.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
-            df_sample_entropy = df_electrodes.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
-            df_fuzzy_entropy = df_electrodes.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
+            df_spectral_entropy = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
+            df_approximate_entropy = df_channels.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
+            df_sample_entropy = df_channels.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
+            df_fuzzy_entropy = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
 
             df_dict = {
                 "PE": df_spectral_entropy,
@@ -137,39 +138,26 @@ for user_id in range(0, num_users):
             }
 
             for i, e in enumerate(entropy_names):
-                backup_matrix[label][user_id][i][epoch_id] = np.array(df_dict[entropy_names[i]])
+                npy_matrix[label][user_id][i][epoch_id] = np.array(df_dict[entropy_names[i]])
 
             rows.append([label, *df_dict[entropy_names[0]], *df_dict[entropy_names[1]], *df_dict[entropy_names[2]], *df_dict[entropy_names[3]]])
 
         if is_complete_train:
-            np.save(str(Path(PATH_DATA_DATAFRAME, "_raw_matrix")), backup_matrix)
-"""
-Create dataframe from rows and columns
-"""
-columns = ["label"] + entropy_electrode_combinations
+            np.save(str(Path(PATH_DATA_DATAFRAME, ".raw_matrix")), npy_matrix)
+
+"""Create dataframe from rows and columns"""
+columns = ["label"] + entropy_channel_combinations
 df = DataFrame(rows, columns=columns)
 df["label"] = df["label"].astype(int)
 
-"""
-Complete training - save instantly so no error with naming is possible
-"""
+"""Complete training - save instantly so no error with naming is possible"""
 if is_complete_train:
-    np.save(str(Path(PATH_DATA_DATAFRAME, "_raw_matrix")), backup_matrix)
-    df.to_pickle(str(Path(PATH_DATA_DATAFRAME, "_raw")))
+    np.save(str(Path(PATH_DATA_DATAFRAME, ".raw_npy.npy")), npy_matrix)
+    df.to_pickle(str(Path(PATH_DATA_DATAFRAME, ".raw_df.pkl")))
 
-
-prefix = ""
-if is_complete_train:
-    pickle_metadata = {}
-    prefix = "complete-"
-else:
-    prefix = "partial-"
-
-np.save(str(Path(PATH_DATA_DATAFRAME, "raw_matrix" + datetime.today().strftime("%Y-%m-%d-%H-%M-%S"))), backup_matrix)
-
-
-save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, prefix + "raw")
-df = normalize_df(df, entropy_electrode_combinations)
+"""Save to files"""
+save_npy_to_disk(npy_matrix, PATH_DATA_DATAFRAME, "npy_matrix", train_metadata)
+save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "raw", train_metadata)
+df = normalize_df(df, entropy_channel_combinations)
 glimpse_df(df)
-
-save_df_to_disk(df, pickle_metadata, PATH_DATA_DATAFRAME, prefix + "normalized")
+save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "normalized", train_metadata)

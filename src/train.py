@@ -19,21 +19,15 @@ from model import model_rfc, model_mlp, model_svc, model_knn
 from tqdm import tqdm
 
 set_option("display.max_columns", None)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 args = parser.parse_args()
 
 df = read_pickle(args.df)
 glimpse_df(df)
-
-df["label"] = df["label"].astype(int)
-
 X = df.loc[:, ~df.columns.isin(["label"])]
-print(X.shape)
 y = df.loc[:, "label"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
-
 
 scorings = ["accuracy"]  # scorings = ["accuracy", "f1"]
 models = [model_rfc, model_mlp, model_knn, model_svc]

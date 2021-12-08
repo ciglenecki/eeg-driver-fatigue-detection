@@ -1,4 +1,7 @@
 from itertools import chain, combinations
+from os import getcwd
+from pathlib import Path
+import sys
 from typing import TypeVar
 from sklearn import preprocessing
 from pandas import DataFrame
@@ -118,3 +121,7 @@ def dict_to_string(dictionary: dict):
     """
     pairs = get_dictionary_leaves(dictionary)
     return "__".join(map(lambda key_value: "=".join([str(key_value[0]), str(key_value[1])]), pairs))
+
+
+def stdout_to_file(file: Path):
+    sys.stdout = open(Path(getcwd(), file), "w")
