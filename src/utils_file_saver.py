@@ -8,6 +8,7 @@ import numpy as np
 from pandas.core.frame import DataFrame
 from utils_functions import dict_to_byte_metadata, dict_to_string
 from sklearn.model_selection import GridSearchCV
+from pandas import read_pickle
 
 # show additional data in file explorer
 METADATA_FIELD_TAGS = "user.xdg.tags"
@@ -16,6 +17,10 @@ METADATA_FIELD_COMMENT = "user.xdg.comment"
 
 def load_model(path: Path) -> GridSearchCV:
     return pickle.loads(load(path))
+
+
+def load_dataframe(path: Path) -> DataFrame:
+    return read_pickle(path)
 
 
 def save_to_file(

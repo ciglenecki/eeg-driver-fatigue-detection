@@ -87,9 +87,6 @@ def normalize_df(df: DataFrame, columns_to_scale: list):
     return df
 
 
-# [PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
-entropy_channel_combinations = ["{}_{}".format(entropy, channel) for entropy in entropy_names for channel in channels_good]
-
 if args.df_checkpoint:
     """
     If checkpoint only action to perform is normalizing since entropies are already caculated
@@ -140,13 +137,13 @@ for user_id in range(0, num_users):
             for i, e in enumerate(entropy_names):
                 npy_matrix[label][user_id][i][epoch_id] = np.array(df_dict[entropy_names[i]])
 
-            rows.append([label, *df_dict[entropy_names[0]], *df_dict[entropy_names[1]], *df_dict[entropy_names[2]], *df_dict[entropy_names[3]]])
+            rows.append([label, user_id, epoch_id, *df_dict[entropy_names[0]], *df_dict[entropy_names[1]], *df_dict[entropy_names[2]], *df_dict[entropy_names[3]]])
 
         if is_complete_train:
             np.save(str(Path(PATH_DATA_DATAFRAME, ".raw_matrix")), npy_matrix)
 
 """Create dataframe from rows and columns"""
-columns = ["label"] + entropy_channel_combinations
+columns = ["label", "user_id", "epoch_id"] + entropy_channel_combinations
 df = DataFrame(rows, columns=columns)
 df["label"] = df["label"].astype(int)
 
@@ -157,7 +154,9 @@ if is_complete_train:
 
 """Save to files"""
 save_npy_to_disk(npy_matrix, PATH_DATA_DATAFRAME, "npy_matrix", train_metadata)
-save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "raw", train_metadata)
+save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "raw-with-userid", train_metadata)
 df = normalize_df(df, entropy_channel_combinations)
 glimpse_df(df)
+save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "normalized-with-userid", train_metadata)
+df = df.drop(["user_id", "epoch_id"])
 save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "normalized", train_metadata)
