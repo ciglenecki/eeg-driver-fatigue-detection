@@ -1,3 +1,4 @@
+from datetime import datetime
 from itertools import chain, combinations
 from os import getcwd
 from pathlib import Path
@@ -10,6 +11,10 @@ from typing import Dict
 import numpy as np
 
 T = TypeVar("T")
+
+
+def get_timestamp():
+    return datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
 
 
 def dict_apply_procedture(old_dict: Dict[str, T], procedure) -> Dict[str, T]:
