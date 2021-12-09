@@ -1,6 +1,7 @@
 import argparse
 from itertools import chain, combinations
 from pathlib import Path
+import sys
 import warnings
 from IPython.core.display import display
 import numpy as np
@@ -27,12 +28,14 @@ import pandas as pd
 from utils_functions import min_max_scaler
 from time import sleep
 
-parser = argparse.ArgumentParser()
-# parser.add_argument("--model", metavar="model", required=True, type=str, help="Model")
-args = parser.parse_args()
+sys.stdin.close()
+print("test")
+# parser = argparse.ArgumentParser()
+# # parser.add_argument("--model", metavar="model", required=True, type=str, help="Model")
+# args = parser.parse_args()
 
 
-print(np.load(Path(getcwd(), "TWO_ELECTRODE_SVM_ACCURACY_SCORE.npy"), allow_pickle=True))
+# print(np.load(Path(getcwd(), "TWO_ELECTRODE_SVM_ACCURACY_SCORE.npy"), allow_pickle=True))
 
 
 # df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2021-12-08-09-48-01-.pkl")

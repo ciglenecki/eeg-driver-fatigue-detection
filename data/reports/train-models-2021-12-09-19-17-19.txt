@@ -1,0 +1,140 @@
+
+Saved file:
+ /home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/randomforestclassifier-0.9847--2021-12-09-19-19-17-max_features=22__n_estimators=500.model
+
+=== Best model RandomForestClassifier with accuracy 0.9847222222222222 and parameters {'max_features': 22, 'n_estimators': 500}
+
+
+Grid scores on test set:
+
+0.984444 (+/-0.011967) for {'max_features': 'auto', 'n_estimators': 500}
+0.984722 (+/-0.014487) for {'max_features': 22, 'n_estimators': 500}
+
+Report on train set:
+              precision    recall  f1-score   support
+
+           0   1.000000  1.000000  1.000000      1812
+           1   1.000000  1.000000  1.000000      1788
+
+    accuracy                       1.000000      3600
+   macro avg   1.000000  1.000000  1.000000      3600
+weighted avg   1.000000  1.000000  1.000000      3600
+
+Report on test set:
+              precision    recall  f1-score   support
+
+           0   0.994350  0.984340  0.989320      1788
+           1   0.984699  0.994481  0.989566      1812
+
+    accuracy                       0.989444      3600
+   macro avg   0.989525  0.989411  0.989443      3600
+weighted avg   0.989493  0.989444  0.989444      3600
+
+Saved file:
+ /home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/mlpclassifier-0.9703--2021-12-09-19-28-00-alpha=0.0001__learning_rate=constant.model
+=== Best model MLPClassifier with accuracy 0.9702777777777778 and parameters {'alpha': 0.0001, 'learning_rate': 'constant'}
+
+
+Grid scores on test set:
+
+0.963889 (+/-0.020563) for {'alpha': 0.05, 'learning_rate': 'constant'}
+0.964167 (+/-0.010744) for {'alpha': 0.05, 'learning_rate': 'adaptive'}
+0.964444 (+/-0.020979) for {'alpha': 0.001, 'learning_rate': 'adaptive'}
+0.966667 (+/-0.015811) for {'alpha': 0.0001, 'learning_rate': 'adaptive'}
+0.966944 (+/-0.013540) for {'alpha': 1e-05, 'learning_rate': 'adaptive'}
+0.967778 (+/-0.021617) for {'alpha': 1e-05, 'learning_rate': 'constant'}
+0.968333 (+/-0.019116) for {'alpha': 0.001, 'learning_rate': 'constant'}
+0.970278 (+/-0.016997) for {'alpha': 0.0001, 'learning_rate': 'constant'}
+
+Report on train set:
+              precision    recall  f1-score   support
+
+           0   0.994505  0.998896  0.996696      1812
+           1   0.998876  0.994407  0.996637      1788
+
+    accuracy                       0.996667      3600
+   macro avg   0.996691  0.996652  0.996666      3600
+weighted avg   0.996676  0.996667  0.996667      3600
+
+Report on test set:
+              precision    recall  f1-score   support
+
+           0   0.974818  0.974273  0.974545      1788
+           1   0.974628  0.975166  0.974897      1812
+
+    accuracy                       0.974722      3600
+   macro avg   0.974723  0.974719  0.974721      3600
+weighted avg   0.974722  0.974722  0.974722      3600
+
+Saved file:
+ /home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/kneighborsclassifier-0.9614--2021-12-09-19-28-01-weights=distance.model
+=== Best model KNeighborsClassifier with accuracy 0.9613888888888888 and parameters {'weights': 'distance'}
+
+
+Grid scores on test set:
+
+0.958611 (+/-0.016611) for {'weights': 'uniform'}
+0.961389 (+/-0.017515) for {'weights': 'distance'}
+
+Report on train set:
+              precision    recall  f1-score   support
+
+           0   1.000000  1.000000  1.000000      1812
+           1   1.000000  1.000000  1.000000      1788
+
+    accuracy                       1.000000      3600
+   macro avg   1.000000  1.000000  1.000000      3600
+weighted avg   1.000000  1.000000  1.000000      3600
+
+Report on test set:
+              precision    recall  f1-score   support
+
+           0   0.959430  0.978747  0.968992      1788
+           1   0.978604  0.959161  0.968785      1812
+
+    accuracy                       0.968889      3600
+   macro avg   0.969017  0.968954  0.968889      3600
+weighted avg   0.969081  0.968889  0.968888      3600
+
+Saved file:
+ /home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/svc-0.9772--2021-12-09-19-28-39-c=100__gamma=0.03125.model
+=== Best model SVC with accuracy 0.9772222222222222 and parameters {'C': 100, 'gamma': 0.03125}
+
+
+Grid scores on test set:
+
+0.503333 (+/-0.001361) for {'C': 0.5, 'gamma': 0.0001}
+0.720000 (+/-0.014657) for {'C': 0.5, 'gamma': 0.001}
+0.819722 (+/-0.018543) for {'C': 100, 'gamma': 0.0001}
+0.849722 (+/-0.016979) for {'C': 500, 'gamma': 0.0001}
+0.858333 (+/-0.021517) for {'C': 1000, 'gamma': 0.0001}
+0.861389 (+/-0.026376) for {'C': 1500, 'gamma': 0.0001}
+0.904444 (+/-0.030902) for {'C': 100, 'gamma': 0.001}
+0.940278 (+/-0.025337) for {'C': 0.5, 'gamma': 0.03125}
+0.943056 (+/-0.019003) for {'C': 500, 'gamma': 0.001}
+0.956389 (+/-0.015376) for {'C': 1000, 'gamma': 0.001}
+0.960556 (+/-0.017621) for {'C': 1500, 'gamma': 0.001}
+0.973611 (+/-0.016005) for {'C': 1000, 'gamma': 0.03125}
+0.973611 (+/-0.016005) for {'C': 1500, 'gamma': 0.03125}
+0.973889 (+/-0.016140) for {'C': 500, 'gamma': 0.03125}
+0.977222 (+/-0.010031) for {'C': 100, 'gamma': 0.03125}
+
+Report on train set:
+              precision    recall  f1-score   support
+
+           0   1.000000  1.000000  1.000000      1812
+           1   1.000000  1.000000  1.000000      1788
+
+    accuracy                       1.000000      3600
+   macro avg   1.000000  1.000000  1.000000      3600
+weighted avg   1.000000  1.000000  1.000000      3600
+
+Report on test set:
+              precision    recall  f1-score   support
+
+           0   0.980370  0.977629  0.978997      1788
+           1   0.977986  0.980684  0.979333      1812
+
+    accuracy                       0.979167      3600
+   macro avg   0.979178  0.979156  0.979165      3600
+weighted avg   0.979170  0.979167  0.979166      3600

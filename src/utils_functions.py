@@ -77,7 +77,6 @@ def get_cnt_filename(i_user: int, state: str):
 
 
 def glimpse_df(df: DataFrame):
-    display(df.describe())
 
     print("\nShowing first 3 data points\n")
     display(df.head(n=3))
@@ -87,6 +86,8 @@ def glimpse_df(df: DataFrame):
 
     print("\nShowing 3 radnom data points\n")
     display(df.sample(n=3))
+
+    display(df.describe())
 
 
 def powerset(iterable):
@@ -128,5 +129,20 @@ def dict_to_string(dictionary: dict):
     return "__".join(map(lambda key_value: "=".join([str(key_value[0]), str(key_value[1])]), pairs))
 
 
+class Tee(object):
+    def __init__(self, *files):
+        self.files = files
+
+    def write(self, obj):
+        for f in self.files:
+            f.write(obj)
+            f.flush()
+
+    def flush(self):
+        for f in self.files:
+            f.flush()
+
+
 def stdout_to_file(file: Path):
-    sys.stdout = open(Path(getcwd(), file), "w")
+    f = open(Path(getcwd(), file), "w")
+    sys.stdout = Tee(sys.stdout, f)

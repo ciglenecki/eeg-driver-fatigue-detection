@@ -51,10 +51,10 @@ def save_to_file_with_metadata(
     os.setxattr(file_path, METADATA_FIELD_TAGS, metadata_bytes)
 
 
-def save_model(model, model_name, score, dir: Path, metadata={}, name_tag=""):
+def save_model(model, model_name, score, directory: Path, metadata={}, name_tag=""):
     basename = "{model_name}-{score:.4f}-{name_tag}".format(model_name=model_name, score=score, name_tag=name_tag)
     file_saver = lambda model, filename: dump(pickle.dumps(model), filename)
-    save_to_file_with_metadata(model, dir, basename, ".model", file_saver, metadata)
+    save_to_file_with_metadata(model, directory, basename, ".model", file_saver, metadata)
 
 
 def save_df_to_disk(df: DataFrame, is_complete_train: bool, dir: Path, name_tag: str, metadata={}):
