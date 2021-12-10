@@ -14,7 +14,7 @@ import pickle
 from joblib import dump, load
 from utils_file_saver import save_model
 from utils_functions import get_timestamp, glimpse_df, powerset, min_max_scaler, stdout_to_file
-from utils_paths import PATH_DATA_MODEL, PATH_REPORT
+from utils_paths import PATH_MODEL, PATH_REPORT
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
 from tqdm import tqdm
@@ -25,10 +25,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 args = parser.parse_args()
 
-timestamp = get_timestamp()
-report_filename = Path(PATH_REPORT, "-".join(["train-models", timestamp]) + ".txt")
-print(report_filename)
-stdout_to_file(report_filename)
+stdout_to_file(Path(PATH_REPORT, "-".join(["train-models", get_timestamp()]) + ".txt"))
 
 
 df = read_pickle(args.df)
@@ -47,7 +44,7 @@ for pair in product(scorings, models):
     model_name = type(model.estimator).__name__
     model.scoring = scoring
     model.fit(X_train, y_train)
-    save_model(model=model, model_name=model_name, score=model.best_score_, directory=PATH_DATA_MODEL, metadata=model.best_params_)
+    save_model(model=model, model_name=model_name, score=model.best_score_, directory=PATH_MODEL, metadata=model.best_params_)
 
     print("=== Best model {} with accuracy {} and parameters {}\n\n".format(model_name, model.best_score_, model.best_params_))
     print("Grid scores on test set:\n")

@@ -144,5 +144,10 @@ class Tee(object):
 
 
 def stdout_to_file(file: Path):
+    """
+    Pipes standard input to standard input and to a file.
+    """
+    print("Standard output piped to file:")
+    print(file)
     f = open(Path(getcwd(), file), "w")
     sys.stdout = Tee(sys.stdout, f)

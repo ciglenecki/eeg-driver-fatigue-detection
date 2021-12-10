@@ -13,8 +13,8 @@ import pickle
 from joblib import dump, load
 from utils_env import entropy_names
 from utils_file_saver import save_model
-from utils_functions import get_dictionary_leaves, glimpse_df, powerset, stdout_to_file
-from utils_paths import PATH_DATA_MODEL, PATH_REPORT
+from utils_functions import get_dictionary_leaves, get_timestamp, glimpse_df, powerset, stdout_to_file
+from utils_paths import PATH_MODEL, PATH_REPORT
 from itertools import product
 from model import model_svc
 from tqdm import tqdm
@@ -26,9 +26,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 args = parser.parse_args()
 
-timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
-report_filename = Path(PATH_REPORT, "-".join(["best-entropies", timestamp]) + ".txt")
-stdout_to_file(report_filename)
+stdout_to_file(Path(PATH_REPORT, "-".join(["best-entropies", get_timestamp()]) + ".txt"))
 
 
 df: DataFrame = read_pickle(args.df)
@@ -61,4 +59,4 @@ for i, pair in enumerate(tqdm(list(product(scorings, models, entropy_excluded_po
     results.append([i, list(set(entropy_names) - set(entropies_exclude)), model.best_score_, get_dictionary_leaves(classification_report_string)])
 
 for result in sorted(results, key=lambda x: x[2], reverse=True):
-    print(result, "\n")
+    print(result[0], result[1], result[2])

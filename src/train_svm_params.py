@@ -14,7 +14,7 @@ import pickle
 from joblib import dump, load
 from utils_file_saver import save_model
 from utils_functions import glimpse_df, powerset, min_max_scaler, stdout_to_file, get_timestamp
-from utils_paths import PATH_DATA_MODEL, PATH_REPORT
+from utils_paths import PATH_MODEL, PATH_REPORT
 from utils_env import num_users
 from itertools import product
 from model import model_svc_wide, wide_params, model_svc, model_mlp
@@ -26,17 +26,14 @@ set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 args = parser.parse_args()
-timestamp = get_timestamp()
-report_filename = Path(PATH_REPORT, "-".join(["loo-parameters", timestamp]) + ".txt")
-print(report_filename)
-stdout_to_file(report_filename)
+stdout_to_file(Path(PATH_REPORT, "-".join(["svm-parameters", get_timestamp()]) + ".txt"))
 
 df = read_pickle(args.df)
 glimpse_df(df)
 X = df.loc[:, ~df.columns.isin(["label"])]
 y = df.loc[:, df.columns.isin(["label", "user_id"])]
-training_columns = X.columns.isin(entropy_channel_combinations)
 
+training_columns = X.columns.isin(entropy_channel_combinations)
 groups = X["user_id"].to_numpy()
 acc_parameters = []
 

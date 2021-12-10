@@ -92,7 +92,7 @@ if args.df_checkpoint:
     If checkpoint only action to perform is normalizing since entropies are already caculated
     """
     df = normalize_df(read_pickle(Path(args.df_checkpoint)), entropy_channel_combinations)
-    save_df_to_disk(df, train_metadata, PATH_DATA_DATAFRAME, "normalized")
+    save_df_to_disk(df, train_metadata, PATH_DATAFRAME, "normalized")
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
@@ -140,7 +140,7 @@ for user_id in range(0, num_users):
             rows.append([label, user_id, epoch_id, *df_dict[entropy_names[0]], *df_dict[entropy_names[1]], *df_dict[entropy_names[2]], *df_dict[entropy_names[3]]])
 
         if is_complete_train:
-            np.save(str(Path(PATH_DATA_DATAFRAME, ".raw_matrix")), npy_matrix)
+            np.save(str(Path(PATH_DATAFRAME, ".raw_matrix")), npy_matrix)
 
 """Create dataframe from rows and columns"""
 columns = ["label", "user_id", "epoch_id"] + entropy_channel_combinations
@@ -149,14 +149,14 @@ df["label"] = df["label"].astype(int)
 
 """Complete training - save instantly so no error with naming is possible"""
 if is_complete_train:
-    np.save(str(Path(PATH_DATA_DATAFRAME, ".raw_npy.npy")), npy_matrix)
-    df.to_pickle(str(Path(PATH_DATA_DATAFRAME, ".raw_df.pkl")))
+    np.save(str(Path(PATH_DATAFRAME, ".raw_npy.npy")), npy_matrix)
+    df.to_pickle(str(Path(PATH_DATAFRAME, ".raw_df.pkl")))
 
 """Save to files"""
-save_npy_to_disk(npy_matrix, PATH_DATA_DATAFRAME, "npy_matrix", train_metadata)
-save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "raw-with-userid", train_metadata)
+save_npy_to_disk(npy_matrix, PATH_DATAFRAME, "npy_matrix", train_metadata)
+save_df_to_disk(df, is_complete_train, PATH_DATAFRAME, "raw-with-userid", train_metadata)
 df = normalize_df(df, entropy_channel_combinations)
 glimpse_df(df)
-save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "normalized-with-userid", train_metadata)
+save_df_to_disk(df, is_complete_train, PATH_DATAFRAME, "normalized-with-userid", train_metadata)
 df = df.drop(["user_id", "epoch_id"])
-save_df_to_disk(df, is_complete_train, PATH_DATA_DATAFRAME, "normalized", train_metadata)
+save_df_to_disk(df, is_complete_train, PATH_DATAFRAME, "normalized", train_metadata)

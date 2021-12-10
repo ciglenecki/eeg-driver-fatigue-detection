@@ -7,7 +7,7 @@ from sklearn.svm import SVC
 
 def caculate_mode_all(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame, y_train_org: DataFrame, y_test_org: DataFrame, channels_good: list) -> List:
     """
-    Calculate single accuracy for each channel (Acc_i) for each user.
+    Calculate single accuracy for each channel (Acc_i) on the whole dataset.
     """
 
     channel_acc: Dict[str, float] = {}
@@ -24,7 +24,7 @@ def caculate_mode_all(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame,
         channel_acc[ch] = accuracy_score(y_test, y_test_pred)
 
     """
-    Calculate weight for each user for each channel (V_i).
+    Calculate weight for the whole dataset for each channel (V_i).
     """
 
     channel_weights = {}

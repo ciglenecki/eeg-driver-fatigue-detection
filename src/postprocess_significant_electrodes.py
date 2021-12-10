@@ -13,7 +13,7 @@ from sklearn.svm import SVC
 from postprocess_significant_electrodes_all import caculate_mode_all
 from postprocess_significant_electrodes_users import caculate_mode_users
 from utils_file_saver import load_model
-from utils_functions import stdout_to_file
+from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_REPORT
 from utils_env import channels_good, num_users
 from itertools import combinations
@@ -33,10 +33,7 @@ parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataf
 parser.add_argument("--svm", metavar="file", required=True, type=str, help="SVM model used for caclulating the accuracy")
 parser.add_argument("--mode", metavar="users/all", required=True, type=str, choices=["users", "all"], help='Defines mode for caculating significant electrodes. "users" caculates weights for each user and then averages it. "all" uses all users at once.')
 args = parser.parse_args()
-timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
-report_filename = Path(PATH_REPORT, "-".join(["significant-electrodes", args.mode, timestamp]) + ".txt")
-print(report_filename)
-stdout_to_file(report_filename)
+stdout_to_file(Path(PATH_REPORT, "-".join(["significant-electrodes", args.mode, get_timestamp()]) + ".txt"))
 print("Results")
 model: SVC = load_model(args.svm).best_estimator_
 
@@ -46,10 +43,11 @@ y = df.loc[:, df.columns.isin(["label", "user_id"])]
 
 X_train_org, X_test_org, y_train_org, y_test_org = train_test_split(X, y, test_size=0.5, random_state=0)
 
-result = None
+result = []
 if args.mode == "users":
     result = caculate_mode_users(model, X_train_org, X_test_org, y_train_org, y_test_org, channels_good, 1)
 else:
     result = caculate_mode_all(model, X_train_org, X_test_org, y_train_org, y_test_org, channels_good)
-print(result)
-sys.stdout.close()
+
+for line in result:
+    print(line)

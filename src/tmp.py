@@ -18,7 +18,7 @@ from utils_env import PAPER_BF_HIDDEN, PAPER_C, PAPER_G, PAPER_RFC_INPUT_VARIABL
 from utils_file_saver import load_dataframe, save_df_to_disk, save_model
 from sklearn.neural_network import MLPClassifier
 from utils_functions import glimpse_df, min_max_dataframe, powerset
-from utils_paths import PATH_DATA_MODEL, PATH_DATASET_MAT
+from utils_paths import PATH_MODEL, PATH_DATASET_MAT
 from sklearn.ensemble import RandomForestClassifier
 from itertools import product
 from sklearn.neighbors import KNeighborsClassifier
@@ -28,8 +28,9 @@ import pandas as pd
 from utils_functions import min_max_scaler
 from time import sleep
 
-sys.stdin.close()
-print("test")
+print(np.load("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/a.npy", allow_pickle=True))
+# sys.stdin.close()
+# print("test")
 # parser = argparse.ArgumentParser()
 # # parser.add_argument("--model", metavar="model", required=True, type=str, help="Model")
 # args = parser.parse_args()
