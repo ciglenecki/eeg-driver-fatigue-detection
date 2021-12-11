@@ -32,9 +32,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
 parser.add_argument("--svm", metavar="file", required=True, type=str, help="SVM model used for caclulating the accuracy")
 parser.add_argument("--mode", metavar="users/all", required=True, type=str, choices=["users", "all"], help='Defines mode for caculating significant electrodes. "users" caculates weights for each user and then averages it. "all" uses all users at once.')
+parser.add_argument("-r", "--output-report", metavar="dir", required=False, type=str, help="Directory where report file will be created.", default=PATH_REPORT)
 args = parser.parse_args()
-stdout_to_file(Path(PATH_REPORT, "-".join(["significant-electrodes", args.mode, get_timestamp()]) + ".txt"))
-print("Results")
+stdout_to_file(Path(args.output_report, "-".join(["significant-electrodes", args.mode, get_timestamp()]) + ".txt"))
 model: SVC = load_model(args.svm).best_estimator_
 
 df = read_pickle(args.df)

@@ -21,34 +21,39 @@
 
 # Todo:
 
+### Utils:
+- [x] Create report file saver and loader for easy and reproducible way to check results
+
 ### Signal:
 - [x] Apply filters to remove noise
-	- [x] notch filter 
-	- [x] band pass 0.15Hz to 40Hz ?
+	- [x] notch filter 50Hz
+	- [x] band pass 0.15Hz to 40Hz
+- [x] Crop the signal to 5 minutes (300 seconds) 
 - [x] Load signal for all users
-- [x] Epoch the signal using the window of 1 second
+- [x] Create epoch from the signal using the window of 1 second
 - [x] Calculate 4 different entropies for each 1 second epoch
 
 ### Df: 
-- [x] Concatenate features into a final dataFrame
-- [x] Normalize across all participans and not single one
-- [x] Split the dataset (train/test 50:50)
-	- use `is_normal_state_mask` you already created
-<!-- - [ ] Remove entropy outliers -->
+- [x] Concatenate features into a final dataframe
+- [x] Normalize across all participants and not single one
+- [x] Filter bad values and replace them with 0
+
 ### Train:
-- [ ] Create interface for training. Each model should use GridSearchCV and save the best f1 score model
-- [ ] Train the dataset with:
-	- [ ] SVM + Grid
-	- [ ] Neural network (BP) + Grid
-	- [ ] KNN + Grid
-	- [ ] Random Forest (RF)+ Grid
-- [ ] Validate accuracy using testing set
-- [ ] Use cross-validation to get better results
-- [ ] Determine significant electrodes
-	- [ ] Add them to "bad channels"
-- [ ] Repeat training with significant electrodes
+- [x] Split the dataset to train and test set (1:1)
+- [x] Use LOO (leave one participant out) approach to find the best `C` and `gamma` parameters for the SVM model
+- [x] Train the SVM model with multiple combinations of entropies (function `powerset`) to find out which entropy combination has the highest accuracy on the train dataset 
+- [x] Train the following models using the Grid Search method:
+	- [x] SVM
+	- [x] Neural network (BP)
+	- [x] KNN
+	- [x] Random Forest (RF)
+- [x] Validate accuracy using testing set and report performance on each model
+- [x] Determine significant electrodes by calculating the weight for each electrode for each user with the formula describe in the research paper:
+	- $$V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$$
+
 
 Optional:
+- [ ] Repeat training with significant electrodes
 - [ ] Compare entropies with entropies from the paper
 - [ ] Visualize training/testing error
 - [ ] Visualize weight-based topographies for each subject
@@ -58,30 +63,9 @@ Optional:
 
 # Questions:
 
-What is the general approach, steps and techniques to prepare the EEG signal?
-
 How is AR (auto-regression) is often mention in the paper. What it's use in the context of the problem?
 
-Should I recalculate significant electrodes or pick the ones form the paper?
-
-
-
-
-
-Page 5/19, min-max normalization on features: what are the features in this context, signal features or entropy features?
-
-Should I implement all classifiers or only SVM/BP?
-
-Rows are participants?
-- **No!**, there are only 12 participants = 12 rows.
-
-Should I one hot encode users and use time as rows ? 
-
-How do I organize the final dataFrame. What are columns / rows?
-
-
-
-# Data structure
+# Dataframe structure
 
 Here, we will calculate the entropy (4) for every channel (30) for every epoch. In the research paper, they also did that but reduced number of entropies from (30 * 4) to (4) by doing a "a feature-level fusion"
 | user_id | label | PE_CH01 | PE_CH02 | ... | PE_CH30 | SE_CH01 | SE_CH02 | ... | FE_CH30 |
@@ -101,7 +85,7 @@ users (12) * epochs (300) * states (2) = 7200
 
 Number of columns:
 ```
-label (1) + entropies (4) * channels (30) = 121
+user_id (1) + label (1) + epoch_id (1) + entropies (4) * channels (30) = 123
 ```
 
 
@@ -123,7 +107,7 @@ Entropy data:
 		- 1 represents the fatigue state
 		- 0 represents the normal state
 
-# Paper notes
+# Reserach paper notes
 ## Goal
 analyze the multiple entropy fusion method and evaluate several channel regions to effectively detect a driver’s fatigue state based on electroencephalogram (EEG) records
 
@@ -180,6 +164,7 @@ Combining multiple entropies always yields better accuracy.
 Significant electrodes were chosen from 30 electrodes.
 1. Calculate Acc(i) of single i electrode using multiple entropy fusion method based on training data by SVM classifier
 2. Obtain accuracy for each electrode and then recalculate it by combining pairwise electrode (with 29 electrodes)
-3. Calculate the weight V_i = Acc(i) + sum[ Acc(ij) + Acc(i) - Acc(j) ] / 30
+3. Calculate the weight for each electrode $V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$
 
-Pick 10 electrodes with biggest weight. These 10 electrodes produce 4 clusters/regions A,B,C,D. A gives the best prediction results and even better prediction compared when all electrodes were used for a prediction. 
+Pick 10 electrodes with biggest weight. These 10 electrodes produce 4 clusters/regions A,B,C,D.
+- A gives the best prediction results and even better prediction compared when all electrodes were used for a prediction

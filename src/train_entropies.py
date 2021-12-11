@@ -21,12 +21,11 @@ from tqdm import tqdm
 from datetime import datetime
 
 set_option("display.max_columns", None)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
+parser.add_argument("-r", "--output-report", metavar="dir", required=False, type=str, help="Directory where report file will be created.", default=PATH_REPORT)
 args = parser.parse_args()
-
-stdout_to_file(Path(PATH_REPORT, "-".join(["best-entropies", get_timestamp()]) + ".txt"))
+stdout_to_file(Path(args.output_report, "-".join(["best-entropies", get_timestamp()]) + ".txt"))
 
 
 df: DataFrame = read_pickle(args.df)
@@ -35,7 +34,8 @@ y = df.loc[:, "label"]
 
 X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
-entropy_excluded_powerset = list(powerset(entropy_names))[:-1]  # Exclude last element where all entropies are mentioned
+# Exclude last element where all entropies are mentioned
+entropy_excluded_powerset = list(powerset(entropy_names))[:-1]
 models = [model_svc]
 scorings = ["accuracy"]
 results = []

@@ -23,9 +23,10 @@ from utils_env import entropy_channel_combinations
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")
+parser.add_argument("-r", "--output-report", metavar="dir", required=False, type=str, help="Directory where report file will be created.", default=PATH_REPORT)
 args = parser.parse_args()
 
-stdout_to_file(Path(PATH_REPORT, "-".join(["train-models", get_timestamp()]) + ".txt"))
+stdout_to_file(Path(args.output_report, "-".join(["train-models", get_timestamp()]) + ".txt"))
 
 
 df = read_pickle(args.df)
