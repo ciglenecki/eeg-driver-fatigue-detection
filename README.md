@@ -12,12 +12,11 @@
 [requirements.txt](requirements.txt)
 
 
-# Notes:
+# Notes to self:
 
 1. Many channels are flatlined during the driving process and they spike only in some moments
 2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
-3. `ipython kernel install --user --name=eeg` to use venv
-
+3. `ipython kernel install --user --name=eeg` to use venv in jupyter
 
 # Todo:
 
