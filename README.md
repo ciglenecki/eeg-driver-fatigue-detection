@@ -32,7 +32,7 @@
 - [x] Create epoch from the signal using the window of 1 second
 - [x] Calculate 4 different entropies for each 1 second epoch
 
-### Df: 
+### Dataframe:
 - [x] Concatenate features into a final dataframe
 - [x] Normalize across all participants and not single one
 - [x] Filter bad values and replace them with 0
