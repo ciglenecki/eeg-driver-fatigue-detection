@@ -7,7 +7,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from itertools import accumulate
 import numpy as np
 
-wide_params = sorted([*np.logspace(-6, 3, 10), 500])  # from 1e-6 to 1000, mutiplying by ten
+# [1e-06, 1e-05, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 500.0, 1000.0]
+wide_params = sorted([*np.logspace(-6, 3, 10), 500])
 
 svm_parameters = [{"gamma": sorted([1e-3, 1e-4, PAPER_G]), "C": sorted([PAPER_C, 100, 500, 1000, 1500])}]
 svm_parameters_wide = [{"gamma": wide_params, "C": wide_params}]

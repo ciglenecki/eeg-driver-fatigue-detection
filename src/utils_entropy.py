@@ -22,32 +22,17 @@ def approximate_entropy(x):
     return an.app_entropy(x, order=2)
 
 
-def pd_fuzzy_entropy(x: Series, standardize_input=False) -> float:
-    # standardization doesnt affect result!
-    x_np = x.to_numpy()
-    if standardize_input:
-        x_np = standard_scaler_1d(x_np)
-    return fuzzy_entropy(x_np)
+def pd_fuzzy_entropy(x: Series) -> float:
+    return fuzzy_entropy(x.to_numpy())
 
 
-def pd_sample_entropy(x: Series, standardize_input=False) -> float:
-    # standardization doesnt affect result!
-    x_np = x.to_numpy()
-    if standardize_input:
-        x_np = standard_scaler_1d(x_np)
-    return sample_entropy(x_np)
+def pd_sample_entropy(x: Series) -> float:
+    return sample_entropy(x_np=x.to_numpy())
 
 
-def pd_spectral_entropy(x: Series, freq: float, standardize_input=False) -> float:
-    # standardization doesnt affect result!
-    x_np = x.to_numpy()
-    if standardize_input:
-        x_np = standard_scaler_1d(x_np)
-    return spectral_entropy(x_np, freq)
+def pd_spectral_entropy(x: Series, freq: float) -> float:
+    return spectral_entropy(x.to_numpy(), freq)
 
 
-def pd_approximate_entropy(x: Series, standardize_input=False) -> float:
-    x_np = x.to_numpy()
-    if standardize_input:
-        x_np = min_max_scaler_1d(x_np)
-    return approximate_entropy(x_np)
+def pd_approximate_entropy(x: Series) -> float:
+    return approximate_entropy(x.to_numpy())

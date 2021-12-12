@@ -7,7 +7,7 @@ from sklearn.svm import SVC
 
 def caculate_mode_all(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame, y_train_org: DataFrame, y_test_org: DataFrame, channels_good: list) -> List:
     """
-    Calculate single accuracy for each channel (Acc_i) on the whole dataset.
+    Calculate accuracy for each channel (Acc_i) by training on the whole dataset.
     """
 
     channel_acc: Dict[str, float] = {}

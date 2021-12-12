@@ -8,6 +8,8 @@ from pandas import DataFrame, set_option, read_pickle
 from pathlib import Path
 import warnings
 import sys
+
+from tqdm import tqdm
 from utils_file_saver import save_df_to_disk, save_npy_to_disk
 from utils_paths import *
 from utils_env import *
@@ -22,16 +24,16 @@ parser.add_argument("--users", metavar="N", type=int, help="Number of users that
 parser.add_argument("--sig", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
 parser.add_argument("--epoch-elems", metavar="N", type=int, help="Reduce (cut off) epoch duration to N miliseconds (11 >= N <= 1000)")
 parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precaculated entropy dataframe (the one that isn't cleaned and normalized)")
+parser.add_argument("--output-dir", metavar="dir", type=str, help="Directory where dataframe and npy files will be saved", default=PATH_DATAFRAME)
 args = parser.parse_args()
 
 is_complete_train = not any([args.users, args.sig, args.epoch_elems])
 is_complete_train = True
-if is_complete_train:
-    print("Performing complete training")
+print("Training on {} dataset...".format("complete" if is_complete_train else "partial"))
 num_users = args.users if (args.users) else num_users
 signal_duration = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS_DEFAULT
 epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
-
+output_dir = args.output_dir
 train_metadata = {
     "is_complete_train": is_complete_train,
     "num_users": num_users,
@@ -60,7 +62,8 @@ def signal_to_epochs(filename: str):
     signal_total_duration = floor(len(eeg) / FREQ)
     start = signal_total_duration - signal_duration + signal_offset
     end = signal_total_duration + signal_offset
-    eeg_filtered = eeg.crop(tmin=start, tmax=end).notch_filter(50).filter(l_freq=0.15, h_freq=40)
+    low_freq, high_freq = LOW_PASS_FILTER_RANGE_HZ
+    eeg_filtered = eeg.crop(tmin=start, tmax=end).notch_filter(NOTCH_FILTER_HZ).filter(l_freq=low_freq, h_freq=high_freq)
 
     return make_fixed_length_epochs(eeg_filtered, duration=EPOCH_SECONDS, preload=True, verbose=False)
 
@@ -92,15 +95,14 @@ if args.df_checkpoint:
     If checkpoint only action to perform is normalizing since entropies are already caculated
     """
     df = normalize_df(read_pickle(Path(args.df_checkpoint)), entropy_channel_combinations)
-    save_df_to_disk(df, train_metadata, PATH_DATAFRAME, "normalized")
+    save_df_to_disk(df, train_metadata, output_dir, "normalized")
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
 npy_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(channels_good)))
 rows = []
-for user_id in range(0, num_users):
+for user_id in tqdm(range(0, num_users)):
     for state in states:
-        print(user_id, state)
         file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
         epochs = signal_to_epochs(file_signal)
         df = epochs_to_dataframe(epochs)
@@ -122,25 +124,25 @@ for user_id in range(0, num_users):
             df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
             df_channels = df_epoch[channels_good]
 
-            df_spectral_entropy = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
-            df_approximate_entropy = df_channels.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
-            df_sample_entropy = df_channels.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
-            df_fuzzy_entropy = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
+            SE = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
+            AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
+            SE = df_channels.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
+            FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
 
             df_dict = {
-                "PE": df_spectral_entropy,
-                "AE": df_approximate_entropy,
-                "SE": df_sample_entropy,
-                "FE": df_fuzzy_entropy,
+                "PE": SE,
+                "AE": AE,
+                "SE": SE,
+                "FE": FE,
             }
 
-            for i, e in enumerate(entropy_names):
+            for i in range(len(entropy_names)):
                 npy_matrix[label][user_id][i][epoch_id] = np.array(df_dict[entropy_names[i]])
 
             rows.append([label, user_id, epoch_id, *df_dict[entropy_names[0]], *df_dict[entropy_names[1]], *df_dict[entropy_names[2]], *df_dict[entropy_names[3]]])
 
         if is_complete_train:
-            np.save(str(Path(PATH_DATAFRAME, ".raw_matrix")), npy_matrix)
+            np.save(str(Path(output_dir, ".raw_matrix")), npy_matrix)
 
 """Create dataframe from rows and columns"""
 columns = ["label", "user_id", "epoch_id"] + entropy_channel_combinations
@@ -149,14 +151,14 @@ df["label"] = df["label"].astype(int)
 
 """Complete training - save instantly so no error with naming is possible"""
 if is_complete_train:
-    np.save(str(Path(PATH_DATAFRAME, ".raw_npy.npy")), npy_matrix)
-    df.to_pickle(str(Path(PATH_DATAFRAME, ".raw_df.pkl")))
+    np.save(str(Path(output_dir, ".raw_npy.npy")), npy_matrix)
+    df.to_pickle(str(Path(output_dir, ".raw_df.pkl")))
 
 """Save to files"""
-save_npy_to_disk(npy_matrix, PATH_DATAFRAME, "npy_matrix", train_metadata)
-save_df_to_disk(df, is_complete_train, PATH_DATAFRAME, "raw-with-userid", train_metadata)
+save_npy_to_disk(npy_matrix, output_dir, "npy_matrix", train_metadata)
+save_df_to_disk(df, is_complete_train, output_dir, "raw-with-userid", train_metadata)
 df = normalize_df(df, entropy_channel_combinations)
 glimpse_df(df)
-save_df_to_disk(df, is_complete_train, PATH_DATAFRAME, "normalized-with-userid", train_metadata)
+save_df_to_disk(df, is_complete_train, output_dir, "normalized-with-userid", train_metadata)
 df = df.drop(["user_id", "epoch_id"])
-save_df_to_disk(df, is_complete_train, PATH_DATAFRAME, "normalized", train_metadata)
+save_df_to_disk(df, is_complete_train, output_dir, "normalized", train_metadata)

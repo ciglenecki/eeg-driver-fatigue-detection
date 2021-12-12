@@ -3,6 +3,7 @@ from itertools import chain, combinations
 from pathlib import Path
 import warnings
 from IPython.core.display import display
+import numpy as np
 from pandas import read_pickle
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
@@ -17,7 +18,7 @@ from utils_functions import glimpse_df, powerset, min_max_scaler, stdout_to_file
 from utils_paths import PATH_MODEL, PATH_REPORT
 from utils_env import num_users
 from itertools import product
-from model import model_svc_wide, wide_params, model_svc, model_mlp
+from model import wide_params
 from tqdm import tqdm
 from utils_env import entropy_channel_combinations
 from sklearn.metrics import accuracy_score

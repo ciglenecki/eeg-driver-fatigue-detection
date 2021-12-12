@@ -35,13 +35,13 @@ parser.add_argument("--mode", metavar="users/all", required=True, type=str, choi
 parser.add_argument("-r", "--output-report", metavar="dir", required=False, type=str, help="Directory where report file will be created.", default=PATH_REPORT)
 args = parser.parse_args()
 stdout_to_file(Path(args.output_report, "-".join(["significant-electrodes", args.mode, get_timestamp()]) + ".txt"))
-model: SVC = load_model(args.svm).best_estimator_
+
 
 df = read_pickle(args.df)
 X = df.loc[:, ~df.columns.isin(["label"])]
 y = df.loc[:, df.columns.isin(["label", "user_id"])]
-
 X_train_org, X_test_org, y_train_org, y_test_org = train_test_split(X, y, test_size=0.5, random_state=0)
+model: SVC = load_model(args.svm).best_estimator_
 
 result = []
 if args.mode == "users":
