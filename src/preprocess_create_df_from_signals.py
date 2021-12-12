@@ -124,10 +124,10 @@ for user_id in tqdm(range(0, num_users)):
             df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
             df_channels = df_epoch[channels_good]
 
-            SE = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ, standardize_input=True), axis=0)
-            AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x, standardize_input=True), axis=0)
-            SE = df_channels.apply(func=lambda x: pd_sample_entropy(x, standardize_input=True), axis=0)
-            FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x, standardize_input=True), axis=0)
+            SE = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ), axis=0)
+            AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x), axis=0)
+            SE = df_channels.apply(func=lambda x: pd_sample_entropy(x), axis=0)
+            FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
 
             df_dict = {
                 "PE": SE,
