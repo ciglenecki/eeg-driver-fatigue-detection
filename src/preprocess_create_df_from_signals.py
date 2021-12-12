@@ -99,10 +99,15 @@ if args.df_checkpoint:
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
+
+def stupid_fuzzy(x):
+    return 0
+
+
 npy_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(channels_good)))
 rows = []
 for user_id in tqdm(range(0, num_users)):
-    for state in states:
+    for state in tqdm(states):
         file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
         epochs = signal_to_epochs(file_signal)
         df = epochs_to_dataframe(epochs)
@@ -127,8 +132,9 @@ for user_id in tqdm(range(0, num_users)):
             SE = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ), axis=0)
             AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x), axis=0)
             SE = df_channels.apply(func=lambda x: pd_sample_entropy(x), axis=0)
-            FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
-            # FE = 0
+            FE = df_channels.apply(func=lambda x: stupid_fuzzy(x), axis=0)
+
+            # FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
 
             df_dict = {
                 "PE": SE,
@@ -161,5 +167,5 @@ save_df_to_disk(df, is_complete_train, output_dir, "raw-with-userid", train_meta
 df = normalize_df(df, entropy_channel_combinations)
 glimpse_df(df)
 save_df_to_disk(df, is_complete_train, output_dir, "normalized-with-userid", train_metadata)
-df = df.drop(["user_id", "epoch_id"])
+df = df.drop(["user_id", "epoch_id"], axis=1)
 save_df_to_disk(df, is_complete_train, output_dir, "normalized", train_metadata)

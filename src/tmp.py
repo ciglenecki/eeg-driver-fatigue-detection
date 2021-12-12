@@ -28,7 +28,14 @@ import pandas as pd
 from utils_functions import min_max_scaler
 from time import sleep
 
-print(np.load("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/a.npy", allow_pickle=True))
+set_option("display.max_columns", None)
+
+
+df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-with_user_id-2021-12-08-16-10-19-.pkl")
+
+# df.drop("user_id")
+print(df["SE_P3"].describe())
+
 # sys.stdin.close()
 # print("test")
 # parser = argparse.ArgumentParser()
