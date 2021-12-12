@@ -128,6 +128,7 @@ for user_id in tqdm(range(0, num_users)):
             AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x), axis=0)
             SE = df_channels.apply(func=lambda x: pd_sample_entropy(x), axis=0)
             FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
+            # FE = 0
 
             df_dict = {
                 "PE": SE,

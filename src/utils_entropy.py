@@ -27,7 +27,7 @@ def pd_fuzzy_entropy(x: Series) -> float:
 
 
 def pd_sample_entropy(x: Series) -> float:
-    return sample_entropy(x_np=x.to_numpy())
+    return sample_entropy(x.to_numpy())
 
 
 def pd_spectral_entropy(x: Series, freq: float) -> float:
