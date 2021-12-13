@@ -99,11 +99,6 @@ if args.df_checkpoint:
     print("Only cleaning of existing df was performed.")
     sys.exit(1)
 
-
-def stupid_fuzzy(x):
-    return 0
-
-
 npy_matrix = np.zeros(shape=(len(states), num_users, len(entropy_names), signal_duration, len(channels_good)))
 rows = []
 for user_id in tqdm(range(0, num_users)):
@@ -132,9 +127,7 @@ for user_id in tqdm(range(0, num_users)):
             SE = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ), axis=0)
             AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x), axis=0)
             SE = df_channels.apply(func=lambda x: pd_sample_entropy(x), axis=0)
-            FE = df_channels.apply(func=lambda x: stupid_fuzzy(x), axis=0)
-
-            # FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
+            FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
 
             df_dict = {
                 "PE": SE,
