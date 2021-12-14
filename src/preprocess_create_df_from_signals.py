@@ -67,10 +67,8 @@ def signal_to_epochs(filename: str):
 
     Notes:
     eeg = read_raw_cnt(filename, eog=["HEOL", "HEOR", "VEOU", "VEOL"], preload=True, verbose=False
-
     when comparing with and without eog, it changed data dramatically? this is what allowed me to sync data with S
     """
-
     eeg = read_raw_cnt(filename, preload=True, verbose=False)
     eeg.info["bads"].extend(channels_bad)
     eeg.pick_channels(channels_good)
