@@ -1,3 +1,22 @@
+"""
+Creates a tabluar dataframe file which is used for training with the following form:
+
+| user_id | epoch_id | label | PE_CH01 | PE_CH02 | ... | PE_CH30 | SE_CH01 | SE_CH02 | ... | FE_CH30 |
+| ------- | -------- | ----- | ------- | ------- | --- | ------- | ------- | ------- | --- | ------- |
+| 01      | 0        | 0     | 0.3     | 0.23    | ... | 0.6     | 0.8     | 0.1     | ... | 0.2     |
+| 01      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
+| ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
+| 01      | 0        | 0     | 0.6     | 0.3     | ... | 0.1     | 0.2     | 0.5     | ... | 0.1     |
+| 02      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
+| ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
+
+Number of rows: users (12) * epochs (300) * states (2) = 7200
+Number of columns: user_id (1) + label (1) + epoch_id (1) + entropies (4) * channels (30) = 123
+
+The dataframe file is saved at ./data/dataframes by default with name
+File with prefix "complete-normalized" should be used for training later on. 
+
+"""
 from datetime import datetime
 from mne.epochs import Epochs
 from mne import make_fixed_length_epochs
@@ -8,7 +27,6 @@ from pandas import DataFrame, set_option, read_pickle
 from pathlib import Path
 import warnings
 import sys
-
 from tqdm import tqdm
 from utils_file_saver import save_df_to_disk, save_npy_to_disk
 from utils_paths import *

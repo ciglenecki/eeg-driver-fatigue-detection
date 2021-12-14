@@ -1,3 +1,11 @@
+"""
+Load already trained model via --svm argument (use it's hyperparameters)
+Load the dataset with the --df argument
+Refit the model (using the same hyperparameters) with a new train_test_split, because it's not known which data was used during the training phase 
+Caculate weight for every channel and sort the list
+Create a report file
+"""
+
 import argparse
 from itertools import chain, combinations
 from math import gamma
@@ -20,12 +28,6 @@ from itertools import combinations
 import sys
 from datetime import datetime
 
-"""
-Get the trained model.
-Get the dataset
-Since we don't know which data was used in training we will refit the model with same optimal parameters.
-Caculate weight for every channel and sort by weight.
-"""
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
