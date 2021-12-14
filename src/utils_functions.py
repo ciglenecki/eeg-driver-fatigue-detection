@@ -1,3 +1,6 @@
+"""
+Utility functions
+"""
 from datetime import datetime
 from itertools import chain, combinations
 from os import getcwd

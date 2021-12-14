@@ -1,3 +1,6 @@
+"""
+Functions which caculate 4 entropies
+"""
 import antropy as an
 import EntropyHub as eh
 import numpy as np

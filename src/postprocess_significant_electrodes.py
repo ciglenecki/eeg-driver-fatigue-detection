@@ -1,4 +1,6 @@
 """
+Finds significant electrodes by caculating weight described by the formula in the paper
+
 Load already trained model via --svm argument (use it's hyperparameters)
 Load the dataset with the --df argument
 Refit the model (using the same hyperparameters) with a new train_test_split, because it's not known which data was used during the training phase 

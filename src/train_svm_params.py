@@ -1,3 +1,11 @@
+"""
+Finds the best C and gamma hyperparameters for SVM model by using Leave One Group out approach.
+A single group of rows is defined by participant's id (user_id).
+Effectively, this is LOO approach where 1 participant is left for validation and other 11 are used for training the model
+
+Load the dataset with the --df argument
+Calculate the accuracy for each hyperparameter pair
+"""
 import argparse
 from itertools import chain, combinations
 from pathlib import Path

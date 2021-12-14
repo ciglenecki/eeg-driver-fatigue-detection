@@ -1,3 +1,6 @@
+"""
+Specified paths -- directory structure
+"""
 from pathlib import Path
 from os import getcwd
 
