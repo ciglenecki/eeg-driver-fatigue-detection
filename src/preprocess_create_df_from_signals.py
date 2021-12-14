@@ -15,8 +15,8 @@ Number of columns: user_id (1) + label (1) + epoch_id (1) + entropies (4) * chan
 
 The dataframe file is saved at ./data/dataframes by default with name
 File with prefix "complete-normalized" should be used for training later on. 
-
 """
+
 from datetime import datetime
 from mne.epochs import Epochs
 from mne import make_fixed_length_epochs
@@ -35,8 +35,6 @@ from utils_functions import *
 from utils_entropy import *
 
 set_option("display.max_columns", None)
-warnings.filterwarnings("ignore")
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--users", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
 parser.add_argument("--sig", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
