@@ -6,6 +6,9 @@ import os
 
 
 def unzip_cnt(zip_path: Path, out_dir: Path):
+    """
+    Unzip CNT dataset files to out_dir
+    """
     subdir = Path(out_dir, "cnt")
     with ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(subdir)
@@ -14,7 +17,7 @@ def unzip_cnt(zip_path: Path, out_dir: Path):
     for zip_item in zips:
         if not str(zip_item).endswith(".zip"):
             continue
-        zip_ref = ZipFile(zip_item)  # create zipfile object
+        zip_ref = ZipFile(zip_item)
         for cnt_file in zip_ref.namelist()[1:]:  # ignore "9/" directory
 
             prefix_number = zip_item.stem  # 9
@@ -23,17 +26,21 @@ def unzip_cnt(zip_path: Path, out_dir: Path):
 
             with open(Path(subdir, filename), "wb") as new_file:
                 new_file.write(zip_ref.read(cnt_file))
-    # Delete zips as they were temporary
+    """ Delete tmp zips """
     for zip_item in zips:
         os.remove(zip_item)
-    print("Unzipped cnt data to:")
-    print("")
+
+    print("Unzipped cnt dataset to:", out_dir)
 
 
 def unzip_mat(zip_path: Path, out_dir: Path):
+    """
+    Unzip MAT dataset files to out_dir
+    """
     subdir = Path(out_dir, "mat")
     with ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(subdir)
+    print("Unzipped mat dataset to:", out_dir)
 
 
 parser = argparse.ArgumentParser()

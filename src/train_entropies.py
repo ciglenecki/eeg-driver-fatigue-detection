@@ -34,8 +34,7 @@ y = df.loc[:, "label"]
 
 X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
-# Exclude last element where all entropies are mentioned
-entropy_excluded_powerset = list(powerset(entropy_names))[:-1]
+entropy_excluded_powerset = list(powerset(entropy_names))[:-1]  # exclude last element (PE, AE, FE, SE)
 models = [model_svc]
 scorings = ["accuracy"]
 results = []
