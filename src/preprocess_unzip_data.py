@@ -1,3 +1,13 @@
+"""
+Unzips the dataset zips 5202739.zip 5202751.zip downloaded from
+- https://figshare.com/articles/dataset/The_original_EEG_data_for_driver_fatigue_detection/5202739
+- https://figshare.com/articles/dataset/The_entropy_value_for_driver_fatigue_detection/5202751/1
+
+Each zip's contents are unzipped to appropriate output directory.
+
+Cnt files are renamed: 3_normal.cnt, 5_fatigue.cnt, 10_normal.cnt...
+Mat files are renamed: 3.mat, 5.mat, 10.mat...
+"""
 import argparse
 from zipfile import ZipFile
 from utils_paths import *

@@ -1,3 +1,11 @@
+"""
+Load the dataset with the --df argument
+Create all possible combinations of entropies:
+[('PE'), ('AE'), ('SE'), ('FE'), ('PE', 'AE'), ('PE', 'SE'), ('PE', 'FE'), ('AE', 'SE'), ('AE', 'FE'), ('SE', 'FE'), ('PE', 'AE', 'SE'), ('PE', 'AE', 'FE'), ('PE', 'SE', 'FE'), ('AE', 'SE', 'FE'), ('PE', 'AE', 'SE', 'FE')]
+Train GridSearch SVM model on each entropy combination
+Find out which entropy combinations performs the best 
+Create a report file
+"""
 import argparse
 from itertools import chain, combinations
 from pathlib import Path

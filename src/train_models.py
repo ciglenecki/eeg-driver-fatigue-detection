@@ -1,3 +1,15 @@
+"""
+Load the dataset with the --df argument
+Use all entropy features during the training phase
+Train each model via grid serach method:
+    - SVC (SVM)
+    - MLPClassifier (Multi-layer Perceptron classifier)
+    - RandomForestClassifier
+    - KNeighborsClassifier
+Save each model to file (data/models)
+Create an report for each model
+Create a report file
+"""
 import argparse
 from itertools import chain, combinations
 from pathlib import Path
