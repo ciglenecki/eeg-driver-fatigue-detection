@@ -129,7 +129,7 @@ def dict_to_string(dictionary: dict):
     return "__".join(map(lambda key_value: "=".join([str(key_value[0]), str(key_value[1])]), pairs))
 
 
-class Tee(object):
+class SocketConcatenator(object):
     def __init__(self, *files):
         self.files = files
 
@@ -150,4 +150,4 @@ def stdout_to_file(file: Path):
     print("Standard output piped to file:")
     print(file)
     f = open(Path(getcwd(), file), "w")
-    sys.stdout = Tee(sys.stdout, f)
+    sys.stdout = SocketConcatenator(sys.stdout, f)
