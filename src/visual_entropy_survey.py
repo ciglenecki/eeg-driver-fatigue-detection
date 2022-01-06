@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from utils_paths import PATH_DATASET_MAT
 
-from utils_entropy import dict_apply_procedture, isnull_values_any
+from utils_feature_extraction import dict_apply_procedture, isnull_values_any
 from utils_functions import min_max_dataframe, standard_scale_dataframe
 
 mat = scipy.io.loadmat(Path(PATH_DATASET_MAT, "1.mat"))

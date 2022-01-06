@@ -30,7 +30,7 @@ from utils_paths import PATH_MODEL, PATH_REPORT
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
 from tqdm import tqdm
-from utils_env import entropy_channel_combinations
+from utils_env import training_columns_regex
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
@@ -44,9 +44,9 @@ stdout_to_file(Path(args.output_report, "-".join(["train-models", get_timestamp(
 df = read_pickle(args.df)
 glimpse_df(df)
 
-df = df.loc[:, df.columns.isin(["label", *entropy_channel_combinations])]
-X = df.loc[:, ~df.columns.isin(["label"])]
+X = df.loc[:, df.columns.str.contains(training_columns_regex)]
 y = df.loc[:, "label"]
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 scorings = ["accuracy"]  # scorings = ["accuracy", "f1"]

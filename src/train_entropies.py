@@ -52,8 +52,8 @@ for i, pair in enumerate(tqdm(list(product(scorings, models, entropy_excluded_po
     (X_train, X_test) = (X_train_org.copy(), X_test_org.copy())
 
     for entropy in entropies_exclude:
-        X_train = X_train.loc[:, ~X_train.columns.str.startswith(entropy)]
-        X_test = X_test.loc[:, ~X_test.columns.str.startswith(entropy)]
+        X_train = X_train.loc[:, ~X_train.columns.str.contains(entropy)]
+        X_test = X_test.loc[:, ~X_test.columns.str.contains(entropy)]
 
     model.scoring = scoring
     model.fit(X_train, y_train)

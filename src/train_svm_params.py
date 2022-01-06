@@ -28,7 +28,7 @@ from utils_env import num_users
 from itertools import product
 from model import wide_params
 from tqdm import tqdm
-from utils_env import entropy_channel_combinations
+from utils_env import training_columns_regex
 from sklearn.metrics import accuracy_score
 
 set_option("display.max_columns", None)
@@ -40,10 +40,13 @@ stdout_to_file(Path(args.output_report, "-".join(["svm-parameters", get_timestam
 
 df = read_pickle(args.df)
 glimpse_df(df)
+
 X = df.loc[:, ~df.columns.isin(["label"])]
 y = df.loc[:, df.columns.isin(["label", "user_id"])]
 
-training_columns = X.columns.isin(entropy_channel_combinations)
+
+training_columns = X.columns.str.contains(training_columns_regex)
+
 groups = X["user_id"].to_numpy()
 acc_parameters = []
 

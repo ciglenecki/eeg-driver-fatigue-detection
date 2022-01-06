@@ -154,3 +154,6 @@ def stdout_to_file(file: Path):
     print(file)
     f = open(Path(getcwd(), file), "w")
     sys.stdout = SocketConcatenator(sys.stdout, f)
+
+def flatten(t):
+    return [item for sublist in t for item in sublist]

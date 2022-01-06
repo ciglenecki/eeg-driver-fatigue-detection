@@ -6,6 +6,7 @@ import EntropyHub as eh
 import numpy as np
 from pandas import Series
 from utils_functions import *
+from scipy import signal
 
 
 def fuzzy_entropy(x):
@@ -18,7 +19,7 @@ def sample_entropy(x):
 
 # don't normalize because you have to normalze across all users and not based on 1 user and 1 sample
 def spectral_entropy(x, freq: float):
-    return an.spectral_entropy(x, sf=freq, normalize=False)
+    return an.spectral_entropy(x, sf=freq, method="welch", normalize=True)
 
 
 def approximate_entropy(x):
@@ -39,3 +40,8 @@ def pd_spectral_entropy(x: Series, freq: float) -> float:
 
 def pd_approximate_entropy(x: Series) -> float:
     return approximate_entropy(x.to_numpy())
+
+
+def psd_welch(x: Series):
+    _, psd = signal.welch(x)
+    return psd

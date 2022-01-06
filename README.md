@@ -17,7 +17,8 @@
 1. Many channels are flatlined during the driving process and they spike only in some moments
 2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
 3. `ipython kernel install --user --name=eeg` to use venv in jupyter
-
+4. Normalized values produce nan for SE entropy (minmax scaler 1d)
+5. Two different libs (EntropyHub and Antropy) produce the same result for sample entropy
 # Todo:
 
 ### Utils:
@@ -50,6 +51,11 @@
 - [x] Determine significant electrodes by calculating the weight for each electrode for each user with the formula describe in the research paper:
 	- $$V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$$
 
+Improvement:
+- [x] Check SE entropy infs
+- [] Alpha beta gama delta waves
+- [] Additional features, mean, psd
+- [] ICA - Principal component analysis
 
 Optional:
 - [ ] Repeat training with significant electrodes

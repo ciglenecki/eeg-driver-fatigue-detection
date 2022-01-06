@@ -3,6 +3,7 @@ FATIGUE_STR = "fatigue"
 NORMAL_STR = "normal"
 states = [NORMAL_STR, FATIGUE_STR]
 
+
 """ Signal config"""
 FREQ = 1000
 EPOCH_SECONDS = 1
@@ -18,8 +19,21 @@ channels_good = ["FP1", "FP2", "F7", "F3", "FZ", "F4", "F8", "FT7", "FC3", "FCZ"
 channels_bad = list(set(channels_all) - set(channels_good))
 channels_ignore = []
 
+USE_BRAIN_BANDS = True
 
+
+def get_brainwave_bands():
+    return {"AL": (8, 10 + 1), "AH": (10, 12 + 1), "BL": (13, 19 + 1), "BH": (19, 25 + 1)}
+
+
+additional_feature_names = ["psd", "mean", "std"]
 entropy_names = ["PE", "AE", "SE", "FE"]
+feature_names = entropy_names + additional_feature_names
+feature_indices = dict((name, i) for i, name in enumerate(feature_names))
+
+
+training_columns_regex = "|".join(channels_good)
+
 entropy_channel_combinations = ["{}_{}".format(entropy, channel) for entropy in entropy_names for channel in channels_good]  # [PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
 
 """ Train parameters"""
