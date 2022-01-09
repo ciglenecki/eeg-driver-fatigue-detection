@@ -25,7 +25,7 @@ from sklearn.svm import SVC
 import pickle
 from joblib import dump, load
 from utils_file_saver import save_model
-from utils_functions import get_timestamp, glimpse_df, powerset, min_max_scaler, stdout_to_file
+from utils_functions import get_timestamp, glimpse_df, isnull_any, powerset, min_max_scaler, stdout_to_file
 from utils_paths import PATH_MODEL, PATH_REPORT
 from itertools import product
 from model import model_rfc, model_mlp, model_svc, model_knn
@@ -39,19 +39,20 @@ parser.add_argument("-r", "--output-report", metavar="dir", required=False, type
 args = parser.parse_args()
 
 stdout_to_file(Path(args.output_report, "-".join(["train-models", get_timestamp()]) + ".txt"))
+print(vars(args))
 
 
 df = read_pickle(args.df)
-glimpse_df(df)
 
 X = df.loc[:, df.columns.str.contains(training_columns_regex)]
+X = X[X.columns[X.max() != -1]]
 y = df.loc[:, "label"]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
 scorings = ["accuracy"]  # scorings = ["accuracy", "f1"]
 models = [model_rfc, model_mlp, model_knn, model_svc]
-for pair in product(scorings, models):
+for pair in tqdm(list(product(scorings, models))):
     scoring, model = pair
 
     model_name = type(model.estimator).__name__

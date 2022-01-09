@@ -2,7 +2,8 @@ num_users = 12
 FATIGUE_STR = "fatigue"
 NORMAL_STR = "normal"
 states = [NORMAL_STR, FATIGUE_STR]
-
+USE_ICA = False
+USE_REREF = False
 
 """ Signal config"""
 FREQ = 1000
@@ -26,7 +27,7 @@ def get_brainwave_bands():
     return {"AL": (8, 10 + 1), "AH": (10, 12 + 1), "BL": (13, 19 + 1), "BH": (19, 25 + 1)}
 
 
-additional_feature_names = ["psd", "mean", "std"]
+additional_feature_names = ["pdf", "mean", "std"]
 entropy_names = ["PE", "AE", "SE", "FE"]
 feature_names = entropy_names + additional_feature_names
 feature_indices = dict((name, i) for i, name in enumerate(feature_names))

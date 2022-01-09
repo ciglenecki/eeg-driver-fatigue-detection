@@ -53,9 +53,13 @@
 
 Improvement:
 - [x] Check SE entropy infs
-- [] Alpha beta gama delta waves
-- [] Additional features, mean, psd
+  - There are no inf and NaN values anymore once this was fixed 
+- [x] Alpha beta gama delta waves
+- [x] Additional features, mean, psd
+- [ ] Training with additional features
+- [ ] Training with additional features and brainwave bands
 - [] ICA - Principal component analysis
+	- [ ] filter low 1hz to remove drifts	
 
 Optional:
 - [ ] Repeat training with significant electrodes

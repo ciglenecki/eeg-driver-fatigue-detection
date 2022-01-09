@@ -1,7 +1,8 @@
 [Dolphin]
 HeaderColumnWidths=482,72,125,125,134
 SortOrder=1
-Timestamp=2021,12,10,3,52,4
+SortRole=creationtime
+Timestamp=2022,1,9,14,46,32
 Version=4
 ViewMode=1
 VisibleRoles=Details_text,Details_size,Details_modificationtime,Details_creationtime,Details_type,CustomizedDetails

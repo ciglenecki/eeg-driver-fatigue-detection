@@ -44,7 +44,7 @@ def save_to_file_with_metadata(
     file_saver: Callable[[object, str], Any] = lambda obj, filename: dump(obj, filename),
     metadata: dict = {},
 ):
-    MAX_FILENAME_LEN = 255
+    MAX_FILENAME_LEN = 255 - 1
     timestamp = datetime.today().strftime("%Y-%m-%d-%H-%M-%S")
     metadata_str = dict_to_string(metadata)
     metadata_bytes = dict_to_byte_metadata(metadata)
@@ -64,7 +64,7 @@ def save_model(model, model_name, score, directory: Path, metadata={}, name_tag=
 def save_df_to_disk(df: DataFrame, is_complete_train: bool, dir: Path, name_tag: str, metadata={}):
     data_type_str = "complete" if is_complete_train else "partial"
     basename = "-".join([data_type_str, name_tag])
-    metadata = {} if is_complete_train else metadata
+    metadata = metadata if is_complete_train else {}
     file_saver = lambda df, filename: df.to_pickle(str(filename))
     save_to_file_with_metadata(df, dir, basename, ".pkl", file_saver, metadata=metadata)
     return

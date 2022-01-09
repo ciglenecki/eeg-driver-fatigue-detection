@@ -5,6 +5,9 @@ import antropy as an
 import EntropyHub as eh
 import numpy as np
 from pandas import Series
+import pandas
+from scipy.signal.filter_design import normalize
+from scipy.signal.spectral import periodogram
 from utils_functions import *
 from scipy import signal
 
@@ -19,7 +22,17 @@ def sample_entropy(x):
 
 # don't normalize because you have to normalze across all users and not based on 1 user and 1 sample
 def spectral_entropy(x, freq: float):
-    return an.spectral_entropy(x, sf=freq, method="welch", normalize=True)
+    axis = -1
+    sf = freq
+    normalize = False
+
+    x = np.asarray(x)
+    _, psd = periodogram(x, sf, axis=axis)
+    psd_norm = psd[1:] / psd[1:].sum(axis=axis, keepdims=True)
+    se = -(psd_norm * np.log2(psd_norm)).sum(axis=axis)
+    if normalize:
+        se /= np.log2(psd_norm.shape[axis])
+    return se
 
 
 def approximate_entropy(x):

@@ -12,6 +12,7 @@ from pandas import DataFrame
 from IPython.display import display
 from typing import Dict
 import numpy as np
+import re
 
 T = TypeVar("T")
 
@@ -25,11 +26,11 @@ def dict_apply_procedture(old_dict: Dict[str, T], procedure) -> Dict[str, T]:
 
 
 def min_max_dataframe(df: DataFrame):
-    return DataFrame(min_max_scaler(df))
+    return df.apply(lambda x: min_max_scaler_1d(x.to_numpy()), axis=0)
 
 
 def standard_scale_dataframe(df: DataFrame):
-    return DataFrame(standard_scaler(df))
+    return df.apply(lambda x: standard_scaler_1d(x.to_numpy()), axis=0)
 
 
 standard_scaler = preprocessing.StandardScaler().fit_transform
@@ -154,6 +155,15 @@ def stdout_to_file(file: Path):
     print(file)
     f = open(Path(getcwd(), file), "w")
     sys.stdout = SocketConcatenator(sys.stdout, f)
+
+
+def print_report(file: Path, regex_filter):
+    regex = re.compile(regex_filter)
+    readlines = open(file, "r").readlines()
+    filtered_lines = [s for s in readlines if regex.match(s)]
+    for line in filtered_lines:
+        print(line.strip())
+
 
 def flatten(t):
     return [item for sublist in t for item in sublist]
