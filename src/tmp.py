@@ -49,9 +49,13 @@ def get_column_names(use_brainbands: bool, brainwave_bands: dict):
 
 set_option("display.max_columns", None)
 
-df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-raw-2022-01-07-09-33-20-.pkl")
+df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-10-00-40-53-is_complete_train=true__brains=false__ica=false__reref=true.pkl")
 
-print(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
+df2 = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-08-14-53-51__brains=false__ica=false.pkl")
+
+print(df.head(n=1)["T5_AE"])
+print(df2.head(n=1)["T5_AE"])
+
 exit(1)
 # df_new = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-07-09-33-21-.pkl")
 
