@@ -11,18 +11,18 @@ Create a report file
 import argparse
 from pathlib import Path
 
-from IPython.core.display import display
-from pandas import read_pickle
+from pandas import read_pickle, DataFrame
 from pandas._config.config import set_option
-from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 
 from postprocess_significant_electrodes_all import caculate_mode_all
 from postprocess_significant_electrodes_users import caculate_mode_users
+from preprocess_preprocess_df import split_and_normalize
 from utils_env import channels_good
 from utils_file_saver import load_model
 from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_REPORT
+from preprocess_preprocess_df import training_columns_regex
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
@@ -43,10 +43,12 @@ stdout_to_file(Path(args.output_report, "-".join(["significant-electrodes", args
 channels_ignore = args.channels_ignore
 channels = list(set(channels_good) - set(channels_ignore))
 
-df = read_pickle(args.df)
+df: DataFrame = read_pickle(args.df)
+training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
 X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
 y = df.loc[:, df.columns.isin(["is_fatigued", "user_id"])]
-X_train_org, X_test_org, y_train_org, y_test_org = train_test_split(X, y, test_size=0.5, random_state=0)
+X_train_org, X_test_org, y_train_org, y_test_org = split_and_normalize(X, y, training_columns, test_size=0.5)
+
 model: SVC = load_model(args.svm).best_estimator_
 
 result = []

@@ -8,15 +8,23 @@ import warnings
 from pathlib import Path
 
 import numpy as np
-from pandas import DataFrame, read_pickle, set_option
+from pandas import DataFrame, read_pickle, set_option, Series
+from sklearn.model_selection import train_test_split
 
-from utils_env import NUM_USERS, training_columns_regex
+from utils_env import training_columns_regex
 from utils_file_saver import save_to_file_with_metadata
-from utils_functions import min_max_dataframe, min_max_scaler_1d, standard_scale_dataframe
 from utils_paths import PATH_DATAFRAME
+from sklearn.preprocessing import MinMaxScaler
 
 
-def normalize_df(df: DataFrame, columns_to_scale: list, scaler=min_max_dataframe, scale_per_person=False):
+def split_and_normalize(X: DataFrame, y: Series, test_size: float, columns_to_scale: list, scaler: MinMaxScaler = MinMaxScaler()):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
+    X_train.loc[:, columns_to_scale] = scaler.fit_transform(X_train.loc[:, columns_to_scale])
+    X_test.loc[:, columns_to_scale] = scaler.transform(X_test.loc[:, columns_to_scale])
+    return X_train, X_test, y_train, y_test
+
+
+def df_replace_values(df: DataFrame):
     """
     Normalizes dataframe by replacing values and scaling them.
     Standard scaler scales for each column independently.
@@ -24,12 +32,6 @@ def normalize_df(df: DataFrame, columns_to_scale: list, scaler=min_max_dataframe
     """
     df = df.replace([np.inf, -np.inf], np.nan)
     df = df.fillna(0)
-    # df[columns_to_scale] = df[columns_to_scale].apply(lambda x: mstats.winsorize(x, limits=[0.01, 0.01]), axis=0)
-    if scale_per_person:
-        for i in range(NUM_USERS):
-            df.loc[df["user_id"] == i, columns_to_scale] = scaler(df.loc[df["user_id"] == i, columns_to_scale])
-    else:
-        df[columns_to_scale] = scaler(df[columns_to_scale])
     return df
 
 
@@ -46,8 +48,8 @@ if __name__ == "__main__":
     output_dir = Path(args.output_dir)
 
     df: DataFrame = read_pickle(df_path)
-    training_column_names = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
-    df = normalize_df(df, training_column_names, scaler=min_max_dataframe, per_person_scale=True)
+    training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
+    df = df_replace_values(df)
 
     file_saver = lambda df, filename: df.to_pickle(str(filename))
     basename = df_path.stem.replace("raw", "normalized-after")

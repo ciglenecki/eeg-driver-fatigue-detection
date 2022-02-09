@@ -11,26 +11,20 @@ Create an report for each model
 Create a report file
 """
 import argparse
-import pickle
-import warnings
-from itertools import chain, combinations, product
+from itertools import product
 from pathlib import Path
 
-from IPython.core.display import display
-from joblib import dump, load
 from pandas import read_pickle
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
 from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.svm import SVC
 from tqdm import tqdm
 
 from model import model_knn, model_mlp, model_rfc, model_svc
+from preprocess_preprocess_df import split_and_normalize
 from utils_env import training_columns_regex
 from utils_file_saver import save_model
-from utils_functions import (get_timestamp, glimpse_df, isnull_any,
-                             min_max_scaler, powerset, stdout_to_file)
+from utils_functions import get_timestamp, glimpse_df, stdout_to_file
 from utils_paths import PATH_MODEL, PATH_REPORT
 
 set_option("display.max_columns", None)
@@ -43,13 +37,12 @@ stdout_to_file(Path(args.output_report, "-".join(["train-models", get_timestamp(
 print(vars(args))
 
 
-df = read_pickle(args.df)
-
-X = df.loc[:, df.columns.str.contains(training_columns_regex)]
-X = X[X.columns[X.max() != -1]]
+df: DataFrame = read_pickle(args.df)
+training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
+X = df.loc[:, training_columns]
+X = X[X.columns[X.max() != -1]]  # remove constant attributes
 y = df.loc[:, "is_fatigued"]
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+X_train, X_test, y_train, y_test = split_and_normalize(X, y, training_columns, test_size=0.5)
 
 scorings = ["accuracy"]  # scorings = ["accuracy", "f1"]
 models = [model_rfc, model_mlp, model_knn, model_svc]

@@ -30,10 +30,10 @@ from mne import Epochs
 from mne.epochs import make_fixed_length_epochs
 from mne.io.base import BaseRaw
 from mne.io.cnt import read_raw_cnt
-from pandas import DataFrame, read_pickle, set_option
+from pandas import DataFrame, set_option
 from tqdm import tqdm
 
-from preprocess_normalize_df import normalize_df
+from preprocess_preprocess_df import df_replace_values
 from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands, training_columns_regex
 from utils_feature_extraction import FeatureExtractor
 from utils_file_saver import save_df_to_disk
@@ -221,6 +221,6 @@ df.to_pickle(str(Path(output_dir, ".raw_df.pkl")))
 
 """Save to files"""
 save_df_to_disk(df, is_complete_dataset, output_dir, "raw", train_metadata)
-df = normalize_df(df, training_cols)
 glimpse_df(df)
-save_df_to_disk(df, is_complete_dataset, output_dir, "normalized", train_metadata)
+df = df_replace_values(df)
+# save_df_to_disk(df, is_complete_dataset, output_dir, "normalized", train_metadata)

@@ -11,7 +11,7 @@ import argparse
 from itertools import product
 from pathlib import Path
 
-from pandas import read_pickle
+from pandas import read_pickle, DataFrame
 from pandas._config.config import set_option
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import LeaveOneGroupOut
@@ -19,6 +19,7 @@ from sklearn.svm import SVC
 from tqdm import tqdm
 
 from model import wide_params
+from preprocess_preprocess_df import split_and_normalize
 from utils_env import NUM_USERS, training_columns_regex
 from utils_functions import get_timestamp, glimpse_df, stdout_to_file
 from utils_paths import PATH_REPORT
@@ -30,13 +31,12 @@ parser.add_argument("-r", "--output-report", metavar="dir", required=False, type
 args = parser.parse_args()
 stdout_to_file(Path(args.output_report, "-".join(["svm-parameters", get_timestamp()]) + ".txt"))
 
-df = read_pickle(args.df)
-glimpse_df(df)
-
+df: DataFrame = read_pickle(args.df)
+training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
 X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
-y = df.loc[:, df.columns.isin(["is_fatigued", "user_id"])]
-
-training_columns = X.columns.str.contains(training_columns_regex)
+X = X[X.columns[X.max() != -1]]  # remove constant attributes
+y = df.loc[:, "is_fatigued"]
+X_train, X_test, y_train, y_test = split_and_normalize(X, y, training_columns, test_size=0.5)
 
 groups = X["user_id"].to_numpy()
 acc_parameters = []
@@ -47,7 +47,7 @@ for C, gamma in tqdm(list(product(wide_params, wide_params))):
 
     for train_index, test_index in LeaveOneGroupOut().split(X, y, groups):
         X_train, X_test = X.iloc[train_index, training_columns], X.iloc[test_index, training_columns]
-        y_train, y_test = y.iloc[train_index]["is_fatigued"], y.iloc[test_index]["is_fatigued"]
+        y_train, y_test = y[train_index], y[test_index]
         model.fit(X_train, y_train)
         y_test_pred = model.predict(X_test)
         acc = accuracy_score(y_test, y_test_pred)

@@ -9,26 +9,20 @@ Train GridSearch SVM model on each entropy combination
 Create a report file
 """
 import argparse
-import pickle
-import warnings
-from datetime import datetime
-from itertools import chain, combinations, product
 from pathlib import Path
 
-from IPython.core.display import display
-from joblib import dump, load
+
 from pandas import DataFrame, read_pickle
 from pandas._config.config import set_option
 from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.svm import SVC
 from tqdm import tqdm
 
 from model import model_svc
 from utils_env import entropy_names
-from utils_file_saver import save_model
-from utils_functions import get_dictionary_leaves, get_timestamp, glimpse_df, powerset, stdout_to_file
+from utils_functions import get_dictionary_leaves, get_timestamp, powerset, stdout_to_file
 from utils_paths import PATH_REPORT
+from preprocess_preprocess_df import split_and_normalize
+from utils_env import training_columns_regex
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
@@ -42,7 +36,8 @@ df: DataFrame = read_pickle(args.df)
 X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
 y = df.loc[:, "is_fatigued"]
 
-X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
+X_train_org, X_test_org, y_train, y_test = split_and_normalize(X, y, training_columns, test_size=0.5)
 
 entropy_excluded_powerset = list(powerset(entropy_names))[:-1]  # exclude last element (PE, AE, FE, SE)
 models = [model_svc]

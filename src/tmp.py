@@ -25,7 +25,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from tqdm import tqdm
 
-from preprocess_normalize_df import normalize_df
+from preprocess_preprocess_df import normalize_df
 from utils_env import PAPER_BF_HIDDEN, PAPER_C, PAPER_G, PAPER_RFC_INPUT_VARIABLES, PAPER_RFC_TREES, channels_good, feature_names, training_columns_regex
 from utils_file_saver import load_dataframe, save_df_to_disk, save_model, save_to_file_with_metadata
 from utils_functions import glimpse_df, min_max_dataframe, min_max_scaler, powerset
