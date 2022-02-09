@@ -24,7 +24,7 @@ from joblib import dump, load
 from utils_file_saver import save_model
 from utils_functions import glimpse_df, powerset, min_max_scaler, stdout_to_file, get_timestamp
 from utils_paths import PATH_MODEL, PATH_REPORT
-from utils_env import num_users
+from utils_env import NUM_USERS
 from itertools import product
 from model import wide_params
 from tqdm import tqdm
@@ -41,8 +41,8 @@ stdout_to_file(Path(args.output_report, "-".join(["svm-parameters", get_timestam
 df = read_pickle(args.df)
 glimpse_df(df)
 
-X = df.loc[:, ~df.columns.isin(["label"])]
-y = df.loc[:, df.columns.isin(["label", "user_id"])]
+X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
+y = df.loc[:, df.columns.isin(["is_fatigued", "user_id"])]
 
 
 training_columns = X.columns.str.contains(training_columns_regex)
@@ -56,12 +56,12 @@ for C, gamma in tqdm(list(product(wide_params, wide_params))):
 
     for train_index, test_index in LeaveOneGroupOut().split(X, y, groups):
         X_train, X_test = X.iloc[train_index, training_columns], X.iloc[test_index, training_columns]
-        y_train, y_test = y.iloc[train_index]["label"], y.iloc[test_index]["label"]
+        y_train, y_test = y.iloc[train_index]["is_fatigued"], y.iloc[test_index]["is_fatigued"]
         model.fit(X_train, y_train)
         y_test_pred = model.predict(X_test)
         acc = accuracy_score(y_test, y_test_pred)
         acc_total += acc
-    acc_parameters.append([acc_total / num_users, C, gamma])
+    acc_parameters.append([acc_total / NUM_USERS, C, gamma])
 
 print("Acc\t\t\tC\tgamma")
 accs = sorted(acc_parameters, key=lambda x: x[0], reverse=True)

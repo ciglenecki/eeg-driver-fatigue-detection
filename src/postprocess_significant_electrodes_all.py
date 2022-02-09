@@ -16,8 +16,8 @@ def caculate_mode_all(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame,
         X_train = X_train_org.loc[:, X_train_org.columns.str.contains(ch)]
         X_test = X_test_org.loc[:, X_test_org.columns.str.contains(ch)]
 
-        y_train = y_train_org["label"]
-        y_test = y_test_org["label"]
+        y_train = y_train_org["is_fatigued"]
+        y_test = y_test_org["is_fatigued"]
 
         model.fit(X_train, y_train)
         y_test_pred = model.predict(X_test)
@@ -41,8 +41,8 @@ def caculate_mode_all(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame,
 
             X_test = X_test_org.loc[:, X_test_org.columns.str.contains("|".join([channel_a_name, channel_b_name]))]
 
-            y_train = y_train_org["label"]
-            y_test = y_test_org["label"]
+            y_train = y_train_org["is_fatigued"]
+            y_test = y_test_org["is_fatigued"]
 
             model.fit(X_train, y_train)
             y_test_pred = model.predict(X_test)

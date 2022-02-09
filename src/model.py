@@ -1,13 +1,17 @@
-from sklearn.model_selection import GridSearchCV, LeaveOneOut, RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.svm import SVC
 from utils_env import PAPER_BF_HIDDEN, PAPER_C, PAPER_G, PAPER_RFC_INPUT_VARIABLES, PAPER_RFC_TREES
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from itertools import accumulate
 import numpy as np
 
-# [1e-06, 1e-05, 0.0001, 0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 500.0, 1000.0]
+PAPER_G = 2 ** (-5)
+PAPER_C = 2 ** (-1)
+PAPER_RFC_TREES = 500
+PAPER_RFC_INPUT_VARIABLES = 22
+PAPER_BF_HIDDEN = 22
+
 wide_params = sorted([*np.logspace(-6, 3, 10), 500])
 
 svm_parameters = [{"gamma": sorted([1e-3, 1e-4, PAPER_G]), "C": sorted([PAPER_C, 100, 500, 1000, 1500])}]

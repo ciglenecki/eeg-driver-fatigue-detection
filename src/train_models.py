@@ -46,7 +46,7 @@ df = read_pickle(args.df)
 
 X = df.loc[:, df.columns.str.contains(training_columns_regex)]
 X = X[X.columns[X.max() != -1]]
-y = df.loc[:, "label"]
+y = df.loc[:, "is_fatigued"]
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 

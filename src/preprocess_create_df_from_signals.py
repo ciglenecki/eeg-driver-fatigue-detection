@@ -10,137 +10,122 @@ Creates a tabluar dataframe file which is used for training with the following f
 | 02      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
 | ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
 
-Number of rows: users (12) * epochs (300) * states (2) = 7200
+Number of rows: users (12) * epochs (300) * driving_states (2) = 7200
 Number of columns: user_id (1) + label (1) + epoch_id (1) + entropies (4) * channels (30) = 123
 
 The dataframe file is saved at ./data/dataframes by default with name
 File with prefix "complete-normalized" should be used for training later on. 
 """
 
-from datetime import datetime
-from multiprocessing import Array
-import mne
-from mne.epochs import Epochs
-from mne.preprocessing import ICA, regress_artifact
-from mne import make_fixed_length_epochs, time_frequency
+from typing import List
 import argparse
 from math import floor
-from mne.io import read_raw_cnt
+from mne.io.cnt import read_raw_cnt
 from mne.io.base import BaseRaw
-from mne.transforms import scaling
+from mne import Epochs
+from mne.epochs import make_fixed_length_epochs
 from pandas import DataFrame, set_option, read_pickle
 from pathlib import Path
 import warnings
 import sys
-from scipy import signal
 from tqdm import tqdm
 from preprocess_normalize_df import normalize_df
 from mne.decoding import UnsupervisedSpatialFilter
-from sklearn.decomposition import PCA, FastICA
-from utils_file_saver import save_df_to_disk, save_npy_to_disk
-from utils_paths import *
-from utils_env import *
-from utils_functions import *
-from utils_feature_extraction import *
+from sklearn.decomposition import FastICA
 from itertools import product
-
+import numpy as np
+from utils_functions import serialize_functions, get_cnt_filename, glimpse_df, is_arg_default
+from utils_paths import PATH_DATAFRAME, PATH_DATASET_CNT
+from utils_file_saver import save_df_to_disk
+from utils_signal import SignalPreprocessor
+from utils_feature_extraction import FeatureExtractor
+from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, get_brainwave_bands, feature_names, channels_good, training_columns_regex, driving_states
 
 set_option("display.max_columns", None)
 warnings.filterwarnings("ignore")
+
 parser = argparse.ArgumentParser()
-parser.add_argument("--users", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
-parser.add_argument("--sig", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
-parser.add_argument("--epoch-elems", metavar="N", type=int, help="Reduce (cut off) epoch duration to N miliseconds (11 >= N <= 1000)")
+parser.add_argument("--user_num", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
+parser.add_argument("--signal-duration", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
+parser.add_argument("--epoch-events-num", metavar="N", type=int, help="Each epoch will contain N events instead of using all 1000 events. The frequency is 1000HZ. (11 >= N <= 1000)")
 parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precaculated entropy dataframe (the one that isn't cleaned and normalized)")
 parser.add_argument("--output-dir", metavar="dir", type=str, help="Directory where dataframe and npy files will be saved", default=PATH_DATAFRAME)
-parser.add_argument("--no-brainbands", dest="use_brainbands", action="store_false", help="Decompose signal into alpha and beta bands")
+parser.add_argument("--use-brainbands", dest="use_brainbands", action="store_true", help="Decompose signal into alpha and beta bands")
 parser.add_argument("--use-ica", dest="use_ica", action="store_true", help="Apply ICA for each subject")
 parser.add_argument("--use-reref", dest="use_reref", action="store_true", help="Apply channel rereferencing")
+parser.add_argument(
+    "--channels_ignore", nargs="+", help="List of channels (electrodes) that will be ignored. Possible values: [HEOL, HEOR, FP1, FP2, VEOU, VEOL, F7, F3, FZ, F4, F8, FT7, FC3, FCZ, FC4, FT8, T3, C3, CZ, C4, T4, TP7, CP3, CPZ, CP4, TP8, A1, T5, P3, PZ, P4, T6, A2, O1, OZ, O2, FT9, FT10, PO1, PO2]"
+)
 
-parser.set_defaults(brainbands=USE_BRAIN_BANDS)
-parser.set_defaults(use_ica=USE_ICA)
-parser.set_defaults(use_reref=USE_REREF)
-
-
+parser.set_defaults(user_num=NUM_USERS)
+parser.set_defaults(signal_duration=SIGNAL_DURATION_SECONDS_DEFAULT)
+parser.set_defaults(epoch_events_num=FREQ)
+parser.set_defaults(brainbands=False)
+parser.set_defaults(use_ica=False)
+parser.set_defaults(use_reref=False)
+parser.set_defaults(channels_ignore=[])
 args = parser.parse_args()
 
-is_complete_train = not any([args.users, args.sig, args.epoch_elems])
-print("Training on {} dataset...".format("complete" if is_complete_train else "partial"))
-num_users = args.users if (args.users) else num_users
-signal_duration = args.sig if (args.sig) else SIGNAL_DURATION_SECONDS_DEFAULT
-epoch_elems = args.epoch_elems if args.epoch_elems else FREQ
+user_num = args.user_num
+signal_duration = args.signal_duration
+epoch_events_num = args.epoch_events_num
 output_dir = args.output_dir
 use_brainbands = args.use_brainbands
 use_ica = args.use_ica
 use_reref = args.use_reref
+channels_ignore = args.channels_ignore
+channels = list(set(channels_good) - set(channels_ignore))
 
-train_metadata = {"is_complete_train": is_complete_train, "brains": args.use_brainbands, "ica": args.use_ica, "reref": args.use_reref}
-brainwave_bands = get_brainwave_bands() if (use_brainbands) else {"placeholder": (0, 40)}
+is_complete_train = not any(map(lambda arg_name: is_arg_default(arg_name, parser, args), ["user_num", "signal_duration", "epoch_events_num", "channels_ignore"]))
+train_metadata = {"is_complete_train": is_complete_train, "brains": use_brainbands, "ica": use_ica, "reref": use_reref}
+print("Training on {} dataset...".format("complete" if is_complete_train else "partial"))
 
 
-def signal_handle(filename: str):
-    """
-    Load the signal.
-    Exclude bad channels.
-    Crops the filter the signal.
-    Return epoches.
+def load_clean_cnt(filename: str, channels: List[str]):
+    cnt = read_raw_cnt(filename, preload=True, verbose=False)
+    print("Bad channels found by MNE:", cnt.info["bads"])
+    cnt.pick_channels(channels)
+    return cnt
 
-    Notes:
-    eeg = read_raw_cnt(filename, eog=["HEOL", "HEOR", "VEOU", "VEOL"], preload=True, verbose=False
-    when comparing with and without eog, it changed data dramatically? this is what allowed me to sync data with S
-    """
-    eeg = read_raw_cnt(filename, preload=True, verbose=False)
-    eeg.info["bads"].extend(channels_bad)
-    eeg.pick_channels(channels_good)
 
-    signal_total_duration = floor(len(eeg) / FREQ)
-    start = signal_total_duration - signal_duration + signal_offset
+def signal_crop(signal: BaseRaw, freq: float, signal_offset: float, signal_duration_wanted: float):
+    signal_total_duration = floor(len(signal) / freq)
+    start = signal_total_duration - signal_duration_wanted + signal_offset
     end = signal_total_duration + signal_offset
-    low_freq, high_freq = LOW_PASS_FILTER_RANGE_HZ
-    return eeg.crop(tmin=start, tmax=end).notch_filter(np.arange(NOTCH_FILTER_HZ, (NOTCH_FILTER_HZ * 5) + 1, NOTCH_FILTER_HZ)).filter(l_freq=low_freq, h_freq=high_freq)
+    return signal.crop(tmin=start, tmax=end)
 
 
-def filter_brain_bandpass(signal: BaseRaw, brainwave_bands: Dict):
-    result = {}
-    for band_name, range_val in brainwave_bands.items():
-        result[band_name] = signal.filter(l_freq=range_val[0], h_freq=range_val[1])
-    return result
+def signal_filter_notch(signal: BaseRaw, filter_hz):
+    return signal.copy().notch_filter(np.arange(filter_hz, (filter_hz * 5) + 1, filter_hz))
 
 
-def signal_dict_to_epoch_dict(signal_dict: Dict[str, Epochs], EPOCH_SECONDS):
-    result = {}
-    for key, signal in signal_dict.items():
-        result[key] = make_fixed_length_epochs(signal, duration=EPOCH_SECONDS, preload=True, verbose=False)
-    return result
-
-
-def epochs_to_dataframe(epochs: Epochs):
+def low_high_pass_filter(signal: BaseRaw, l_freq, h_freq):
     """
-    Returns epochs converted to dataframe.
-    Useless columns are excluded.
+    Filters the signal (cutoff lower and higher frequency) by using zero-phase filtering
+    """
+    return signal.copy().filter(l_freq=l_freq, h_freq=h_freq)
+
+
+def epochs_to_dataframe(epochs: Epochs, drop_columns=["time", "condition"]):
+    """
+    Converts to dataframe and drops unnecessary columns
     """
     df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1))
-    df = df.drop(["time", "condition", *channels_ignore], axis=1)
+    df = df.drop(drop_columns, axis=1)
     return df
 
 
-def get_column_name(feature: str, channel: str, bandname: str = None):
+def get_column_name(feature: str, channel: str, suffix: str = None):
     result = "_".join([channel, feature])
-    if use_brainbands:
-        return "_".join([result, bandname])
+    result = result if suffix is None else "_".join([result, suffix])
     return result
 
 
-def get_column_names(use_brainbands: bool, brainwave_bands: dict):
-    prod = product()
-    if use_brainbands:
-        prod = product(channels_good, feature_names, brainwave_bands.keys())
-    else:
-        prod = product(channels_good, feature_names)
-    return list(map(lambda x: "_".join(x), prod))
+def get_column_names(channels, feature_names, preprocess_procedure_names: dict):
+    prod = product(channels, feature_names, preprocess_procedure_names)
+    return list(map(lambda strs: "_".join(strs), prod))
 
 
-training_cols = get_column_names(use_brainbands, brainwave_bands)
 if args.df_checkpoint:
     """
     If checkpoint only action to perform is normalizing since features are already caculated
@@ -153,31 +138,56 @@ if args.df_checkpoint:
     sys.exit(1)
 
 
-df_dict = {k: [] for k in ["label", "user_id", "epoch_id", *training_cols]}
+feature_extractor = FeatureExtractor(picked_features=feature_names)
 
-for user_id, state in tqdm(list(product(range(0, num_users), states))):
-    label = 1 if state == FATIGUE_STR else 0
-    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, state)))
-    signal_clean = signal_handle(file_signal)
+signal_preprocessor = SignalPreprocessor()
 
-    signal_brain_filtered = filter_brain_bandpass(signal_clean, brainwave_bands)
-    epochs_brain_filtered = signal_dict_to_epoch_dict(signal_brain_filtered, EPOCH_SECONDS)
+"""
+Register signal preprocessing procedures with SignalPreprocessor
+"standard" -> .notch and .filter with lower and higher pass-band edge defined in the research paper
+"AL", "AH", "BL", "BH" -> .notch and .filter with lower and higher pass-band edge defined in brainwave_bands in env.py
+"reref" -> .notch and .filter with lower and higher pass-band edge defined in the research paper and rereference within electodes
+"""
 
-    for i_brainband, (bandname, epochs) in enumerate(tqdm(epochs_brain_filtered.items())):
-        pdfs, _ = time_frequency.psd_welch(epochs, n_fft=FREQ, n_per_seg=FREQ, n_overlap=0, verbose=False)
+base_preprocess_procedure = serialize_functions(
+    lambda s: signal_crop(s, FREQ, SIGNAL_OFFSET, signal_duration),
+    lambda s: signal_filter_notch(s, NOTCH_FILTER_HZ),
+)
 
-        if use_reref:
-            signal_clean.set_eeg_reference(ref_channels="average", ch_type="eeg")
+filter_frequencies = {"standard": LOW_PASS_FILTER_RANGE_HZ}
+if use_brainbands:
+    filter_frequencies.update(get_brainwave_bands())
 
-        if use_ica:
-            signal_l1 = signal_clean.copy().load_data().filter(l_freq=1, h_freq=None)
-            ica = UnsupervisedSpatialFilter(FastICA(len(channels_good)), average=False)
-            ica_data = ica.fit_transform(epochs.get_data())
-            ica_data = ica_data.reshape(FREQ * signal_duration, len(channels_good))
-            ica_data = np.insert(ica_data, 0, np.repeat(np.arange(0, signal_duration, 1), FREQ), axis=1)
-            df = DataFrame.from_records(ica_data, columns=["epoch", *channels_good])
-        else:
-            df = epochs_to_dataframe(epochs)
+for freq_name, freq_range in filter_frequencies.items():
+    low_freq, high_freq = freq_range
+    proc = serialize_functions(
+        base_preprocess_procedure,
+        lambda s: s.filter(low_freq, high_freq),
+    )
+    signal_preprocessor.add_preprocess_procedure(freq_name, proc, context={"freq_filter_range": freq_range})
+
+if use_reref:
+    low_freq, high_freq = LOW_PASS_FILTER_RANGE_HZ
+    proc = serialize_functions(
+        base_preprocess_procedure,
+        lambda s: s.filter(low_freq, high_freq).set_eeg_reference(ref_channels="average", ch_type="eeg"),
+    )
+    signal_preprocessor.add_preprocess_procedure("reref", proc, context={"freq_filter_range": LOW_PASS_FILTER_RANGE_HZ})
+
+training_cols = get_column_names(channels, feature_extractor.picked_features, signal_preprocessor.get_preprocess_procedure_names())
+df_dict = {k: [] for k in ["is_fatigued", "user_id", "epoch_id", *training_cols]}
+
+for user_id, driving_state in tqdm(list(product(range(0, user_num), driving_states))):
+    is_fatigued = 1 if driving_state == FATIGUE_STR else 0
+    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, driving_state)))
+
+    signal = load_clean_cnt(file_signal, channels)
+    signal_preprocessor.fit(signal)
+    for signal_processed, proc_name, proc_context in signal_preprocessor.get_preprocessed_signals():
+        epochs = make_fixed_length_epochs(signal_processed)
+        df = epochs_to_dataframe(epochs)
+        freq_filter_range = proc_context["freq_filter_range"]
+        feature_extractor.fit(signal_processed, FREQ)
 
         for epoch_id in tqdm(list(range(0, signal_duration))):
             """
@@ -191,37 +201,20 @@ for user_id, state in tqdm(list(product(range(0, num_users), states))):
             e.g. [0, PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
             """
 
-            df_epoch = df.loc[df["epoch"] == epoch_id].head(epoch_elems)
-            df_channels = df_epoch[channels_good]
+            df_epoch = df.loc[df["epoch"] == epoch_id, channels].head(epoch_events_num)
+            feature_dict = feature_extractor.get_features(df_epoch, context=dict(epoch_id=epoch_id, freq_filter_range=freq_filter_range))
 
-            lfreq = brainwave_bands[bandname][0]
-            hfreq = brainwave_bands[bandname][1]
+            for channel_idx, channel in enumerate(channels):
+                for feature_name, feature_array in feature_dict.items():
+                    df_dict[get_column_name(feature_name, channel, proc_name)].append(feature_array[channel_idx])
 
-            mean = df_channels.apply(func=lambda x: np.mean(x), axis=0)
-            std = df_channels.apply(func=lambda x: np.std(x), axis=0)
-            pdf = np.apply_along_axis(lambda x: np.mean(x), axis=1, arr=pdfs[epoch_id, :, lfreq:hfreq])
-            PE = df_channels.apply(func=lambda x: pd_spectral_entropy(x, freq=FREQ), axis=0)
-            AE = df_channels.apply(func=lambda x: pd_approximate_entropy(x), axis=0)
-            SE = df_channels.apply(func=lambda x: pd_sample_entropy(x), axis=0)
-            FE = df_channels.apply(func=lambda x: pd_fuzzy_entropy(x), axis=0)
-
-            for i_ch, channel in enumerate(channels_good):
-                df_dict[get_column_name("mean", channel, bandname)].append(mean[i_ch])
-                df_dict[get_column_name("std", channel, bandname)].append(std[i_ch])
-                df_dict[get_column_name("pdf", channel, bandname)].append(pdf[i_ch])
-                df_dict[get_column_name("PE", channel, bandname)].append(PE[i_ch])
-                df_dict[get_column_name("AE", channel, bandname)].append(AE[i_ch])
-                df_dict[get_column_name("SE", channel, bandname)].append(SE[i_ch])
-                df_dict[get_column_name("FE", channel, bandname)].append(FE[i_ch])
-
-            if i_brainband == 0:
-                df_dict["user_id"].append(user_id)
-                df_dict["label"].append(label)
-                df_dict["epoch_id"].append(epoch_id)
+            df_dict["user_id"].append(user_id)
+            df_dict["is_fatigued"].append(is_fatigued)
+            df_dict["epoch_id"].append(epoch_id)
 
 """Create dataframe from rows and columns"""
 df = DataFrame.from_dict(df_dict)
-df["label"] = df["label"].astype(int)
+df["is_fatigued"] = df["is_fatigued"].astype(int)
 df["user_id"] = df["user_id"].astype(int)
 df["epoch_id"] = df["epoch_id"].astype(int)
 

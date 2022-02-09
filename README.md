@@ -13,14 +13,22 @@
 
 
 # Notes to self:
+- preprocessor, only preprocesses
+- feature extract fit -> caculates psds
+
 
 1. Many channels are flatlined during the driving process and they spike only in some moments
 2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
 3. `ipython kernel install --user --name=eeg` to use venv in jupyter
 4. Normalized values produce nan for SE entropy (minmax scaler 1d)
 5. Two different libs (EntropyHub and Antropy) produce the same result for sample entropy
+6. Applying filter before converting to epochs and after is not the same
 # Todo:
-
+- [ ] Fix data leakage. Don't scale on the whole dataset. Scale only the train dataset seperatly of test data. Fit on train, transform on train, transform on test
+- [ ] Instead of remove main features, append alpha beta gamma delta features along side the main ones
+- [ ] Explore more options for feature extraction https://tsfel.readthedocs.io/en/latest/descriptions/feature_list.html
+- [ ] Rereferencing - append columns instead of removing them
+- [ ] Explore which features are most important for prediction
 ### Utils:
 - [x] Create report file saver and loader for easy and reproducible way to check results
 
@@ -56,10 +64,10 @@ Improvement:
   - There are no inf and NaN values anymore once this was fixed 
 - [x] Alpha beta gama delta waves
 - [x] Additional features, mean, psd
-- [ ] Training with additional features
-- [ ] Training with additional features and brainwave bands
-- [] ICA - Principal component analysis
-	- [ ] filter low 1hz to remove drifts	
+- [x] Training with additional features
+- [x] Training with additional features and brainwave bands
+- [x] ICA - Principal component analysis
+	- [x] filter low 1hz to remove drifts	
 
 Optional:
 - [ ] Repeat training with significant electrodes
@@ -90,7 +98,7 @@ Here, we will calculate the entropy (4) for every channel (30) for every epoch. 
 Number of rows: 
 
 ```
-users (12) * epochs (300) * states (2) = 7200
+users (12) * epochs (300) * driving_states (2) = 7200
 ```
 
 Number of columns:
@@ -103,7 +111,7 @@ user_id (1) + label (1) + epoch_id (1) + entropies (4) * channels (30) = 123
 # Dataset notes
 
 EEG data:
-- .cnt files were created by a 40-channel Neuroscan amplifier including the EEG data in two states in the process of driving.
+- .cnt files were created by a 40-channel Neuroscan amplifier including the EEG data in two driving_states in the process of driving.
 
 Entropy data:
 - four entropies of twelve healthy subjects for driver fatigue detection

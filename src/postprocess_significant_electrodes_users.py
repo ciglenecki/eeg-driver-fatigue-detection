@@ -5,19 +5,19 @@ from tqdm import tqdm
 from sklearn.svm import SVC
 
 
-def caculate_mode_users(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame, y_train_org: DataFrame, y_test_org: DataFrame, channels_good: list, num_users: int) -> List:
+def caculate_mode_users(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame, y_train_org: DataFrame, y_test_org: DataFrame, channels_good: list, NUM_USERS: int) -> List:
     """
     Calculate single accuracy for each channel (Acc_i) for each user.
     """
     user_channel_acc: Dict[str, Dict[str, float]] = {}
 
-    for user_id in tqdm(range(num_users)):
+    for user_id in tqdm(range(NUM_USERS)):
         for ch in channels_good:
             X_train = X_train_org.loc[X_train_org["user_id"] == user_id, X_train_org.columns.str.contains(ch)]
             X_test = X_test_org.loc[X_test_org["user_id"] == user_id, X_test_org.columns.str.contains(ch)]
 
-            y_train = y_train_org[y_train_org["user_id"] == user_id]["label"]
-            y_test = y_test_org[y_test_org["user_id"] == user_id]["label"]
+            y_train = y_train_org[y_train_org["user_id"] == user_id]["is_fatigued"]
+            y_test = y_test_org[y_test_org["user_id"] == user_id]["is_fatigued"]
 
             model.fit(X_train, y_train)
             y_test_pred = model.predict(X_test)
@@ -45,7 +45,7 @@ def caculate_mode_users(model: SVC, X_train_org: DataFrame, X_test_org: DataFram
     """
 
     users_channel_weights = []
-    for user_id in tqdm(range(num_users)):
+    for user_id in tqdm(range(NUM_USERS)):
         channel_weights = {}
 
         for channel_a_name in channels_good:
@@ -62,8 +62,8 @@ def caculate_mode_users(model: SVC, X_train_org: DataFrame, X_test_org: DataFram
 
                 X_test = X_test_org.loc[X_test_org["user_id"] == user_id, X_test_org.columns.str.contains("|".join([channel_a_name, channel_b_name]))]
 
-                y_train = y_train_org[y_train_org["user_id"] == user_id]["label"]
-                y_test = y_test_org[y_test_org["user_id"] == user_id]["label"]
+                y_train = y_train_org[y_train_org["user_id"] == user_id]["is_fatigued"]
+                y_test = y_test_org[y_test_org["user_id"] == user_id]["is_fatigued"]
 
                 model.fit(X_train, y_train)
                 y_test_pred = model.predict(X_test)

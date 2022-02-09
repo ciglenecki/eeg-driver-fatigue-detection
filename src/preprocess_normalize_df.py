@@ -11,7 +11,7 @@ from pandas import DataFrame
 import numpy as np
 from utils_functions import min_max_dataframe, min_max_scaler_1d, standard_scale_dataframe
 from utils_paths import PATH_DATAFRAME
-from utils_env import training_columns_regex, num_users
+from utils_env import training_columns_regex, NUM_USERS
 
 
 def normalize_df(df: DataFrame, columns_to_scale: list, scaler=min_max_dataframe, per_person_scale=False):
@@ -23,7 +23,7 @@ def normalize_df(df: DataFrame, columns_to_scale: list, scaler=min_max_dataframe
     df = df.fillna(0)
     # df[columns_to_scale] = df[columns_to_scale].apply(lambda x: mstats.winsorize(x, limits=[0.01, 0.01]), axis=0)
     if per_person_scale:
-        for i in range(num_users):
+        for i in range(NUM_USERS):
             df.loc[df["user_id"] == i, columns_to_scale] = scaler(df.loc[df["user_id"] == i, columns_to_scale])
     else:
         df[columns_to_scale] = scaler(df[columns_to_scale])

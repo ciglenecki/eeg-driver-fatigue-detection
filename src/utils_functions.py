@@ -1,6 +1,7 @@
 """
 Utility functions
 """
+import argparse
 from datetime import datetime
 from itertools import chain, combinations
 from os import getcwd
@@ -15,6 +16,14 @@ import numpy as np
 import re
 
 T = TypeVar("T")
+
+
+def serialize_functions(first, *rest):
+    return lambda x: first(serialize_functions(*rest)(x) if rest else x)
+
+
+def is_arg_default(arg_name: str, parser: argparse.ArgumentParser, args: argparse.Namespace):
+    return parser.get_default("arg_name") == vars(args)[arg_name]
 
 
 def get_timestamp():

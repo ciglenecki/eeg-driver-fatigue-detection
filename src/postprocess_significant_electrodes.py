@@ -25,7 +25,7 @@ from postprocess_significant_electrodes_users import caculate_mode_users
 from utils_file_saver import load_model
 from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_REPORT
-from utils_env import channels_good, num_users
+from utils_env import channels_good, NUM_USERS
 from itertools import combinations
 import sys
 from datetime import datetime
@@ -42,8 +42,8 @@ stdout_to_file(Path(args.output_report, "-".join(["significant-electrodes", args
 
 
 df = read_pickle(args.df)
-X = df.loc[:, ~df.columns.isin(["label"])]
-y = df.loc[:, df.columns.isin(["label", "user_id"])]
+X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
+y = df.loc[:, df.columns.isin(["is_fatigued", "user_id"])]
 X_train_org, X_test_org, y_train_org, y_test_org = train_test_split(X, y, test_size=0.5, random_state=0)
 model: SVC = load_model(args.svm).best_estimator_
 

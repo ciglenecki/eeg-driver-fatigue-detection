@@ -37,8 +37,8 @@ stdout_to_file(Path(args.output_report, "-".join(["best-entropies", get_timestam
 
 
 df: DataFrame = read_pickle(args.df)
-X = df.loc[:, ~df.columns.isin(["label"])]
-y = df.loc[:, "label"]
+X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
+y = df.loc[:, "is_fatigued"]
 
 X_train_org, X_test_org, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
 
