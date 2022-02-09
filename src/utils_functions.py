@@ -2,18 +2,18 @@
 Utility functions
 """
 import argparse
+import re
+import sys
 from datetime import datetime
 from itertools import chain, combinations
 from os import getcwd
 from pathlib import Path
-import sys
-from typing import TypeVar
-from sklearn import preprocessing
-from pandas import DataFrame
-from IPython.display import display
-from typing import Dict
+from typing import Dict, TypeVar
+
 import numpy as np
-import re
+from IPython.display import display
+from pandas import DataFrame
+from sklearn import preprocessing
 
 T = TypeVar("T")
 

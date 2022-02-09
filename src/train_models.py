@@ -11,26 +11,27 @@ Create an report for each model
 Create a report file
 """
 import argparse
-from itertools import chain, combinations
-from pathlib import Path
+import pickle
 import warnings
+from itertools import chain, combinations, product
+from pathlib import Path
+
 from IPython.core.display import display
+from joblib import dump, load
 from pandas import read_pickle
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.svm import SVC
-import pickle
-from joblib import dump, load
-from utils_file_saver import save_model
-from utils_functions import get_timestamp, glimpse_df, isnull_any, powerset, min_max_scaler, stdout_to_file
-from utils_paths import PATH_MODEL, PATH_REPORT
-from itertools import product
-from model import model_rfc, model_mlp, model_svc, model_knn
 from tqdm import tqdm
+
+from model import model_knn, model_mlp, model_rfc, model_svc
 from utils_env import training_columns_regex
+from utils_file_saver import save_model
+from utils_functions import (get_timestamp, glimpse_df, isnull_any,
+                             min_max_scaler, powerset, stdout_to_file)
+from utils_paths import PATH_MODEL, PATH_REPORT
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()

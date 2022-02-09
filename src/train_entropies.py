@@ -1,32 +1,34 @@
 """
+Find out which entropy combinations performs the best 
+
+
 Load the dataset with the --df argument
 Create all possible combinations of entropies:
 [('PE'), ('AE'), ('SE'), ('FE'), ('PE', 'AE'), ('PE', 'SE'), ('PE', 'FE'), ('AE', 'SE'), ('AE', 'FE'), ('SE', 'FE'), ('PE', 'AE', 'SE'), ('PE', 'AE', 'FE'), ('PE', 'SE', 'FE'), ('AE', 'SE', 'FE'), ('PE', 'AE', 'SE', 'FE')]
 Train GridSearch SVM model on each entropy combination
-Find out which entropy combinations performs the best 
 Create a report file
 """
 import argparse
-from itertools import chain, combinations
-from pathlib import Path
-import warnings
-from IPython.core.display import display
-from pandas import read_pickle, DataFrame
-from pandas._config.config import set_option
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import classification_report
-from sklearn.svm import SVC
 import pickle
+import warnings
+from datetime import datetime
+from itertools import chain, combinations, product
+from pathlib import Path
+
+from IPython.core.display import display
 from joblib import dump, load
+from pandas import DataFrame, read_pickle
+from pandas._config.config import set_option
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.svm import SVC
+from tqdm import tqdm
+
+from model import model_svc
 from utils_env import entropy_names
 from utils_file_saver import save_model
 from utils_functions import get_dictionary_leaves, get_timestamp, glimpse_df, powerset, stdout_to_file
-from utils_paths import PATH_MODEL, PATH_REPORT
-from itertools import product
-from model import model_svc
-from tqdm import tqdm
-from datetime import datetime
+from utils_paths import PATH_REPORT
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()

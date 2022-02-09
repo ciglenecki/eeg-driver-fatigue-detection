@@ -1,13 +1,13 @@
 from pathlib import Path
 from typing import Dict
-import scipy.io
-import pandas as pd
-import matplotlib.pyplot as plt
 
-from utils_paths import PATH_DATASET_MAT
+import matplotlib.pyplot as plt
+import pandas as pd
+import scipy.io
 
 from utils_feature_extraction import dict_apply_procedture, isnull_values_any
 from utils_functions import min_max_dataframe, standard_scale_dataframe
+from utils_paths import PATH_DATASET_MAT
 
 mat = scipy.io.loadmat(Path(PATH_DATASET_MAT, "1.mat"))
 keys = [key for key in mat.keys() if not key.startswith("__")]

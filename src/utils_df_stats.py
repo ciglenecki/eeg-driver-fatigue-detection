@@ -1,10 +1,11 @@
 import argparse
 from pathlib import Path
+
 from pandas import read_pickle
 from pandas._config.config import set_option
+
 from utils_functions import get_timestamp, glimpse_df, isnull_any, stdout_to_file
 from utils_paths import PATH_REPORT
-
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()

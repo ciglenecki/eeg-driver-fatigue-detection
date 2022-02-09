@@ -1,8 +1,9 @@
 from typing import Dict, List
+
 from pandas.core.frame import DataFrame
 from sklearn.metrics import accuracy_score
-from tqdm import tqdm
 from sklearn.svm import SVC
+from tqdm import tqdm
 
 
 def caculate_mode_all(model: SVC, X_train_org: DataFrame, X_test_org: DataFrame, y_train_org: DataFrame, y_test_org: DataFrame, channels_good: list) -> List:

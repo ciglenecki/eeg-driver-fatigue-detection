@@ -9,10 +9,11 @@ Cnt files are renamed: 3_normal.cnt, 5_fatigue.cnt, 10_normal.cnt...
 Mat files are renamed: 3.mat, 5.mat, 10.mat...
 """
 import argparse
-from zipfile import ZipFile
-from utils_paths import *
-from pathlib import Path
 import os
+from pathlib import Path
+from zipfile import ZipFile
+
+from utils_paths import *
 
 
 def unzip_cnt(zip_path: Path, out_dir: Path):

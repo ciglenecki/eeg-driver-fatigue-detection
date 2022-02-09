@@ -1,37 +1,35 @@
 import argparse
-from itertools import chain, combinations
-from pathlib import Path
+import pickle
 import sys
 import warnings
-from IPython.core.display import display
+from itertools import chain, combinations, product
+from os import getcwd
+from pathlib import Path
+from time import sleep
+
 import numpy as np
+import pandas as pd
+import scipy.io
+from IPython.core.display import display
+from joblib import dump, load
 from pandas import read_pickle
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
+from scipy import stats
+from scipy.stats import mstats
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
-import pickle
-from joblib import dump, load
 from tqdm import tqdm
+
 from preprocess_normalize_df import normalize_df
 from utils_env import PAPER_BF_HIDDEN, PAPER_C, PAPER_G, PAPER_RFC_INPUT_VARIABLES, PAPER_RFC_TREES, channels_good, feature_names, training_columns_regex
 from utils_file_saver import load_dataframe, save_df_to_disk, save_model, save_to_file_with_metadata
-from sklearn.neural_network import MLPClassifier
-from utils_functions import glimpse_df, min_max_dataframe, powerset
-from utils_paths import PATH_MODEL, PATH_DATASET_MAT
-from sklearn.ensemble import RandomForestClassifier
-from itertools import product
-from sklearn.neighbors import KNeighborsClassifier
-from os import getcwd
-import scipy.io
-import pandas as pd
-from utils_functions import min_max_scaler
-from time import sleep
-from scipy import stats
-from scipy.stats import mstats
-
+from utils_functions import glimpse_df, min_max_dataframe, min_max_scaler, powerset
+from utils_paths import PATH_DATASET_MAT, PATH_MODEL
 
 """
 Temporary file used only for testing things around.
@@ -49,7 +47,7 @@ def get_column_names(use_brainbands: bool, brainwave_bands: dict):
 
 set_option("display.max_columns", None)
 
-df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-10-00-40-53-is_complete_train=true__brains=false__ica=false__reref=true.pkl")
+df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-10-00-40-53-is_complete_dataset=true__brains=false__ica=false__reref=true.pkl")
 
 df2 = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-08-14-53-51__brains=false__ica=false.pkl")
 

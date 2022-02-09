@@ -2,17 +2,19 @@
 Set of wrapper functions which save and load files
 Functions are often used for saving reports, models and dataframes 
 """
-from datetime import datetime
 import os
-from pathlib import Path
 import pickle
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Callable
-from joblib import dump, load
+
 import numpy as np
-from pandas.core.frame import DataFrame
-from utils_functions import dict_to_byte_metadata, dict_to_string
-from sklearn.model_selection import GridSearchCV
+from joblib import dump, load
 from pandas import read_pickle
+from pandas.core.frame import DataFrame
+from sklearn.model_selection import GridSearchCV
+
+from utils_functions import dict_to_byte_metadata, dict_to_string
 
 # show additional data in file explorer
 METADATA_FIELD_TAGS = "user.xdg.tags"
@@ -61,10 +63,10 @@ def save_model(model, model_name, score, directory: Path, metadata={}, name_tag=
     save_to_file_with_metadata(model, directory, basename, ".model", file_saver, metadata)
 
 
-def save_df_to_disk(df: DataFrame, is_complete_train: bool, dir: Path, name_tag: str, metadata={}):
-    data_type_str = "complete" if is_complete_train else "partial"
+def save_df_to_disk(df: DataFrame, is_complete_dataset: bool, dir: Path, name_tag: str, metadata={}):
+    data_type_str = "complete" if is_complete_dataset else "partial"
     basename = "-".join([data_type_str, name_tag])
-    metadata = metadata if is_complete_train else {}
+    metadata = metadata if is_complete_dataset else {}
     file_saver = lambda df, filename: df.to_pickle(str(filename))
     save_to_file_with_metadata(df, dir, basename, ".pkl", file_saver, metadata=metadata)
     return

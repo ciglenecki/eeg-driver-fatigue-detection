@@ -1,5 +1,6 @@
 """
 Finds the best C and gamma hyperparameters for SVM model by using Leave One Group out approach.
+
 A single group of rows is defined by participant's id (user_id).
 Effectively, this is LOO approach where 1 participant is left for validation and other 11 are used for training the model
 
@@ -7,29 +8,20 @@ Load the dataset with the --df argument
 Calculate the accuracy for each hyperparameter pair
 """
 import argparse
-from itertools import chain, combinations
+from itertools import product
 from pathlib import Path
-import warnings
-from IPython.core.display import display
-import numpy as np
+
 from pandas import read_pickle
 from pandas._config.config import set_option
-from pandas.core.frame import DataFrame
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV, LeaveOneGroupOut, LeavePGroupsOut
-from sklearn.metrics import classification_report
-from sklearn.svm import SVC
-import pickle
-from joblib import dump, load
-from utils_file_saver import save_model
-from utils_functions import glimpse_df, powerset, min_max_scaler, stdout_to_file, get_timestamp
-from utils_paths import PATH_MODEL, PATH_REPORT
-from utils_env import NUM_USERS
-from itertools import product
-from model import wide_params
-from tqdm import tqdm
-from utils_env import training_columns_regex
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import LeaveOneGroupOut
+from sklearn.svm import SVC
+from tqdm import tqdm
+
+from model import wide_params
+from utils_env import NUM_USERS, training_columns_regex
+from utils_functions import get_timestamp, glimpse_df, stdout_to_file
+from utils_paths import PATH_REPORT
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()
@@ -43,7 +35,6 @@ glimpse_df(df)
 
 X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
 y = df.loc[:, df.columns.isin(["is_fatigued", "user_id"])]
-
 
 training_columns = X.columns.str.contains(training_columns_regex)
 

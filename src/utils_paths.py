@@ -1,8 +1,8 @@
 """
 Specified paths -- directory structure
 """
-from pathlib import Path
 from os import getcwd
+from pathlib import Path
 
 PATH_CWD = Path(getcwd())
 PATH_DATA = Path(PATH_CWD, "data")

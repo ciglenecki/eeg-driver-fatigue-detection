@@ -1,9 +1,11 @@
-from typing import Callable, List, Optional, Tuple, TypedDict, Union
 from math import floor
+from typing import Callable, List, Optional, Tuple, TypedDict, Union
+
+import numpy as np
 from mne.io import read_raw_cnt
 from mne.io.base import BaseRaw
 from pandas import DataFrame
-import numpy as np
+from mne import Epochs
 
 
 def load_clean_cnt(filename: str, channels: List[str]):
@@ -121,7 +123,7 @@ class SignalPreprocessor:
         if not isinstance(procedure_name, str):
             raise SignalPreprocessorInvalidName("Procedure name has to be a string.")
 
-        procedure = dict(name=procedure_name, proc=procedure, context=context)
+        procedure = dict(name=procedure_name, procedure=procedure, context=context)
         self.preprocess_procedures.append(procedure)
         return procedure
 

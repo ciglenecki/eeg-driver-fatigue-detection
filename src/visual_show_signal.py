@@ -1,9 +1,10 @@
 from math import floor
-from mne.io import read_raw_cnt
 from pathlib import Path
 
-from utils_paths import *
+from mne.io import read_raw_cnt
+
 from utils_env import *
+from utils_paths import *
 
 filename = str(Path(PATH_DATASET_CNT, "2_fatigue.cnt"))
 eeg = read_raw_cnt(filename, verbose=False)

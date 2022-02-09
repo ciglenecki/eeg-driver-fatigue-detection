@@ -1,21 +1,21 @@
 """
 Functions which caculate 4 entropies
 """
+from math import ceil, floor
+from typing import Callable, List, Optional, Tuple, TypedDict, Union
+
 import antropy as an
 import EntropyHub as eh
 import numpy as np
-from pandas import Series, DataFrame
 import pandas
+from mne import make_fixed_length_epochs, time_frequency
+from mne.io.base import BaseRaw
+from pandas import DataFrame, Series
+from scipy import signal
 from scipy.signal.filter_design import normalize
 from scipy.signal.spectral import periodogram
-from utils_functions import *
-from scipy import signal
-from typing import List, Optional, TypedDict, Union, Tuple
-from typing import Callable
-from mne import make_fixed_length_epochs, time_frequency
-from math import ceil, floor
-from mne.io.base import BaseRaw
 
+from utils_functions import *
 
 feature_long_to_short_mapping = {
     "mean": "mean",
