@@ -17,7 +17,10 @@ from utils_paths import PATH_DATAFRAME
 from sklearn.preprocessing import MinMaxScaler
 
 
-def split_and_normalize(X: DataFrame, y: Series, test_size: float, columns_to_scale: list, scaler: MinMaxScaler = MinMaxScaler()):
+def split_and_normalize(X: DataFrame, y: Series, test_size: float, columns_to_scale, scaler: MinMaxScaler = MinMaxScaler()):
+    """
+    Columns to scale can be both string list or list of bools
+    """
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
     X_train.loc[:, columns_to_scale] = scaler.fit_transform(X_train.loc[:, columns_to_scale])
     X_test.loc[:, columns_to_scale] = scaler.transform(X_test.loc[:, columns_to_scale])

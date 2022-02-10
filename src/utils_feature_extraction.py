@@ -36,7 +36,7 @@ def sample_entropy(x):
     return an.sample_entropy(x)
 
 
-# don't normalize because you have to normalze across all users and not based on 1 user and 1 sample
+# don't normalize because you have to normalze across all drivers and not based on 1 driver and 1 sample
 def spectral_entropy(x, freq: float):
     axis = -1
     sf = freq

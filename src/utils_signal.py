@@ -116,7 +116,7 @@ class SignalPreprocessor:
             signal_preprocessed = preprocessor_procedure(self.signal.copy())
             yield signal_preprocessed, procedure_name, procedure_context
 
-    def add_preprocess_procedure(self, procedure_name: str, procedure, context: SignalPreprocessorContext = {}):
+    def register_preprocess_procedure(self, procedure_name: str, procedure, context: SignalPreprocessorContext = {}):
         """
         Register a preprocess procedure
         """
@@ -127,7 +127,7 @@ class SignalPreprocessor:
         self.preprocess_procedures.append(procedure)
         return procedure
 
-    def remove_preprocess_procedure(self, procedure_name):
+    def unregister_preprocess_procedure(self, procedure_name):
         """
         Unregister a preprocess procedure
         """

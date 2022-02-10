@@ -1,24 +1,36 @@
 """
 Creates a tabluar dataframe file which is used for training with the following form:
 
-| user_id | epoch_id | label | PE_CH01 | PE_CH02 | ... | PE_CH30 | SE_CH01 | SE_CH02 | ... | FE_CH30 |
-| ------- | -------- | ----- | ------- | ------- | --- | ------- | ------- | ------- | --- | ------- |
-| 01      | 0        | 0     | 0.3     | 0.23    | ... | 0.6     | 0.8     | 0.1     | ... | 0.2     |
-| 01      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
-| ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
-| 01      | 0        | 0     | 0.6     | 0.3     | ... | 0.1     | 0.2     | 0.5     | ... | 0.1     |
-| 02      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
-| ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
+|     | is_fatigued | driver_id | epoch_id | CP3_PE_standard | CP3_PE_AL | ... | FT7_PE_standard |   FT7_PE_AL | ... |
+| --- | ----------: | --------: | -------: | --------------: | --------: | --- | --------------: | ----------: | --- |
+| 0   |           0 |         0 |        0 |        0.361971 |  0.361971 | ... |     1.84037e-23 | 1.84037e-23 | ... |
+| 1   |           0 |         0 |        1 |        0.232837 |  0.232837 | ... |      1.4759e-23 |  1.4759e-23 | ... |
+| 2   |           0 |         0 |        2 |        0.447734 |  0.447734 | ... |     1.27735e-23 | 1.27735e-23 | ... |
+| 3   |           1 |         0 |        0 |         3.18712 |   3.18712 | ... |      1.4759e-23 |  1.4759e-23 | ... |
+| 4   |           1 |         0 |        1 |         2.81654 |   2.81654 | ... |     1.27735e-23 | 1.27735e-23 | ... |
 
-Number of rows: users (12) * epochs (300) * driving_states (2) = 7200
-Number of columns: user_id (1) + label (1) + epoch_id (1) + entropies (4) * channels (30) = 123
+Number of rows:
+drivers (NUM_DRIVERS=12) *
+epochs (SIGNAL_DURATION_SECONDS_DEFAULT=300) *
+driving_states (len(driving_states)=2)
 
-The dataframe file is saved at ./data/dataframes by default with name
-File with prefix "complete-normalized" should be used for training later on. 
+12 * 300 * 2 = 7200 rows
+
+Number of columns:
+driver_id (1) +
+is_fatigue_state (1) +
+epoch_id (1) +
+features (len(feature_names)=7) *
+channels (len(channels_good)=30) *
+preprocess procedures N (N <1, +>)
+
+1 + 1 + 1 + 7 * 30 * N = 210 * N ~ in most cases it's 1050
+
+The dataframe file is saved at ./data/dataframes by default
+Dataframe files with prefix "complete-clean" should be used as the dataframe for training later on. 
 """
 
 import argparse
-import sys
 import warnings
 from itertools import product
 from math import floor
@@ -34,7 +46,7 @@ from pandas import DataFrame, set_option
 from tqdm import tqdm
 
 from preprocess_preprocess_df import df_replace_values
-from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands, training_columns_regex
+from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands
 from utils_feature_extraction import FeatureExtractor
 from utils_file_saver import save_df_to_disk
 from utils_functions import get_cnt_filename, glimpse_df, is_arg_default, serialize_functions
@@ -45,7 +57,7 @@ set_option("display.max_columns", None)
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--user_num", metavar="N", type=int, help="Number of users that will be used (1 >= N <= 12)")
+parser.add_argument("--driver_num", metavar="N", type=int, help="Number of drivers that will be used (1 >= N <= 12)")
 parser.add_argument("--signal-duration", metavar="N", type=int, help="Duration of the signal in seconds (1 >= N <= 300)")
 parser.add_argument("--epoch-events-num", metavar="N", type=int, help="Each epoch will contain N events instead of using all 1000 events. The frequency is 1000HZ. (11 >= N <= 1000)")
 parser.add_argument("--df-checkpoint", metavar="df", type=str, help="Load precaculated entropy dataframe (the one that isn't cleaned and normalized)")
@@ -55,7 +67,7 @@ parser.add_argument("--use-reref", dest="use_reref", action="store_true", help="
 parser.add_argument(
     "--channels-ignore", nargs="+", help="List of channels (electrodes) that will be ignored. Possible values: [HEOL, HEOR, FP1, FP2, VEOU, VEOL, F7, F3, FZ, F4, F8, FT7, FC3, FCZ, FC4, FT8, T3, C3, CZ, C4, T4, TP7, CP3, CPZ, CP4, TP8, A1, T5, P3, PZ, P4, T6, A2, O1, OZ, O2, FT9, FT10, PO1, PO2]"
 )
-parser.set_defaults(user_num=NUM_USERS)
+parser.set_defaults(driver_num=NUM_USERS)
 parser.set_defaults(signal_duration=SIGNAL_DURATION_SECONDS_DEFAULT)
 parser.set_defaults(epoch_events_num=FREQ)
 parser.set_defaults(brainbands=False)
@@ -63,7 +75,7 @@ parser.set_defaults(use_reref=False)
 parser.set_defaults(channels_ignore=[])
 args = parser.parse_args()
 
-user_num = args.user_num
+driver_num = args.driver_num
 signal_duration = args.signal_duration
 epoch_events_num = args.epoch_events_num
 output_dir = args.output_dir
@@ -72,7 +84,7 @@ use_reref = args.use_reref
 channels_ignore = args.channels_ignore
 channels = list(set(channels_good) - set(channels_ignore))
 
-is_complete_dataset = not any(map(lambda arg_name: is_arg_default(arg_name, parser, args), ["user_num", "signal_duration", "epoch_events_num", "channels_ignore"]))
+is_complete_dataset = not any(map(lambda arg_name: is_arg_default(arg_name, parser, args), ["driver_num", "signal_duration", "epoch_events_num", "channels_ignore"]))
 train_metadata = {"is_complete_dataset": is_complete_dataset, "brains": use_brainbands, "reref": use_reref}
 print("Creating {} dataset...".format("complete" if is_complete_dataset else "partial"))
 
@@ -129,7 +141,9 @@ signal_preprocessor = SignalPreprocessor()
 """
 Register signal preprocessing procedures with SignalPreprocessor
 "standard" -> .notch and .filter with lower and higher pass-band edge defined in the research paper
+
 "AL", "AH", "BL", "BH" -> .notch and .filter with lower and higher pass-band edge defined in brainwave_bands in env.py
+
 "reref" -> .notch and .filter with lower and higher pass-band edge defined in the research paper and rereference within electodes
 """
 
@@ -142,34 +156,36 @@ filter_frequencies = {"standard": LOW_PASS_FILTER_RANGE_HZ}
 if use_brainbands:
     filter_frequencies.update(get_brainwave_bands())
 
+""" Registers preprocessing procedures that will filter frequencies defined in filter_frequencies"""
 for freq_name, freq_range in filter_frequencies.items():
     low_freq, high_freq = freq_range
     proc = serialize_functions(
         base_preprocess_procedure,
         lambda s: s.filter(low_freq, high_freq),
     )
-    signal_preprocessor.add_preprocess_procedure(freq_name, proc, context={"freq_filter_range": freq_range})
+    signal_preprocessor.register_preprocess_procedure(freq_name, proc, context={"freq_filter_range": freq_range})
 
+""" Registers preprocessing procedure that uses channel rereferencing"""
 if use_reref:
     low_freq, high_freq = LOW_PASS_FILTER_RANGE_HZ
     proc = serialize_functions(
         base_preprocess_procedure,
         lambda s: s.filter(low_freq, high_freq).set_eeg_reference(ref_channels="average", ch_type="eeg"),
     )
-    signal_preprocessor.add_preprocess_procedure("reref", proc, context={"freq_filter_range": LOW_PASS_FILTER_RANGE_HZ})
+    signal_preprocessor.register_preprocess_procedure("reref", proc, context={"freq_filter_range": LOW_PASS_FILTER_RANGE_HZ})
 
 training_cols = get_column_names(channels, feature_extractor.picked_features, signal_preprocessor.get_preprocess_procedure_names())
-df_dict = {k: [] for k in ["is_fatigued", "user_id", "epoch_id", *training_cols]}
+df_dict = {k: [] for k in ["is_fatigued", "driver_id", "epoch_id", *training_cols]}
 
-for user_id, driving_state in tqdm(list(product(range(0, user_num), driving_states))):
+for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_states))):
 
     is_fatigued = 1 if driving_state == FATIGUE_STR else 0
-    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(user_id + 1, driving_state)))
+    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(driver_id + 1, driving_state)))
 
     signal = load_clean_cnt(file_signal, channels)
     signal_preprocessor.fit(signal)
 
-    for signal_processed, proc_name, proc_context in signal_preprocessor.get_preprocessed_signals():
+    for proc_index, (signal_processed, proc_name, proc_context) in enumerate(signal_preprocessor.get_preprocessed_signals()):
         epochs = make_fixed_length_epochs(signal_processed)
         df = epochs_to_dataframe(epochs)
         freq_filter_range = proc_context["freq_filter_range"]
@@ -198,24 +214,24 @@ for user_id, driving_state in tqdm(list(product(range(0, user_num), driving_stat
             for channel_idx, channel in enumerate(channels):
                 for feature_name, feature_array in feature_dict.items():
                     df_dict[get_column_name(feature_name, channel, proc_name)].append(feature_array[channel_idx])
-
-            df_dict["user_id"].append(user_id)
-            df_dict["is_fatigued"].append(is_fatigued)
-            df_dict["epoch_id"].append(epoch_id)
+            if proc_index == 0:
+                df_dict["epoch_id"].append(epoch_id)
+                df_dict["driver_id"].append(driver_id)
+                df_dict["is_fatigued"].append(is_fatigued)
     """
     Checkpoint - save the dataset after each driver anddriving state combination
     """
     if is_complete_dataset:
         tmp_df = DataFrame.from_dict(df_dict)
         tmp_df["is_fatigued"] = tmp_df["is_fatigued"].astype(int)
-        tmp_df["user_id"] = tmp_df["user_id"].astype(int)
+        tmp_df["driver_id"] = tmp_df["driver_id"].astype(int)
         tmp_df["epoch_id"] = tmp_df["epoch_id"].astype(int)
         tmp_df.to_pickle(str(Path(output_dir, ".raw_df.pkl")))
 
 """Create dataframe from rows and columns"""
 df = DataFrame.from_dict(df_dict)
 df["is_fatigued"] = df["is_fatigued"].astype(int)
-df["user_id"] = df["user_id"].astype(int)
+df["driver_id"] = df["driver_id"].astype(int)
 df["epoch_id"] = df["epoch_id"].astype(int)
 df.to_pickle(str(Path(output_dir, ".raw_df.pkl")))
 
@@ -223,4 +239,4 @@ df.to_pickle(str(Path(output_dir, ".raw_df.pkl")))
 save_df_to_disk(df, is_complete_dataset, output_dir, "raw", train_metadata)
 glimpse_df(df)
 df = df_replace_values(df)
-# save_df_to_disk(df, is_complete_dataset, output_dir, "normalized", train_metadata)
+save_df_to_disk(df, is_complete_dataset, output_dir, "clean", train_metadata)

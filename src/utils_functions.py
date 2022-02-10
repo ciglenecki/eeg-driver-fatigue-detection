@@ -12,6 +12,7 @@ from typing import Dict, TypeVar
 
 import numpy as np
 from IPython.display import display
+import pandas as pd
 from pandas import DataFrame
 from sklearn import preprocessing
 
@@ -85,8 +86,8 @@ def to_numpy_reshape(x):
     return DataFrame.to_numpy(x).reshape(-1, 1)
 
 
-def get_cnt_filename(i_user: int, state: str):
-    return "{i_user}_{state}.cnt".format(i_user=i_user, state=state)
+def get_cnt_filename(i_driver: int, state: str):
+    return "{i_driver}_{state}.cnt".format(i_driver=i_driver, state=state)
 
 
 def glimpse_df(df: DataFrame):

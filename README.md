@@ -7,28 +7,18 @@
 	<a align="center" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756">Paper: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</a>
 </p>
 
+## Assignment
+Implement steps described in the research paper and produce similar results.
+
+**Grade: 40/40**
+
 # Requirements
 
 [requirements.txt](requirements.txt)
 
 
-# Notes to self:
-- preprocessor, only preprocesses
-- feature extract fit -> caculates psds
-
-
-1. Many channels are flatlined during the driving process and they spike only in some moments
-2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
-3. `ipython kernel install --user --name=eeg` to use venv in jupyter
-4. Normalized values produce nan for SE entropy (minmax scaler 1d)
-5. Two different libs (EntropyHub and Antropy) produce the same result for sample entropy
-6. Applying filter before converting to epochs and after is not the same
 # Todo:
-- [ ] Fix data leakage. Don't scale on the whole dataset. Scale only the train dataset seperatly of test data. Fit on train, transform on train, transform on test
-- [ ] Instead of remove main features, append alpha beta gamma delta features along side the main ones
-- [ ] Explore more options for feature extraction https://tsfel.readthedocs.io/en/latest/descriptions/feature_list.html
-- [ ] Rereferencing - append columns instead of removing them
-- [ ] Explore which features are most important for prediction
+
 ### Utils:
 - [x] Create report file saver and loader for easy and reproducible way to check results
 
@@ -37,17 +27,23 @@
 	- [x] notch filter 50Hz
 	- [x] band pass 0.15Hz to 40Hz
 - [x] Crop the signal to 5 minutes (300 seconds) 
-- [x] Load signal for all users
-- [x] Create epoch from the signal using the window of 1 second
-- [x] Calculate 4 different entropies for each 1 second epoch
+- [x] Load signal for all drivers
+
+### Feature extraction
+- [x] Create epochs from the raw signal using the window of 1 second
+- [x] Create class for easier signal preprocessing procedures
+- [x] Create class for dynamic feature extraction
+- [x] Define features:
+	- [x] 4 different entropies for each 1 second epoch
+	- [x] standard deviation, mean, power density spectrum 
+- [x] Use product of preprocessing procedures and feature extraction to extract more features
 
 ### Dataframe:
 - [x] Concatenate features into a final dataframe
-- [x] Normalize across all participants and not single one
-- [x] Filter bad values and replace them with 0
+- [x] Clean the dataframe, replace bad values
+- [x] Create a normalization process that avoids data leakage 
 
 ### Train:
-- [x] Split the dataset to train and test set (1:1)
 - [x] Use LOO (leave one participant out) approach to find the best `C` and `gamma` parameters for the SVM model
 - [x] Train the SVM model with multiple combinations of entropies (function `powerset`) to find out which entropy combination has the highest accuracy on the train dataset 
 - [x] Train the following models using the Grid Search method:
@@ -56,71 +52,90 @@
 	- [x] KNN
 	- [x] Random Forest (RF)
 - [x] Validate accuracy using testing set and report performance on each model
-- [x] Determine significant electrodes by calculating the weight for each electrode for each user with the formula describe in the research paper:
+- [x] Determine significant electrodes by calculating the weight for each electrode for each driver with the formula describe in the research paper:
 	- $$V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$$
 
-Improvement:
-- [x] Check SE entropy infs
-  - There are no inf and NaN values anymore once this was fixed 
-- [x] Alpha beta gama delta waves
-- [x] Additional features, mean, psd
-- [x] Training with additional features
-- [x] Training with additional features and brainwave bands
+### Improvements:
+- [x] Fix the code in EntropyHub library (sample entropy) where NaN is returned by the `np.log` if the power density for a given frequency equals to 0
+- [x] Add additional preprocessing procedure which decomposes signal to alpha and beta waves
 - [x] ICA - Principal component analysis
 	- [x] filter low 1hz to remove drifts	
+- [x] Fix data leakage. Don't scale on the whole dataset. Scale only the train dataset seperatly of test data. Fit on train, transform on train, transform on test
+- [x] Fix the code for dataframe creation - add interface that allows feature concaternation
+- [x] Explore which features are most important for prediction
 
 Optional:
-- [ ] Repeat training with significant electrodes
-- [ ] Compare entropies with entropies from the paper
 - [ ] Visualize training/testing error
 - [ ] Visualize weight-based topographies for each subject
 - [ ] Visualize weight-based topographies average
 
-
-
-# Questions:
-
-How is AR (auto-regression) is often mention in the paper. What it's use in the context of the problem?
-
 # Dataframe structure
 
-Here, we will calculate the entropy (4) for every channel (30) for every epoch. In the research paper, they also did that but reduced number of entropies from (30 * 4) to (4) by doing a "a feature-level fusion"
+## Rows
+Each row is defined by a tripplet:
+1. **driver** (driver_id)
+2. **epoch** (epoch_id)
+3. **driving state** (y=is_fatigue_state)
 
-| user_id | epoch_id | label | PE_CH01 | PE_CH02 | ... | PE_CH30 | SE_CH01 | SE_CH02 | ... | FE_CH30 |
-| ------- | -------- | ----- | ------- | ------- | --- | ------- | ------- | ------- | --- | ------- |
-| 01      | 0        | 0     | 0.3     | 0.23    | ... | 0.6     | 0.8     | 0.1     | ... | 0.2     |
-| 01      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
-| ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
-| 01      | 0        | 0     | 0.6     | 0.3     | ... | 0.1     | 0.2     | 0.5     | ... | 0.1     |
-| 02      | 1        | 0     | 0.2     | 0.1     | ... | 0       | 0.2     | 0.1     | ... | 0.2     |
-| ...     | ...      | ...   | ...     | ...     | ... | ...     | ...     | ...     | ... | ...     |
-
-Number of rows: 
-
+Number of rows:
 ```
-users (12) * epochs (300) * driving_states (2) = 7200
+drivers (NUM_DRIVERS=12) *
+epochs (SIGNAL_DURATION_SECONDS_DEFAULT=300) *
+driving_states (len(driving_states)=2)
+
+12 * 300 * 2 = 7200 rows
 ```
+
+## Columns
+Columns are defined by a tripplet:
+1. **feature** (mean, AE (approximate entropy), standard deviation...)
+2. **channel** (FC4, T6, P3...) - electrodes on the cap which driver wears during the driving session
+3. **preprocess procedure** (standard, alpha waves, channel rereferencing...)
 
 Number of columns:
 ```
-user_id (1) + label (1) + epoch_id (1) + entropies (4) * channels (30) = 123
+driver_id (1) +
+is_fatigue_state (1) +
+epoch_id (1) +
+features (len(feature_names)=7) *
+channels (len(channels_good)=30) *
+preprocess procedures N (N <1, +>)
+
+1 + 1 + 1 + 7 * 30 * N = 210 * N
+
+in most cases it's 1050
 ```
 
 
+Total number of columns is product (multiplying) of feature (7), channels (30) and preprocess procedure (N)
+
+Each driver has two driving states (normal and fatigue) which gives 2 raw signals for each driver.
+
+Each signal consists of 300 seconds which will be transformed to 300 epochs.
+
+For each epoch (row), all **columns** are caculated.
+
+|     | is_fatigued | driver_id | epoch_id | CP3_PE_standard | CP3_PE_AL | ... | FT7_PE_standard |   FT7_PE_AL | ... |
+| --- | ----------: | --------: | -------: | --------------: | --------: | --- | --------------: | ----------: | --- |
+| 0   |           0 |         0 |        0 |        0.361971 |  0.361971 | ... |     1.84037e-23 | 1.84037e-23 | ... |
+| 1   |           0 |         0 |        1 |        0.232837 |  0.232837 | ... |      1.4759e-23 |  1.4759e-23 | ... |
+| 2   |           0 |         0 |        2 |        0.447734 |  0.447734 | ... |     1.27735e-23 | 1.27735e-23 | ... |
+| 3   |           1 |         0 |        0 |         3.18712 |   3.18712 | ... |      1.4759e-23 |  1.4759e-23 | ... |
+| 4   |           1 |         0 |        1 |         2.81654 |   2.81654 | ... |     1.27735e-23 | 1.27735e-23 | ... |
 
 # Dataset notes
 
 EEG data:
-- .cnt files were created by a 40-channel Neuroscan amplifier including the EEG data in two driving_states in the process of driving.
+- .cnt files were created by a 40-channel Neuroscan amplifier including the EEG data in two states in the process of driving.
 
-Entropy data:
+Entropy data (not used):
 - four entropies of twelve healthy subjects for driver fatigue detection
 - the digital number represents different participants
 - each .mat file included five files
-	- FE
-	- SE
-	- AE
-	- PE described four entropy values in the training data
+	- FE - fuzzy entropy
+	- SE - sample entropy
+	- AE - approximate entropy
+	- PE - spectral entropy
 	- Class_label 0 or 1
 		- 1 represents the fatigue state
 		- 0 represents the normal state
@@ -186,3 +201,12 @@ Significant electrodes were chosen from 30 electrodes.
 
 Pick 10 electrodes with biggest weight. These 10 electrodes produce 4 clusters/regions A,B,C,D.
 - A gives the best prediction results and even better prediction compared when all electrodes were used for a prediction
+
+
+# Notes to self:
+
+1. Many channels are flatlined during the driving process and spike during some moments
+2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
+3. `ipython kernel install --driver --name=eeg` to use venv in jupyter
+4. Two different libs (EntropyHub and Antropy) produce the same result for sample entropy
+5. Applying filter before and after converting to epochs gives different results

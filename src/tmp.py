@@ -14,45 +14,29 @@ from IPython.core.display import display
 from joblib import dump, load
 from pandas import read_pickle
 from pandas._config.config import set_option
-from pandas.core.frame import DataFrame
-from scipy import stats
-from scipy.stats import mstats
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.svm import SVC
-from tqdm import tqdm
 
-from preprocess_preprocess_df import normalize_df
-from utils_env import PAPER_BF_HIDDEN, PAPER_C, PAPER_G, PAPER_RFC_INPUT_VARIABLES, PAPER_RFC_TREES, channels_good, feature_names, training_columns_regex
-from utils_file_saver import load_dataframe, save_df_to_disk, save_model, save_to_file_with_metadata
-from utils_functions import glimpse_df, min_max_dataframe, min_max_scaler, powerset
-from utils_paths import PATH_DATASET_MAT, PATH_MODEL
+from utils_file_saver import load_dataframe
+from utils_env import training_columns_regex
 
 """
 Temporary file used only for testing things around.
 """
 
 
-def get_column_names(use_brainbands: bool, brainwave_bands: dict):
-    prod = product()
-    if use_brainbands:
-        prod = product(channels_good, feature_names, brainwave_bands.keys())
-    else:
-        prod = product(channels_good, feature_names)
-    return list(map(lambda x: "_".join(x), prod))
+# def get_column_names(use_brainbands: bool, brainwave_bands: dict):
+#     prod = product()
+#     if use_brainbands:
+#         prod = product(channels_good, feature_names, brainwave_bands.keys())
+#     else:
+#         prod = product(channels_good, feature_names)
+#     return list(map(lambda x: "_".join(x), prod))
 
 
 set_option("display.max_columns", None)
 
-df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-10-00-40-53-is_complete_dataset=true__brains=false__ica=false__reref=true.pkl")
+df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/partial-raw-2022-01-08-01-23-36-is_complete_train=false__brains=false__ica=true.pkl")
 
-df2 = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-08-14-53-51__brains=false__ica=false.pkl")
-
-print(df.head(n=1)["T5_AE"])
-print(df2.head(n=1)["T5_AE"])
+training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
 
 exit(1)
 # df_new = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-07-09-33-21-.pkl")
@@ -101,7 +85,7 @@ exit(1)
 # print(df.describe())
 
 
-# # df.drop("user_id")
+# # df.drop("driver_id")
 # print(df["SE_P3"].describe())
 
 

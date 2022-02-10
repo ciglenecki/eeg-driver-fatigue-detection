@@ -1,7 +1,7 @@
 """
 Finds the best C and gamma hyperparameters for SVM model by using Leave One Group out approach.
 
-A single group of rows is defined by participant's id (user_id).
+A single group of rows is defined by participant's id (driver_id).
 Effectively, this is LOO approach where 1 participant is left for validation and other 11 are used for training the model
 
 Load the dataset with the --df argument
@@ -38,7 +38,7 @@ X = X[X.columns[X.max() != -1]]  # remove constant attributes
 y = df.loc[:, "is_fatigued"]
 X_train, X_test, y_train, y_test = split_and_normalize(X, y, training_columns, test_size=0.5)
 
-groups = X["user_id"].to_numpy()
+groups = X["driver_id"].to_numpy()
 acc_parameters = []
 
 for C, gamma in tqdm(list(product(wide_params, wide_params))):
