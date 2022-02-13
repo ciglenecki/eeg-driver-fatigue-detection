@@ -4,7 +4,8 @@
 	<img src="pics/header_image.png"></img>
 </p>
 <p align="center">
-	<a align="center" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756">Paper: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</a>
+	<p align="center">Paper:</p>
+	<a align="center" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756">https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</a>
 </p>
 
 ## Assignment
