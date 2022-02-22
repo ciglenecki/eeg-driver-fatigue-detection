@@ -2,6 +2,7 @@
 Normalized the dataframe.
 Features will be scaled to [0,1]
 """
+
 import argparse
 import sys
 import warnings

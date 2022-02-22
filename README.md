@@ -2,7 +2,7 @@
 
 ## https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 <p align="center">
-	<img src="pics/header_image.png"></img>
+	<img src="readme-pics/header_image.png"></img>
 </p>
 
 ## Assignment
@@ -51,7 +51,7 @@ Implement steps described in the research paper and produce similar results.
 	- [x] Random Forest (RF)
 - [x] Validate accuracy using testing set and report performance on each model
 - [x] Determine significant electrodes by calculating the weight for each electrode for each driver with the formula describe in the research paper:
-	- ![](pics/v_weights.png)
+	- ![](readme-pics/v_weights.png)
 	<!-- - $$V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$$ -->
 
 ### Improvements:

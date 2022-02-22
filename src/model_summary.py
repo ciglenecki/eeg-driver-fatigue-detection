@@ -33,6 +33,7 @@ for filepath in filepaths:
     num_of_fits = len(y_trues)
     model_name: str = type(model.estimator).__name__
 
+    """Caculate metrics and add them to the table"""
     accuracies = list(map(lambda x: accuracy_score(x[0], x[1]), zip(y_trues, y_preds)))
     f1s = list(map(lambda x: f1_score(x[0], x[1]), zip(y_trues, y_preds)))
     aucs = list(map(lambda x: roc_auc_score(x[0], x[1]), zip(y_trues, y_preds)))
@@ -50,7 +51,6 @@ for filepath in filepaths:
         metadata=model.best_params_,
         datetime_arg=True,
     )
-
     fig, ax = plt.subplots()
     ax.set_title("{} ROC (area under curve {:.4f})".format(model_name, auc))
     plt.grid()

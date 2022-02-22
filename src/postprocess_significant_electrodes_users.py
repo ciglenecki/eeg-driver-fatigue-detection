@@ -1,3 +1,11 @@
+"""
+Caculate significant electrodes for each user
+
+In this method weights for each electrode is caculated for each user. Once all weights are obtained, average weights across all users and all electrodes is caculated, resulting in 30 average weights for each electrode.
+
+In every step, we refit the model with input data `X_train` which contains filtered rows (rows with a certain `user_id`) and filtered columns (columns for `electrode` which the accuracy is being caculated for) 
+"""
+
 from typing import Dict, List
 
 from pandas.core.frame import DataFrame

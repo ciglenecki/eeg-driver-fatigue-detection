@@ -42,12 +42,6 @@ args = parser.parse_args()
 stdout_to_file(Path(args.output_report, "-".join(["train-models", get_timestamp()]) + ".txt"))
 print(vars(args), "\n")
 
-df: DataFrame = read_pickle(args.df)
-training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
-X = df.drop("is_fatigued", axis=1)
-X = X[X.columns[X.max() != -1]]  # remove constant attributes
-y = df.loc[:, "is_fatigued"]
-
 
 def loo_generator(X, y):
     groups = X["driver_id"].to_numpy()
@@ -59,6 +53,13 @@ def loo_generator(X, y):
 
 def split_generator(X, y):
     yield split_and_normalize(X.loc[:, training_columns], y, test_size=0.5, columns_to_scale=training_columns)
+
+
+df: DataFrame = read_pickle(args.df)
+training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
+X = df.drop("is_fatigued", axis=1)
+X = X[X.columns[X.max() != -1]]  # remove constant attributes
+y = df.loc[:, "is_fatigued"]
 
 
 strategies = {"leaveoneout": loo_generator, "split": split_generator}

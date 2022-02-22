@@ -1,11 +1,17 @@
 """
-Finds significant electrodes by caculating weight described by the formula in the paper
+Summary:
+    Finds significant electrodes by caculating weight described by the formula in the paper
 
-Load already trained model via --svm argument (use it's hyperparameters)
-Load the dataset with the --df argument
-Refit the model (using the same hyperparameters) with a new train_test_split, because it's not known which data was used during the training phase 
-Caculate weight for every channel and sort the list
-Create a report file
+Steps:
+    Load already trained model via --svm argument (use it's hyperparameters)
+    Load the dataset with the --df argument
+    Refit the model (using the same hyperparameters) with a new train_test_split, because it's not known which data was used during the training phase 
+    Caculate weight for every channel and sort the list
+    Create a report file
+
+--------------------
+
+Some electrodes are more important for predicting driver's state. To find the most significant electrodes we will use methods described in paper where we caculate weights for each electrode. Electrode with the highest weight is considered to be the most important.
 """
 
 import argparse
@@ -17,8 +23,7 @@ from postprocess_significant_electrodes_drivers import caculate_mode_drivers
 from sklearn.svm import SVC
 
 from postprocess_significant_electrodes_all import caculate_mode_all
-from preprocess_preprocess_df import (split_and_normalize,
-                                      training_columns_regex)
+from preprocess_preprocess_df import split_and_normalize, training_columns_regex
 from utils_env import channels_good
 from utils_file_saver import load_model
 from utils_functions import get_timestamp, stdout_to_file

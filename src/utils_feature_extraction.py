@@ -1,4 +1,12 @@
-""" Class which extracts features for a given dataframe's epoch"""
+""" 
+Class which extracts features for a given dataframe's epoch
+
+PE - special entropy - calculated by applying the Shannon function to the normalized power spectrum based on the peaks of a Fourier transform
+AE - Approximate entropy - calculated in time domain without phase-space reconstruction of signal (short-length time series data)
+SE - Sample entropy - similar to AE. Se is less sensitive to changes in data length with larger values corresponding to greater complexity or irregularity in the data
+FE - Fuzzy entropy - stable results for different parameters. Best noise resistance using fuzzy membership function.
+
+"""
 from math import ceil, floor
 from typing import Callable, List, Optional, Tuple, TypedDict
 
@@ -10,16 +18,6 @@ from mne import make_fixed_length_epochs, time_frequency
 from pandas import DataFrame, Series
 from scipy import signal
 from scipy.signal.spectral import periodogram
-
-feature_long_to_short_mapping = {
-    "mean": "mean",
-    "standard_deviation": "std",
-    "power_spectral_density": "psd",
-    "spectral_entropy": "PE",
-    "approximate_entropy": "AE",
-    "sample_entropy": "SE",
-    "fuzzy_entropy": "FE",
-}
 
 
 def fuzzy_entropy(x):

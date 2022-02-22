@@ -1,3 +1,13 @@
+"""
+Caculate significant electrodes for the whole dataset
+
+In this method weights for each electrode is caculated with the whole dataset. Instead of filtering participants they are all taken into account when caculating the weight for a specific electrode. These **weights will generally be lower** than weights in the **Method 1**. 
+
+In practice, each participant has it's own significant electrodes and those electrodes don't have to be significant for other participants. Significant electrodes are not significant for all participants.
+
+For example: electrode F4 might perform well for participants (3,4) but not so well for the rest of the participants (1,2,5,...,12). Because the electrode F4 has little significance in predicting the state for participants (1,2,5,...,12) the accuracy will be low for those participants but high for the other participants (3,4). Since validation is performed on all participants this results in validation disbalance. Even though electrode performs well for only 2 participants (3,4), resulting in accuracy that's generally low compared to **Method 1** accuracy.
+"""
+
 from typing import Dict, List
 
 from pandas.core.frame import DataFrame
