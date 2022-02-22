@@ -74,12 +74,12 @@ Optional:
 
 # Figures
 
-3 compontent (x,y, color) T-SNE of the dataset
+### 3 compontent (x,y, color) T-SNE of the dataset
 
 ![](data/figures/data_tsne.png)
 
 
-## 50:50 train test split
+## Metrics - 50:50 train test split
 
 ### Model comparison
 
