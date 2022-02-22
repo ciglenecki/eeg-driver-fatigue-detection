@@ -54,7 +54,8 @@ Implement steps described in the research paper and produce similar results.
 	- [x] Random Forest (RF)
 - [x] Validate accuracy using testing set and report performance on each model
 - [x] Determine significant electrodes by calculating the weight for each electrode for each driver with the formula describe in the research paper:
-	- $$V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$$
+	- ![](pics/v_weights.png)
+	<!-- - $$V_i=\frac{Acc(i) + \sum_{j=1, j\not=i}^{30}{Acc_{(ij)} + Acc_{(i)} - Acc_{(j)}}}{30}$$ -->
 
 ### Improvements:
 - [x] Fix the code in EntropyHub library (sample entropy) where NaN is returned by the `np.log` if the power density for a given frequency equals to 0
@@ -69,6 +70,32 @@ Optional:
 - [ ] Visualize training/testing error
 - [ ] Visualize weight-based topographies for each subject
 - [ ] Visualize weight-based topographies average
+
+
+# Figures
+
+3 compontent (x,y, color) T-SNE of the dataset
+
+![](data/figures/data_tsne.png)
+
+
+## 50:50 train test split
+
+### Model comparison
+
+![](data/figures/model-compare-2022-02-22-01-21-49-.png)
+
+
+### Receiver operating characteristic (ROC)
+
+[RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.0000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.9928)
+--- | ---
+![](data/figures/randomforestclassifier-1.0000-roc-2022-02-22-01-21-48-max_features_22___n_estimators_500.png) | ![](data/figures/svc-0.9928-roc-2022-02-22-01-21-48-c_100___gamma_0.03125.png)
+
+[KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.9892) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.9861)
+--- | ---
+![](data/figures/kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png) | ![](data/figures/mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png)
+
 
 # Dataframe structure
 
@@ -88,10 +115,10 @@ driving_states (len(driving_states)=2)
 ```
 
 ## Columns
-Columns are defined by a tripplet:
-1. **feature** (mean, AE (approximate entropy), standard deviation...)
-2. **channel** (FC4, T6, P3...) - electrodes on the cap which driver wears during the driving session
-3. **preprocess procedure** (standard, alpha waves, channel rereferencing...)
+Each feature column is defined by a tripplet:
+1. **feature** (`mean`, approximate entropy (`AE`), standard deviation (`std`)...)
+2. **channel** (`FC4`, `T6`, `P3`...) - electrodes on the cap which driver wears during the driving session
+3. **preprocess procedure** (`standard`, alpha waves (`AL`), channel rereferencing...)
 
 Number of columns:
 ```
@@ -100,11 +127,12 @@ is_fatigue_state (1) +
 epoch_id (1) +
 features (len(feature_names)=7) *
 channels (len(channels_good)=30) *
-preprocess procedures N (N <1, +>)
+N preprocess procedures (N <1, +>)
 
 1 + 1 + 1 + 7 * 30 * N = 210 * N
 
-in most cases it's 1050
+in most cases N = 5 (standard, AL, AH, BL, BH)
+num of cols = 1050
 ```
 
 

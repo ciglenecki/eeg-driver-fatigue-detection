@@ -11,18 +11,18 @@ Create a report file
 import argparse
 from pathlib import Path
 
-from pandas import read_pickle, DataFrame
+from pandas import DataFrame, read_pickle
 from pandas._config.config import set_option
+from postprocess_significant_electrodes_drivers import caculate_mode_drivers
 from sklearn.svm import SVC
 
 from postprocess_significant_electrodes_all import caculate_mode_all
-from postprocess_significant_electrodes_drivers import caculate_mode_drivers
-from preprocess_preprocess_df import split_and_normalize
+from preprocess_preprocess_df import (split_and_normalize,
+                                      training_columns_regex)
 from utils_env import channels_good
 from utils_file_saver import load_model
 from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_REPORT
-from preprocess_preprocess_df import training_columns_regex
 
 set_option("display.max_columns", None)
 parser = argparse.ArgumentParser()

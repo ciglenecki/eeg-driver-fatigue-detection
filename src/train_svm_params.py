@@ -11,7 +11,7 @@ import argparse
 from itertools import product
 from pathlib import Path
 
-from pandas import read_pickle, DataFrame
+from pandas import DataFrame, read_pickle
 from pandas._config.config import set_option
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import LeaveOneGroupOut
@@ -36,7 +36,6 @@ training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_rege
 X = df.loc[:, ~df.columns.isin(["is_fatigued"])]
 X = X[X.columns[X.max() != -1]]  # remove constant attributes
 y = df.loc[:, "is_fatigued"]
-X_train, X_test, y_train, y_test = split_and_normalize(X, y, training_columns, test_size=0.5)
 
 groups = X["driver_id"].to_numpy()
 acc_parameters = []
@@ -46,7 +45,7 @@ for C, gamma in tqdm(list(product(wide_params, wide_params))):
     acc_total = 0
 
     for train_index, test_index in LeaveOneGroupOut().split(X, y, groups):
-        X_train, X_test = X.iloc[train_index, training_columns], X.iloc[test_index, training_columns]
+        X_train, X_test = X.loc[train_index, training_columns], X.loc[test_index, training_columns]
         y_train, y_test = y[train_index], y[test_index]
         model.fit(X_train, y_train)
         y_test_pred = model.predict(X_test)

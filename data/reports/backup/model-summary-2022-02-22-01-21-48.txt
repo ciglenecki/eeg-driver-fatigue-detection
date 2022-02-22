@@ -1,0 +1,27 @@
+randomforestclassifier-1.0000-roc-2022-02-22-01-21-48-max_features_22___n_estimators_500.png
+Saved file:
+/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/randomforestclassifier-1.0000-roc-2022-02-22-01-21-48-max_features_22___n_estimators_500.png
+
+svc-0.9928-roc-2022-02-22-01-21-48-c_100___gamma_0.03125.png
+Saved file:
+/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/svc-0.9928-roc-2022-02-22-01-21-48-c_100___gamma_0.03125.png
+
+kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png
+Saved file:
+/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png
+
+mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png
+Saved file:
+/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png
+
+| Model name             |   F1 score |   Accuracy |   Area under curve |
+|------------------------|------------|------------|--------------------|
+| RandomForestClassifier |   1        |   1        |           1        |
+| SVC                    |   0.992822 |   0.992778 |           0.992781 |
+| KNeighborsClassifier   |   0.989158 |   0.989167 |           0.989216 |
+| MLPClassifier          |   0.986226 |   0.986111 |           0.986099 | 
+
+model-compare-2022-02-22-01-21-49-.png
+Saved file:
+/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/model-compare-2022-02-22-01-21-49-.png
+

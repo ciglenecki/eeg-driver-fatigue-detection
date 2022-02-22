@@ -46,10 +46,15 @@ from pandas import DataFrame, set_option
 from tqdm import tqdm
 
 from preprocess_preprocess_df import df_replace_values
-from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands
+from utils_env import (FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ,
+                       NOTCH_FILTER_HZ, NUM_USERS,
+                       SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET,
+                       channels_good, driving_states, feature_names,
+                       get_brainwave_bands)
 from utils_feature_extraction import FeatureExtractor
-from utils_file_saver import save_df_to_disk
-from utils_functions import get_cnt_filename, glimpse_df, is_arg_default, serialize_functions
+from utils_file_saver import save_df
+from utils_functions import (get_cnt_filename, glimpse_df, is_arg_default,
+                             serialize_functions)
 from utils_paths import PATH_DATAFRAME, PATH_DATASET_CNT
 from utils_signal import SignalPreprocessor
 
@@ -108,16 +113,14 @@ def signal_filter_notch(signal: BaseRaw, filter_hz):
 
 
 def low_high_pass_filter(signal: BaseRaw, l_freq, h_freq):
-    """
-    Filters the signal (cutoff lower and higher frequency) by using zero-phase filtering
-    """
+    """Filters the signal (cutoff lower and higher frequency) by using zero-phase filtering"""
+
     return signal.copy().filter(l_freq=l_freq, h_freq=h_freq)
 
 
 def epochs_to_dataframe(epochs: Epochs, drop_columns=["time", "condition"]):
-    """
-    Converts to dataframe and drops unnecessary columns
-    """
+    """Converts to dataframe and drops unnecessary columns"""
+
     df: DataFrame = epochs.to_data_frame(scalings=dict(eeg=1))
     df = df.drop(drop_columns, axis=1)
     return df
@@ -134,19 +137,17 @@ def get_column_names(channels, feature_names, preprocess_procedure_names: dict):
     return list(map(lambda strs: "_".join(strs), prod))
 
 
-feature_extractor = FeatureExtractor(picked_features=feature_names)
-
+feature_extractor = FeatureExtractor(selected_feature_names=feature_names)
 signal_preprocessor = SignalPreprocessor()
 
 """
-Register signal preprocessing procedures with SignalPreprocessor
+4 signal preprocessing procedures with SignalPreprocessor
 "standard" -> .notch and .filter with lower and higher pass-band edge defined in the research paper
 
 "AL", "AH", "BL", "BH" -> .notch and .filter with lower and higher pass-band edge defined in brainwave_bands in env.py
 
 "reref" -> .notch and .filter with lower and higher pass-band edge defined in the research paper and rereference within electodes
 """
-
 base_preprocess_procedure = serialize_functions(
     lambda s: signal_crop(s, FREQ, SIGNAL_OFFSET, signal_duration),
     lambda s: signal_filter_notch(s, NOTCH_FILTER_HZ),
@@ -174,7 +175,7 @@ if use_reref:
     )
     signal_preprocessor.register_preprocess_procedure("reref", proc, context={"freq_filter_range": LOW_PASS_FILTER_RANGE_HZ})
 
-training_cols = get_column_names(channels, feature_extractor.picked_features, signal_preprocessor.get_preprocess_procedure_names())
+training_cols = get_column_names(channels, feature_extractor.get_feature_names(), signal_preprocessor.get_preprocess_procedure_names())
 df_dict = {k: [] for k in ["is_fatigued", "driver_id", "epoch_id", *training_cols]}
 
 for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_states))):
@@ -184,14 +185,13 @@ for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_
 
     signal = load_clean_cnt(file_signal, channels)
     signal_preprocessor.fit(signal)
-
     for proc_index, (signal_processed, proc_name, proc_context) in enumerate(signal_preprocessor.get_preprocessed_signals()):
-        epochs = make_fixed_length_epochs(signal_processed)
+        epochs = make_fixed_length_epochs(signal_processed, verbose=False)
         df = epochs_to_dataframe(epochs)
+
         freq_filter_range = proc_context["freq_filter_range"]
         feature_extractor.fit(signal_processed, FREQ)
-
-        for epoch_id in tqdm(list(range(0, signal_duration))):
+        for epoch_id in range(0, signal_duration):
             """
             Filter the dataframe rows by selecting the rows with epoch_id.
 
@@ -209,7 +209,7 @@ for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_
             """
 
             df_epoch = df.loc[df["epoch"] == epoch_id, channels].head(epoch_events_num)
-            feature_dict = feature_extractor.get_features(df_epoch, context=dict(epoch_id=epoch_id, freq_filter_range=freq_filter_range))
+            feature_dict = feature_extractor.get_features(df_epoch, epoch_id=epoch_id, freq_filter_range=freq_filter_range)
 
             for channel_idx, channel in enumerate(channels):
                 for feature_name, feature_array in feature_dict.items():
@@ -236,7 +236,7 @@ df["epoch_id"] = df["epoch_id"].astype(int)
 df.to_pickle(str(Path(output_dir, ".raw_df.pkl")))
 
 """Save to files"""
-save_df_to_disk(df, is_complete_dataset, output_dir, "raw", train_metadata)
+save_df(df, is_complete_dataset, output_dir, "raw", train_metadata)
 glimpse_df(df)
 df = df_replace_values(df)
-save_df_to_disk(df, is_complete_dataset, output_dir, "clean", train_metadata)
+save_df(df, is_complete_dataset, output_dir, "clean", train_metadata)

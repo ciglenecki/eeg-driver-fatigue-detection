@@ -8,20 +8,23 @@ import warnings
 from pathlib import Path
 
 import numpy as np
-from pandas import DataFrame, read_pickle, set_option, Series
+from pandas import DataFrame, Series, read_pickle, set_option
 from sklearn.model_selection import train_test_split
-
-from utils_env import training_columns_regex
-from utils_file_saver import save_to_file_with_metadata
-from utils_paths import PATH_DATAFRAME
 from sklearn.preprocessing import MinMaxScaler
 
+from utils_env import training_columns_regex
+from utils_file_saver import get_decorated_filepath, save_obj
+from utils_paths import PATH_DATAFRAME
 
-def split_and_normalize(X: DataFrame, y: Series, test_size: float, columns_to_scale, scaler: MinMaxScaler = MinMaxScaler()):
-    """
-    Columns to scale can be both string list or list of bools
-    """
+
+def split_and_normalize(X: Series, y: Series, test_size: float, columns_to_scale, scaler: MinMaxScaler = MinMaxScaler()):
+    """Columns to scale can be both string list or list of bools"""
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
+    X_train: Series
+    X_test: Series
+    y_train: Series
+    y_test: Series
     X_train.loc[:, columns_to_scale] = scaler.fit_transform(X_train.loc[:, columns_to_scale])
     X_test.loc[:, columns_to_scale] = scaler.transform(X_test.loc[:, columns_to_scale])
     return X_train, X_test, y_train, y_test
@@ -33,6 +36,7 @@ def df_replace_values(df: DataFrame):
     Standard scaler scales for each column independently.
     Scale per person
     """
+
     df = df.replace([np.inf, -np.inf], np.nan)
     df = df.fillna(0)
     return df
@@ -54,6 +58,7 @@ if __name__ == "__main__":
     training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
     df = df_replace_values(df)
 
-    file_saver = lambda df, filename: df.to_pickle(str(filename))
-    basename = df_path.stem.replace("raw", "normalized-after")
-    save_to_file_with_metadata(df, output_dir, basename, ".pkl", file_saver, metadata={})
+    basename = df_path.stem.replace("raw", "cleaned2")
+    file_saver = lambda df, filepath: DataFrame.to_pickle(df, filepath)
+    filepath = get_decorated_filepath(directory=output_dir, basename=basename, extension=".pkl")
+    save_obj(obj=df, filepath=filepath, file_saver=DataFrame.to_pickle, metadata={})

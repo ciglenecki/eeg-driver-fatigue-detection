@@ -10,11 +10,8 @@ from os import getcwd
 from pathlib import Path
 from typing import Dict, TypeVar
 
-import numpy as np
 from IPython.display import display
-import pandas as pd
 from pandas import DataFrame
-from sklearn import preprocessing
 
 T = TypeVar("T")
 
@@ -33,28 +30,6 @@ def get_timestamp():
 
 def dict_apply_procedture(old_dict: Dict[str, T], procedure) -> Dict[str, T]:
     return {k: procedure(v) for k, v in old_dict.items()}
-
-
-def min_max_dataframe(df: DataFrame):
-    return df.apply(lambda x: min_max_scaler_1d(x.to_numpy()), axis=0)
-
-
-def standard_scale_dataframe(df: DataFrame):
-    return df.apply(lambda x: standard_scaler_1d(x.to_numpy()), axis=0)
-
-
-standard_scaler = preprocessing.StandardScaler().fit_transform
-
-
-def standard_scaler_1d(x: np.ndarray) -> np.ndarray:
-    return standard_scaler(x.reshape(-1, 1)).reshape(1, -1).squeeze()
-
-
-min_max_scaler = preprocessing.MinMaxScaler((-1, 1)).fit_transform
-
-
-def min_max_scaler_1d(x):
-    return min_max_scaler(x.reshape(-1, 1)).reshape(1, -1).squeeze()
 
 
 def isnull_any(df):
@@ -137,13 +112,20 @@ def dict_to_byte_metadata(dictionary: dict):
 
 def dict_to_string(dictionary: dict):
     """
-    {accuracy: 73, method: "net} ---> "accuracy=73___method=net"
+    {"accuracy": 73, "method": "net"} ---> "accuracy_73___method_net"
     """
     pairs = get_dictionary_leaves(dictionary)
-    return "__".join(map(lambda key_value: "=".join([str(key_value[0]), str(key_value[1])]), pairs))
+    if pairs is None:
+        return ""
+    return "___".join(map(lambda key_value: "_".join([str(key_value[0]), str(key_value[1])]), pairs))
 
 
 class SocketConcatenator(object):
+    """
+    Class adds an abillity to write to mulitple sockets
+    For example, write both to stdout and to a file
+    """
+
     def __init__(self, *files):
         self.files = files
 
@@ -161,8 +143,10 @@ def stdout_to_file(file: Path):
     """
     Pipes standard input to standard input and to a file.
     """
+    print()
     print("Standard output piped to file:")
     print(file)
+    print()
     f = open(Path(getcwd(), file), "w")
     sys.stdout = SocketConcatenator(sys.stdout, f)
 
@@ -177,3 +161,7 @@ def print_report(file: Path, regex_filter):
 
 def flatten(t):
     return [item for sublist in t for item in sublist]
+
+
+if __name__ == "__main__":
+    pass

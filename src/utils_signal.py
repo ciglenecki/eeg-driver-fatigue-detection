@@ -2,10 +2,10 @@ from math import floor
 from typing import Callable, List, Optional, Tuple, TypedDict, Union
 
 import numpy as np
+from mne import Epochs
 from mne.io import read_raw_cnt
 from mne.io.base import BaseRaw
 from pandas import DataFrame
-from mne import Epochs
 
 
 def load_clean_cnt(filename: str, channels: List[str]):
@@ -139,3 +139,7 @@ class SignalPreprocessor:
 
     def get_preprocess_procedure_names(self) -> List[str]:
         return list(map(lambda x: x["name"], self.preprocess_procedures))
+
+
+if __name__ == "__main__":
+    pass

@@ -2,6 +2,7 @@ import argparse
 import pickle
 import sys
 import warnings
+from collections import Counter
 from itertools import chain, combinations, product
 from os import getcwd
 from pathlib import Path
@@ -15,14 +16,23 @@ from joblib import dump, load
 from pandas import read_pickle
 from pandas._config.config import set_option
 
-from utils_file_saver import load_dataframe
 from utils_env import training_columns_regex
+from utils_file_saver import load_dataframe
 
 """
 Temporary file used only for testing things around.
 """
 
+def sum_dict(d1, d2):
+	d1 = Counter(d1)
+	d2 = Counter(d2)
+	z = dict(Counter(x)+Counter(y))
 
+dict1 = {"a": 1, "b": 2, "c": {"a": 1, "b": 2}}
+dict2 = {"a": 1, "b": 2, "c": {"a": 5, "b": 5}}
+
+print(Counter(dict1) + Counter(dict2))
+print(dict1 + dict2)
 # def get_column_names(use_brainbands: bool, brainwave_bands: dict):
 #     prod = product()
 #     if use_brainbands:
@@ -32,13 +42,13 @@ Temporary file used only for testing things around.
 #     return list(map(lambda x: "_".join(x), prod))
 
 
-set_option("display.max_columns", None)
+# set_option("display.max_columns", None)
 
-df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/partial-raw-2022-01-08-01-23-36-is_complete_train=false__brains=false__ica=true.pkl")
+# df = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/partial-raw-2022-01-08-01-23-36-is_complete_train=false__brains=false__ica=true.pkl")
 
-training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
+# training_columns = list(df.iloc[:, df.columns.str.contains(training_columns_regex)].columns)
 
-exit(1)
+# exit(1)
 # df_new = load_dataframe("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/dataframes/complete-normalized-2022-01-07-09-33-21-.pkl")
 
 
