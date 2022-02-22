@@ -19,7 +19,7 @@ from pathlib import Path
 
 from pandas import DataFrame, read_pickle
 from pandas._config.config import set_option
-from postprocess_significant_electrodes_drivers import caculate_mode_drivers
+from postprocess_significant_electrodes_users import caculate_mode_drivers
 from sklearn.svm import SVC
 
 from postprocess_significant_electrodes_all import caculate_mode_all
