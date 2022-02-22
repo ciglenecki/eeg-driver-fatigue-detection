@@ -1,11 +1,8 @@
 # Driver fatigue detection through multiple entropy fusion analysis in an EEG-based system
 
+## https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 <p align="center">
 	<img src="pics/header_image.png"></img>
-</p>
-<p align="center">
-	<p align="center">Paper:</p>
-	<a align="center" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756">https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756</a>
 </p>
 
 ## Assignment
