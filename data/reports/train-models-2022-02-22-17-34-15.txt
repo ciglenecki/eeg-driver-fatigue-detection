@@ -1,4 +1,4 @@
-{'df': 'data/dataframes/complete-clean-2022-02-17-04-08-40-is_complete_dataset=true__brains=true__reref=false.pickle', 'strategy': 'leaveoneout', 'output_report': PosixPath('/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/reports')} 
+{'df': 'data/dataframes/complete-clean-2022-02-17-04-08-40-is_complete_dataset=true__brains=true__reref=false.pickle', 'strategy': 'leaveoneout', 'output_report': PosixPath('data/reports')} 
 
 0.642008 (+/-0.245102) for {'gamma': 0.01, 'C': 0.5}
 0.614021 (+/-0.302459) for {'gamma': 0.01, 'C': 100}
@@ -18,7 +18,7 @@ SVC      0.440617    0.385972  0.5     0.01
 
 svc-0.6839-leaveoneout-c_0.5___gamma_0.01.model
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/svc-0.6839-leaveoneout-c_0.5___gamma_0.01.model
+data/models/svc-0.6839-leaveoneout-c_0.5___gamma_0.01.model
 
 0.651580 (+/-0.306740) for {'max_features': 22, 'n_estimators': 500}
 0.647149 (+/-0.307988) for {'n_estimators': 500, 'max_features': 'auto'}
@@ -28,7 +28,7 @@ RandomForestClassifier  0.530038    0.502361              22             500
 
 randomforestclassifier-0.7247-leaveoneout-max_features_22___n_estimators_500.model
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/randomforestclassifier-0.7247-leaveoneout-max_features_22___n_estimators_500.model
+data/models/randomforestclassifier-0.7247-leaveoneout-max_features_22___n_estimators_500.model
 
 0.571273 (+/-0.295293) for {'alpha': 0.05, 'learning_rate': 'constant'}
 0.554161 (+/-0.292380) for {'alpha': 0.001, 'learning_rate': 'constant'}
@@ -40,7 +40,7 @@ MLPClassifier  0.409977    0.399167    0.001  constant
 
 mlpclassifier-0.6622-leaveoneout-alpha_0.001___learning_rate_constant.model
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/mlpclassifier-0.6622-leaveoneout-alpha_0.001___learning_rate_constant.model
+data/models/mlpclassifier-0.6622-leaveoneout-alpha_0.001___learning_rate_constant.model
 
 0.632906 (+/-0.247368) for {'weights': 'uniform'}
 0.632872 (+/-0.247392) for {'weights': 'distance'}
@@ -50,7 +50,7 @@ KNeighborsClassifier  0.483793    0.466389  uniform
 
 kneighborsclassifier-0.7067-leaveoneout-weights_uniform.model
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/kneighborsclassifier-0.7067-leaveoneout-weights_uniform.model
+data/models/kneighborsclassifier-0.7067-leaveoneout-weights_uniform.model
 
 
 Showing first 3 data points

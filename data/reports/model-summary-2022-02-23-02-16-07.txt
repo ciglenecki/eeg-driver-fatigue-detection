@@ -1,18 +1,18 @@
 kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png
+data/figures/kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png
 
 randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png
+data/figures/randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png
 
 mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png
+data/figures/mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png
 
 svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png
+data/figures/svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png
 
 | Model name             |   F1 score |   Accuracy |   Area under curve |
 |------------------------|------------|------------|--------------------|
@@ -23,5 +23,4 @@ Saved file:
 
 model-compare-2022-02-23-02-16-09-.png
 Saved file:
-/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/figures/model-compare-2022-02-23-02-16-09-.png
-
+data/figures/model-compare-2022-02-23-02-16-09-.png
