@@ -80,6 +80,13 @@ Optional:
 
 ### Model comparison
 
+| Model name             |   F1 score |   Accuracy |   Area under curve |
+|------------------------|------------|------------|--------------------|
+| RandomForestClassifier |   1        |   1        |           1        |
+| SVC                    |   0.992822 |   0.992778 |           0.992781 |
+| KNeighborsClassifier   |   0.989158 |   0.989167 |           0.989216 |
+| MLPClassifier          |   0.986226 |   0.986111 |           0.986099 | 
+
 ![](data/figures/model-compare-2022-02-22-01-21-49-.png)
 
 
@@ -92,6 +99,32 @@ Optional:
 [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.9892) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.9861)
 --- | ---
 ![](data/figures/kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png) | ![](data/figures/mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png)
+
+
+## Metrics - Leave one driver out (LOO)
+
+### Model comparison
+
+| Model name             |   F1 score |   Accuracy |   Area under curve |
+|------------------------|------------|------------|--------------------|
+| RandomForestClassifier |   0.530038 |   0.502361 |           0.502361 |
+| KNeighborsClassifier   |   0.483793 |   0.466389 |           0.466389 |
+| SVC                    |   0.440617 |   0.385972 |           0.385972 |
+| MLPClassifier          |   0.409977 |   0.399167 |           0.399167 | 
+
+![](data/figures/model-compare-leaveoneout-2022-02-23-02-16-09-.png)
+
+
+### Receiver operating characteristic (ROC)
+
+[RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.5025) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.3860)
+--- | ---
+![](data/figures/randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png) | ![](data/figures/svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png)
+
+[KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.4664) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.3992)
+--- | ---
+![](data/figures/kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png) | ![](data/figures/mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png)
+
 
 
 # Dataframe structure

@@ -15,6 +15,7 @@ It's assumed that combination with all 4 entropies will produce the highest pred
 """
 
 import argparse
+from itertools import product
 from pathlib import Path
 
 from pandas import DataFrame, read_pickle
