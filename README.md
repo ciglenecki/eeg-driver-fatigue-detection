@@ -1,5 +1,11 @@
 # Driver fatigue detection through multiple entropy fusion analysis in an EEG-based system
 
+| Model                  | P1    | P2    | P3    | P4    | P5    | P6    | P7    | P8    | P9    | P10   | P11   | P12   |
+| ---------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| randomforestclassifier | 0.541 | 0.281 | 0.606 | 0.92  | 0.5   | 0.441 | 0.565 | 0.503 | 0.628 | 0.478 | 0.561 | 0.0   |
+| SVM                    | 0.278 | 0.285 | 0.501 | 0.401 | 0.166 | 0.361 | 0.5   | 0.506 | 0.528 | 0.556 | 0.5   | 0.045 |
+
+
 ## https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 <p align="center">
 	<img src="readme-pics/header_image.png"></img>
@@ -80,50 +86,50 @@ Optional:
 
 ### Model comparison
 
-| Model name             |   F1 score |   Accuracy |   Area under curve |
-|------------------------|------------|------------|--------------------|
-| RandomForestClassifier |   1        |   1        |           1        |
-| SVC                    |   0.992822 |   0.992778 |           0.992781 |
-| KNeighborsClassifier   |   0.989158 |   0.989167 |           0.989216 |
-| MLPClassifier          |   0.986226 |   0.986111 |           0.986099 | 
+| Model name             | F1 score | Accuracy | Area under curve |
+| ---------------------- | -------- | -------- | ---------------- |
+| RandomForestClassifier | 1        | 1        | 1                |
+| SVC                    | 0.992822 | 0.992778 | 0.992781         |
+| KNeighborsClassifier   | 0.989158 | 0.989167 | 0.989216         |
+| MLPClassifier          | 0.986226 | 0.986111 | 0.986099         |
 
 ![](data/figures/model-compare-2022-02-22-01-21-49-.png)
 
 
 ### Receiver operating characteristic (ROC)
 
-[RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.0000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.9928)
---- | ---
-![](data/figures/randomforestclassifier-1.0000-roc-2022-02-22-01-21-48-max_features_22___n_estimators_500.png) | ![](data/figures/svc-0.9928-roc-2022-02-22-01-21-48-c_100___gamma_0.03125.png)
+| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.0000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.9928) |
+| --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| ![](data/figures/randomforestclassifier-1.0000-roc-2022-02-22-01-21-48-max_features_22___n_estimators_500.png)                          | ![](data/figures/svc-0.9928-roc-2022-02-22-01-21-48-c_100___gamma_0.03125.png)               |
 
-[KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.9892) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.9861)
---- | ---
-![](data/figures/kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png) | ![](data/figures/mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png)
+| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.9892) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.9861) |
+| ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| ![](data/figures/kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png)                                            | ![](data/figures/mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png)                     |
 
 
 ## Metrics - Leave one driver out (LOO)
 
 ### Model comparison
 
-| Model name             |   F1 score |   Accuracy |   Area under curve |
-|------------------------|------------|------------|--------------------|
-| RandomForestClassifier |   0.530038 |   0.502361 |           0.502361 |
-| KNeighborsClassifier   |   0.483793 |   0.466389 |           0.466389 |
-| SVC                    |   0.440617 |   0.385972 |           0.385972 |
-| MLPClassifier          |   0.409977 |   0.399167 |           0.399167 | 
+| Model name             | F1 score | Accuracy | Area under curve |
+| ---------------------- | -------- | -------- | ---------------- |
+| RandomForestClassifier | 0.530038 | 0.502361 | 0.502361         |
+| KNeighborsClassifier   | 0.483793 | 0.466389 | 0.466389         |
+| SVC                    | 0.440617 | 0.385972 | 0.385972         |
+| MLPClassifier          | 0.409977 | 0.399167 | 0.399167         |
 
 ![](data/figures/model-compare-leaveoneout-2022-02-23-02-16-09-.png)
 
 
 ### Receiver operating characteristic (ROC)
 
-[RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.5025) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.3860)
---- | ---
-![](data/figures/randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png) | ![](data/figures/svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png)
+| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.5025) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.3860) |
+| --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| ![](data/figures/randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png)                          | ![](data/figures/svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png)                  |
 
-[KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.4664) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.3992)
---- | ---
-![](data/figures/kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png) | ![](data/figures/mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png)
+| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.4664) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.3992) |
+| ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| ![](data/figures/kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png)                                            | ![](data/figures/mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png)                     |
 
 
 

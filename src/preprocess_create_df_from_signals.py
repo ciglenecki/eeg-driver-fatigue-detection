@@ -35,7 +35,7 @@ import warnings
 from itertools import product
 from math import floor
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 import numpy as np
 from mne import Epochs
@@ -44,17 +44,14 @@ from mne.io.base import BaseRaw
 from mne.io.cnt import read_raw_cnt
 from pandas import DataFrame, set_option
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+
 
 from preprocess_preprocess_df import df_replace_values
-from utils_env import (FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ,
-                       NOTCH_FILTER_HZ, NUM_USERS,
-                       SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET,
-                       channels_good, driving_states, feature_names,
-                       get_brainwave_bands)
+from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands
 from utils_feature_extraction import FeatureExtractor
 from utils_file_saver import save_df
-from utils_functions import (get_cnt_filename, glimpse_df, is_arg_default,
-                             serialize_functions)
+from utils_functions import get_cnt_filename, glimpse_df, is_arg_default, serialize_functions
 from utils_paths import PATH_DATAFRAME, PATH_DATASET_CNT
 from utils_signal import SignalPreprocessor
 
@@ -89,7 +86,7 @@ use_reref = args.use_reref
 channels_ignore = args.channels_ignore
 channels = list(set(channels_good) - set(channels_ignore))
 
-is_complete_dataset = not any(map(lambda arg_name: is_arg_default(arg_name, parser, args), ["driver_num", "signal_duration", "epoch_events_num", "channels_ignore"]))
+is_complete_dataset = not any(map(lambda arg_name, parser=parser, args=args: is_arg_default(arg_name, parser, args), ["driver_num", "signal_duration", "epoch_events_num", "channels_ignore"]))
 train_metadata = {"is_complete_dataset": is_complete_dataset, "brains": use_brainbands, "reref": use_reref}
 print("Creating {} dataset...".format("complete" if is_complete_dataset else "partial"))
 
@@ -105,7 +102,7 @@ def signal_crop(signal: BaseRaw, freq: float, signal_offset: float, signal_durat
     signal_total_duration = floor(len(signal) / freq)
     start = signal_total_duration - signal_duration_wanted + signal_offset
     end = signal_total_duration + signal_offset
-    return signal.crop(tmin=start, tmax=end)
+    return signal.copy().crop(tmin=start, tmax=end)
 
 
 def signal_filter_notch(signal: BaseRaw, filter_hz):
@@ -126,13 +123,13 @@ def epochs_to_dataframe(epochs: Epochs, drop_columns=["time", "condition"]):
     return df
 
 
-def get_column_name(feature: str, channel: str, suffix: str = None):
+def get_column_name(feature: str, channel: str, suffix: Union[str, None] = None):
     result = "_".join([channel, feature])
     result = result if suffix is None else "_".join([result, suffix])
     return result
 
 
-def get_column_names(channels, feature_names, preprocess_procedure_names: dict):
+def get_column_names(channels, feature_names, preprocess_procedure_names: List[str]):
     prod = product(channels, feature_names, preprocess_procedure_names)
     return list(map(lambda strs: "_".join(strs), prod))
 
@@ -148,30 +145,32 @@ signal_preprocessor = SignalPreprocessor()
 
 "reref" -> .notch and .filter with lower and higher pass-band edge defined in the research paper and rereference within electodes
 """
-base_preprocess_procedure = serialize_functions(
-    lambda s: signal_crop(s, FREQ, SIGNAL_OFFSET, signal_duration),
-    lambda s: signal_filter_notch(s, NOTCH_FILTER_HZ),
-)
+
 
 filter_frequencies = {"standard": LOW_PASS_FILTER_RANGE_HZ}
 if use_brainbands:
     filter_frequencies.update(get_brainwave_bands())
 
+
 """ Registers preprocessing procedures that will filter frequencies defined in filter_frequencies"""
 for freq_name, freq_range in filter_frequencies.items():
     low_freq, high_freq = freq_range
-    proc = serialize_functions(
-        base_preprocess_procedure,
-        lambda s: s.filter(low_freq, high_freq),
+
+    procedure = serialize_functions(
+        lambda s, notch_filter_hz=NOTCH_FILTER_HZ: signal_filter_notch(s, notch_filter_hz),
+        lambda s, low_freq=low_freq, high_freq=high_freq: s.copy().filter(low_freq, high_freq),
+        lambda s, freq=FREQ, signal_offset=SIGNAL_OFFSET, signal_duration=signal_duration: signal_crop(s, freq, signal_offset, signal_duration),
     )
-    signal_preprocessor.register_preprocess_procedure(freq_name, proc, context={"freq_filter_range": freq_range})
+
+    signal_preprocessor.register_preprocess_procedure(freq_name, procedure=procedure, context={"freq_filter_range": freq_range})
 
 """ Registers preprocessing procedure that uses channel rereferencing"""
 if use_reref:
     low_freq, high_freq = LOW_PASS_FILTER_RANGE_HZ
     proc = serialize_functions(
-        base_preprocess_procedure,
-        lambda s: s.filter(low_freq, high_freq).set_eeg_reference(ref_channels="average", ch_type="eeg"),
+        lambda s, notch_filter_hz=NOTCH_FILTER_HZ: signal_filter_notch(s, notch_filter_hz),
+        lambda s, low_freq=low_freq, high_freq=high_freq: s.filter(low_freq, high_freq).set_eeg_reference(ref_channels="average", ch_type="eeg"),
+        lambda s, freq=FREQ, signal_offset=SIGNAL_OFFSET, signal_duration=signal_duration: signal_crop(s, freq, signal_offset, signal_duration),
     )
     signal_preprocessor.register_preprocess_procedure("reref", proc, context={"freq_filter_range": LOW_PASS_FILTER_RANGE_HZ})
 
@@ -181,9 +180,9 @@ df_dict = {k: [] for k in ["is_fatigued", "driver_id", "epoch_id", *training_col
 for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_states))):
 
     is_fatigued = 1 if driving_state == FATIGUE_STR else 0
-    file_signal = str(Path(PATH_DATASET_CNT, get_cnt_filename(driver_id + 1, driving_state)))
+    signal_filepath = str(Path(PATH_DATASET_CNT, get_cnt_filename(driver_id + 1, driving_state)))
 
-    signal = load_clean_cnt(file_signal, channels)
+    signal = load_clean_cnt(signal_filepath, channels)
     signal_preprocessor.fit(signal)
     for proc_index, (signal_processed, proc_name, proc_context) in enumerate(signal_preprocessor.get_preprocessed_signals()):
         epochs = make_fixed_length_epochs(signal_processed, verbose=False)

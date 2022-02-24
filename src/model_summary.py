@@ -37,10 +37,16 @@ for filepath in filepaths:
     accuracies = list(map(lambda x: accuracy_score(x[0], x[1]), zip(y_trues, y_preds)))
     f1s = list(map(lambda x: f1_score(x[0], x[1]), zip(y_trues, y_preds)))
     aucs = list(map(lambda x: roc_auc_score(x[0], x[1]), zip(y_trues, y_preds)))
+
     accuracy = sum(accuracies) / num_of_fits
     f1 = sum(f1s) / num_of_fits
     auc = sum(aucs) / num_of_fits
     table.append([model_name, f1, accuracy, auc])
+
+    """Print metrics for each driver"""
+
+    for i, (driver_acc, driver_f1, driver_auc) in enumerate(zip(accuracies, f1s, aucs)):
+        print("Driver {i} F1 {driver_f1}, Acc {driver_acc}, AUC {driver_auc}")
 
     """Plot ROC figure and save it"""
     figure_basename = get_model_basename(model_name, auc, name_tag="roc")
@@ -57,7 +63,7 @@ for filepath in filepaths:
     for i, (y_true, y_pred) in enumerate(zip(y_trues, y_preds)):
         label = "ROC ({:.4f})".format(auc) if num_of_fits == 1 else "Participant {} ROC ({:.4f})".format(i + 1, aucs[i])
         roc_plot = RocCurveDisplay.from_predictions(y_true=y_true, y_pred=y_pred, ax=ax, alpha=0.9, label=label)
-    save_figure(figure_filepath, metadata=model.best_params_)
+    # save_figure(figure_filepath, metadata=model.best_params_)
 
 """Print models' summary"""
 table = sorted(table, key=lambda x: x[1], reverse=True)
@@ -79,4 +85,4 @@ figure_filepath = get_decorated_filepath(
     extension="png",
     datetime_arg=True,
 )
-save_figure(figure_filepath)
+# save_figure(figure_filepath)

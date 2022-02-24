@@ -1,0 +1,51 @@
+{'df': 'data/dataframes/complete-clean-2022-02-17-04-08-40-is_complete_dataset=true__brains=true__reref=false.pickle', 'strategy': 'split', 'output_report': PosixPath('/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/reports')} 
+
+(7200, 1052)
+1.000000 (+/-0.000000) for {'max_features': 22, 'n_estimators': 500}
+1.000000 (+/-0.000000) for {'max_features': 'auto', 'n_estimators': 500}
+Model                     f1    accuracy    max_features    n_estimators
+----------------------  ----  ----------  --------------  --------------
+RandomForestClassifier     1           1              22             500 
+
+randomforestclassifier-1.0000-split-max_features_22___n_estimators_500.model
+Saved file:
+/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/models/randomforestclassifier-1.0000-split-max_features_22___n_estimators_500.model
+
+
+Showing first 3 data points
+
+   is_fatigued  driver_id  epoch_id  ...  P4_FE_AH  P4_FE_BL  P4_FE_BH
+0            0          0         0  ...  0.353348  0.353348  0.353348
+1            0          0         1  ...  0.352959  0.352959  0.352959
+2            0          0         2  ...  0.354924  0.354924  0.354924
+
+[3 rows x 1053 columns]
+
+Showing last 3 data points
+
+      is_fatigued  driver_id  epoch_id  ...  P4_FE_AH  P4_FE_BL  P4_FE_BH
+7197            1         11       297  ...  0.319417  0.319417  0.319417
+7198            1         11       298  ...  0.302421  0.302421  0.302421
+7199            1         11       299  ...  0.330966  0.330966  0.330966
+
+[3 rows x 1053 columns]
+
+Showing 3 radnom data points
+
+      is_fatigued  driver_id  epoch_id  ...  P4_FE_AH  P4_FE_BL  P4_FE_BH
+1230            0          2        30  ...  0.357846  0.357846  0.357846
+2709            1          4         9  ...  0.331871  0.331871  0.331871
+1544            1          2        44  ...  0.349465  0.349465  0.349465
+
+[3 rows x 1053 columns]
+       is_fatigued    driver_id  ...     P4_FE_BL     P4_FE_BH
+count  7200.000000  7200.000000  ...  7200.000000  7200.000000
+mean      0.500000     5.500000  ...     0.329530     0.329530
+std       0.500035     3.452292  ...     0.032091     0.032091
+min       0.000000     0.000000  ...     0.076582     0.076582
+25%       0.000000     2.750000  ...     0.318655     0.318655
+50%       0.500000     5.500000  ...     0.334511     0.334511
+75%       1.000000     8.250000  ...     0.344434     0.344434
+max       1.000000    11.000000  ...     0.409688     0.409688
+
+[8 rows x 1053 columns]

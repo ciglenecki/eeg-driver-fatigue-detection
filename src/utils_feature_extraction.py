@@ -8,7 +8,7 @@ FE - Fuzzy entropy - stable results for different parameters. Best noise resista
 
 """
 from math import ceil, floor
-from typing import Callable, List, Optional, Tuple, TypedDict
+from typing import Callable, Dict, List, Optional, Tuple, TypedDict
 
 import antropy as an
 import EntropyHub as eh
@@ -67,7 +67,7 @@ class FeatureExtractorFeatureInvalidArgument(Exception):
 
 
 class FeatureExtractor:
-    def __init__(self, selected_feature_names: List[Callable]):
+    def __init__(self, selected_feature_names: List[str]):
         self._set_mappers()
         self.signal = None
         self.freq = None

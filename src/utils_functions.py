@@ -16,8 +16,10 @@ from pandas import DataFrame
 T = TypeVar("T")
 
 
-def serialize_functions(first, *rest):
-    return lambda x: first(serialize_functions(*rest)(x) if rest else x)
+def serialize_functions(*rest):
+    current = rest[len(rest) - 1]
+    rest = rest[:-1]
+    return lambda x: current(serialize_functions(*rest)(x) if rest else x)
 
 
 def is_arg_default(arg_name: str, parser: argparse.ArgumentParser, args: argparse.Namespace):

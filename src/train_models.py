@@ -32,7 +32,7 @@ from utils_functions import get_timestamp, glimpse_df, stdout_to_file
 from utils_paths import PATH_MODEL, PATH_REPORT
 
 warnings.filterwarnings(action="ignore", category=ConvergenceWarning)
-set_option("display.max_columns", None)
+# set_option("display.max_columns", None)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--df", metavar="file", required=True, type=str, help="Dataframe file used for training")

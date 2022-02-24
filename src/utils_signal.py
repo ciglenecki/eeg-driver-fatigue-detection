@@ -62,7 +62,7 @@ class SignalPreprocessorContext(TypedDict):
 
 
 class SignalPreprocessorProcedureDict(TypedDict):
-    proc: Callable[[DataFrame], DataFrame]
+    procedure: Callable[[DataFrame], DataFrame]
     context: SignalPreprocessorContext
     name: Union[str, None]
 
@@ -105,7 +105,6 @@ class SignalPreprocessor:
         Returns: preprocessed signal, procedure name, procedure's context
         """
         self._check_signal_fit()
-
         if self.preprocess_procedures == []:
             preprocessor_procedure, procedure_name, procedure_context = self._get_procedure_dict_tripplet(self.DEFAULT_PREPROCESSING_PROCEDURE)
             signal_preprocessed = preprocessor_procedure(self.signal)
@@ -123,9 +122,9 @@ class SignalPreprocessor:
         if not isinstance(procedure_name, str):
             raise SignalPreprocessorInvalidName("Procedure name has to be a string.")
 
-        procedure = dict(name=procedure_name, procedure=procedure, context=context)
-        self.preprocess_procedures.append(procedure)
-        return procedure
+        procedure_dict = dict(name=procedure_name, procedure=procedure, context=context)
+        self.preprocess_procedures.append(procedure_dict)
+        return procedure_dict
 
     def unregister_preprocess_procedure(self, procedure_name):
         """
