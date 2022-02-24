@@ -106,7 +106,7 @@ class FeatureExtractor:
         pdfs = df.apply(func=lambda x: psd_welch(x, self.freq), axis=0)
         low_freq, high_freq = freq_filter_range
         pdfs = pdfs[floor(low_freq) : ceil(high_freq)]
-        return pdfs.mean(axis=1)
+        return pdfs.mean(axis=0)
 
     def feature_spectral_entropy(self, df: DataFrame, **kwargs):
         return df.apply(func=lambda x: spectral_entropy(x.to_numpy(), self.freq), axis=0)

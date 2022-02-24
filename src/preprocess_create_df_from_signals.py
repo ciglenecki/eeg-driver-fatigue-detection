@@ -46,15 +46,10 @@ from pandas import DataFrame, set_option
 from tqdm import tqdm
 
 from preprocess_preprocess_df import df_replace_values
-from utils_env import (FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ,
-                       NOTCH_FILTER_HZ, NUM_USERS,
-                       SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET,
-                       channels_good, driving_states, feature_names,
-                       get_brainwave_bands)
+from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands
 from utils_feature_extraction import FeatureExtractor
 from utils_file_saver import save_df
-from utils_functions import (get_cnt_filename, glimpse_df, is_arg_default,
-                             serialize_functions)
+from utils_functions import get_cnt_filename, glimpse_df, is_arg_default, serialize_functions
 from utils_paths import PATH_DATAFRAME, PATH_DATASET_CNT
 from utils_signal import SignalPreprocessor
 
@@ -187,13 +182,13 @@ for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_
 
     signal = load_clean_cnt(signal_filepath, channels)
     signal_preprocessor.fit(signal)
-    for proc_index, (signal_processed, proc_name, proc_context) in enumerate(signal_preprocessor.get_preprocessed_signals()):
+    for proc_index, (signal_processed, proc_name, proc_context) in tqdm(enumerate(signal_preprocessor.get_preprocessed_signals())):
         epochs = make_fixed_length_epochs(signal_processed, verbose=False)
         df = epochs_to_dataframe(epochs)
 
         freq_filter_range = proc_context["freq_filter_range"]
         feature_extractor.fit(signal_processed, FREQ)
-        for epoch_id in range(0, signal_duration):
+        for epoch_id in tqdm(range(0, signal_duration)):
             """
             Filter the dataframe rows by selecting the rows with epoch_id.
 
@@ -211,7 +206,6 @@ for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_
             """
 
             df_epoch = df.loc[df["epoch"] == epoch_id, channels].head(epoch_events_num)
-
             feature_dict = feature_extractor.get_features(df_epoch, epoch_id=epoch_id, freq_filter_range=freq_filter_range)
 
             for channel_idx, channel in enumerate(channels):
