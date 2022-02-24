@@ -26,7 +26,8 @@ from tqdm import tqdm
 from model import model_svc
 from preprocess_preprocess_df import split_and_normalize
 from utils_env import entropy_names, training_columns_regex
-from utils_functions import get_dictionary_leaves, get_timestamp, powerset, stdout_to_file
+from utils_functions import (get_dictionary_leaves, get_timestamp, powerset,
+                             stdout_to_file)
 from utils_paths import PATH_REPORT
 
 set_option("display.max_columns", None)

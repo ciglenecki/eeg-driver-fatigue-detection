@@ -19,6 +19,8 @@ from pandas import DataFrame, Series
 from scipy import signal
 from scipy.signal.spectral import periodogram
 
+from utils_env import FREQ
+
 
 def fuzzy_entropy(x):
     return eh.FuzzEn(x, m=2, r=(np.std(x, ddof=0) * 0.2, 1))[0][-1]
@@ -47,8 +49,8 @@ def approximate_entropy(x):
     return an.app_entropy(x, order=2)
 
 
-def psd_welch(x: Series):
-    _, psd = signal.welch(x)
+def psd_welch(x: Series, fs=FREQ):
+    _, psd = signal.welch(x, fs=fs)
     return psd
 
 
@@ -71,7 +73,6 @@ class FeatureExtractor:
         self._set_mappers()
         self.signal = None
         self.freq = None
-        self.psds = None
         filtered_features = filter(lambda pair: pair[0] in selected_feature_names, self._name_to_function_mapper.items())
         self.selected_features_functions = list(map(lambda pair: pair[1], filtered_features))
 
@@ -94,11 +95,6 @@ class FeatureExtractor:
     def fit(self, signal, freq=None):
         self.signal = signal
         self.freq = freq
-        if self.feature_power_spectral_density in self.selected_features_functions:
-            if self.freq is None:
-                raise FeatureExtractorFeatureInvalidArgument("Freq argument is required for feature psd")
-            epochs = make_fixed_length_epochs(signal, verbose=False)
-            self.psds, _ = time_frequency.psd_welch(epochs, n_fft=freq, n_per_seg=freq, n_overlap=0, verbose=False)
 
     def feature_mean(self, df: DataFrame, **kwargs):
         return df.apply(func=lambda x: np.mean(x), axis=0)
@@ -107,10 +103,10 @@ class FeatureExtractor:
         return df.apply(func=lambda x: np.std(x), axis=0)
 
     def feature_power_spectral_density(self, df: DataFrame, freq_filter_range: Optional[Tuple[float, float]], epoch_id: int, **kwargs):
-        series: pd.Series = self.psds[epoch_id, :]
+        pdfs = df.apply(func=lambda x: psd_welch(x, self.freq), axis=0)
         low_freq, high_freq = freq_filter_range
-        series = series[:, floor(low_freq) : ceil(high_freq)]
-        return series.mean(axis=1)
+        pdfs = pdfs[floor(low_freq) : ceil(high_freq)]
+        return pdfs.mean(axis=1)
 
     def feature_spectral_entropy(self, df: DataFrame, **kwargs):
         return df.apply(func=lambda x: spectral_entropy(x.to_numpy(), self.freq), axis=0)

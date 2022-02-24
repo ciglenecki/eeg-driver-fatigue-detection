@@ -44,14 +44,17 @@ from mne.io.base import BaseRaw
 from mne.io.cnt import read_raw_cnt
 from pandas import DataFrame, set_option
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-
 
 from preprocess_preprocess_df import df_replace_values
-from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands
+from utils_env import (FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ,
+                       NOTCH_FILTER_HZ, NUM_USERS,
+                       SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET,
+                       channels_good, driving_states, feature_names,
+                       get_brainwave_bands)
 from utils_feature_extraction import FeatureExtractor
 from utils_file_saver import save_df
-from utils_functions import get_cnt_filename, glimpse_df, is_arg_default, serialize_functions
+from utils_functions import (get_cnt_filename, glimpse_df, is_arg_default,
+                             serialize_functions)
 from utils_paths import PATH_DATAFRAME, PATH_DATASET_CNT
 from utils_signal import SignalPreprocessor
 
@@ -208,6 +211,7 @@ for driver_id, driving_state in tqdm(list(product(range(0, driver_num), driving_
             """
 
             df_epoch = df.loc[df["epoch"] == epoch_id, channels].head(epoch_events_num)
+
             feature_dict = feature_extractor.get_features(df_epoch, epoch_id=epoch_id, freq_filter_range=freq_filter_range)
 
             for channel_idx, channel in enumerate(channels):

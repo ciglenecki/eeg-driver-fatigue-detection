@@ -8,10 +8,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
-from sklearn.metrics import RocCurveDisplay, accuracy_score, f1_score, roc_auc_score
+from sklearn.metrics import (RocCurveDisplay, accuracy_score, f1_score,
+                             roc_auc_score)
 from tabulate import tabulate
 
-from utils_file_saver import get_decorated_filepath, get_model_basename, load_model, save_figure
+from utils_file_saver import (get_decorated_filepath, get_model_basename,
+                              load_model, save_figure)
 from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_FIGURE, PATH_REPORT
 
