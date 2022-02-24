@@ -1,11 +1,5 @@
 # Driver fatigue detection through multiple entropy fusion analysis in an EEG-based system
 
-| Model                  | P1    | P2    | P3    | P4    | P5    | P6    | P7    | P8    | P9    | P10   | P11   | P12   |
-| ---------------------- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
-| randomforestclassifier | 0.541 | 0.281 | 0.606 | 0.92  | 0.5   | 0.441 | 0.565 | 0.503 | 0.628 | 0.478 | 0.561 | 0.0   |
-| SVM                    | 0.278 | 0.285 | 0.501 | 0.401 | 0.166 | 0.361 | 0.5   | 0.506 | 0.528 | 0.556 | 0.5   | 0.045 |
-
-
 ## https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 <p align="center">
 	<img src="readme-pics/header_image.png"></img>
