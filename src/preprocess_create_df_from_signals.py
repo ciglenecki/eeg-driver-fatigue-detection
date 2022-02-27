@@ -44,6 +44,7 @@ from mne.io.base import BaseRaw
 from mne.io.cnt import read_raw_cnt
 from pandas import DataFrame, set_option
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from preprocess_preprocess_df import df_replace_values
 from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands

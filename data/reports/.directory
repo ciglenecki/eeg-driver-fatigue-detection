@@ -1,7 +1,7 @@
 [Dolphin]
 SortOrder=1
 SortRole=creationtime
-Timestamp=2022,2,22,17,22,26
+Timestamp=2022,2,27,22,58,22
 Version=4
 ViewMode=1
 VisibleRoles=Details_text,Details_size,Details_modificationtime,Details_creationtime,Details_type,CustomizedDetails

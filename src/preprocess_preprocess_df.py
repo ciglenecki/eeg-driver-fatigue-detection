@@ -6,26 +6,25 @@ Features will be scaled to [0,1]
 import argparse
 import sys
 import warnings
+from itertools import product
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 from pandas import DataFrame, Series, read_pickle, set_option
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.model_selection import GridSearchCV, LeaveOneGroupOut, train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
 from utils_env import training_columns_regex
-from utils_file_saver import get_decorated_filepath, save_obj
+from utils_file_saver import get_decorated_filepath, save_figure, save_obj
 from utils_paths import PATH_DATAFRAME
 
 
 def split_and_normalize(X: Series, y: Series, test_size: float, columns_to_scale, scaler: MinMaxScaler = MinMaxScaler()):
     """Columns to scale can be both string list or list of bools"""
-
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0)
-    X_train: Series
-    X_test: Series
-    y_train: Series
-    y_test: Series
     X_train.loc[:, columns_to_scale] = scaler.fit_transform(X_train.loc[:, columns_to_scale])
     X_test.loc[:, columns_to_scale] = scaler.transform(X_test.loc[:, columns_to_scale])
     return X_train, X_test, y_train, y_test

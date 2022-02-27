@@ -1,0 +1,2 @@
+{'df': 'data/dataframes/complete-clean-2022-02-26-is_complete_dataset_true___brains_true___reref_false.pickle', 'strategy': 'leaveoneout', 'output_report': PosixPath('/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/data/reports')} 
+

@@ -8,12 +8,10 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
-from sklearn.metrics import (RocCurveDisplay, accuracy_score, f1_score,
-                             roc_auc_score)
+from sklearn.metrics import RocCurveDisplay, accuracy_score, f1_score, roc_auc_score
 from tabulate import tabulate
 
-from utils_file_saver import (get_decorated_filepath, get_model_basename,
-                              load_model, save_figure)
+from utils_file_saver import get_decorated_filepath, get_model_basename, load_model, save_figure
 from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_FIGURE, PATH_REPORT
 
@@ -35,6 +33,15 @@ for filepath in filepaths:
     num_of_fits = len(y_trues)
     model_name: str = type(model.estimator).__name__
 
+    # TODO: check if preds are the same?
+    # print(y_preds[0])
+    # print(y_preds[1])
+    # print(y_preds[2])
+
+    # TODO: check if predictons are okay
+    # print(y_trues[11])
+    # print(y_preds[11])
+
     """Caculate metrics and add them to the table"""
     accuracies = list(map(lambda x: accuracy_score(x[0], x[1]), zip(y_trues, y_preds)))
     f1s = list(map(lambda x: f1_score(x[0], x[1]), zip(y_trues, y_preds)))
@@ -46,9 +53,8 @@ for filepath in filepaths:
     table.append([model_name, f1, accuracy, auc])
 
     """Print metrics for each driver"""
-
     for i, (driver_acc, driver_f1, driver_auc) in enumerate(zip(accuracies, f1s, aucs)):
-        print("Driver {i} F1 {driver_f1}, Acc {driver_acc}, AUC {driver_auc}")
+        print("Driver {} F1 {}, Acc {}, AUC {}".format(i, driver_f1, driver_acc, driver_auc))
 
     """Plot ROC figure and save it"""
     figure_basename = get_model_basename(model_name, auc, name_tag="roc")
@@ -65,7 +71,7 @@ for filepath in filepaths:
     for i, (y_true, y_pred) in enumerate(zip(y_trues, y_preds)):
         label = "ROC ({:.4f})".format(auc) if num_of_fits == 1 else "Participant {} ROC ({:.4f})".format(i + 1, aucs[i])
         roc_plot = RocCurveDisplay.from_predictions(y_true=y_true, y_pred=y_pred, ax=ax, alpha=0.9, label=label)
-    # save_figure(figure_filepath, metadata=model.best_params_)
+    save_figure(figure_filepath, metadata=model.best_params_)
 
 """Print models' summary"""
 table = sorted(table, key=lambda x: x[1], reverse=True)
@@ -87,4 +93,4 @@ figure_filepath = get_decorated_filepath(
     extension="png",
     datetime_arg=True,
 )
-# save_figure(figure_filepath)
+save_figure(figure_filepath)

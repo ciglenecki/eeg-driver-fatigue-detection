@@ -21,8 +21,11 @@ from pandas.core.frame import DataFrame
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import GridSearchCV, LeaveOneGroupOut
+from sklearn.preprocessing import MinMaxScaler
 from tabulate import tabulate
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import numpy as np
 
 from model import model_knn, model_mlp, model_rfc, model_svc
 from preprocess_preprocess_df import split_and_normalize
@@ -45,9 +48,13 @@ print(vars(args), "\n")
 
 def loo_generator(X, y):
     groups = X["driver_id"].to_numpy()
+    scaler = MinMaxScaler()
+
     for train_index, test_index in LeaveOneGroupOut().split(X, y, groups):
         X_train, X_test = X.loc[train_index, training_columns], X.loc[test_index, training_columns]
         y_train, y_test = y[train_index], y[test_index]
+        X_train.loc[:, training_columns] = scaler.fit_transform(X_train.loc[:, training_columns])
+        X_test.loc[:, training_columns] = scaler.transform(X_test.loc[:, training_columns])
         yield X_train, X_test, y_train, y_test
 
 
@@ -96,7 +103,6 @@ for scoring, model in tqdm(list(product(scorings, models)), desc="Training model
                 params_dict[params]["stds"] = []
             params_dict[params]["means"].append(mean)
             params_dict[params]["stds"].append(std)
-
     f1_average = sum((map(lambda x: f1_score(x[0], x[1]), zip(y_trues, y_preds)))) / len(y_trues)
     acc_average = sum((map(lambda x: accuracy_score(x[0], x[1]), zip(y_trues, y_preds)))) / len(y_trues)
 
