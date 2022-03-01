@@ -26,8 +26,8 @@ TIMESTAMP_FORMAT = "%Y-%m-%d-%H-%M-%S"
 
 class ModelPickle(TypedDict):
     model: GridSearchCV
-    y_trues: List[List[int]]
-    y_preds: List[List[int]]
+    y_trues: Union[None, List[List[int]]]
+    y_preds: Union[None, List[List[int]]]
 
 
 def default_obj_saver(obj, filepath):
@@ -79,7 +79,7 @@ def load_dataframe(path: Path) -> DataFrame:
     return read_pickle(path)
 
 
-def get_decorated_filepath(directory: Path, basename: str, extension: str = None, datetime_arg: Union[datetime, None, bool] = None, metadata: dict = {}):
+def get_decorated_filepath(directory: Path, basename: str, extension: str = None, datetime_arg: Union[datetime, None, bool] = True, metadata: dict = {}):
     """
     Returns filepath
 
@@ -134,12 +134,19 @@ def save_model(
     directory: Path,
     metadata={},
     name_tag=None,
-    y_trues=None,
-    y_preds=None,
+    datetime: Union[datetime, None, bool] = True,
+    y_trues: Union[None, List[List[int]]] = None,
+    y_preds: Union[None, List[List[int]]] = None,
 ):
 
     basename = get_model_basename(model_name, score, name_tag)
-    filepath = get_decorated_filepath(directory=directory, basename=basename, extension="model", metadata=metadata)
+    filepath = get_decorated_filepath(
+        directory=directory,
+        basename=basename,
+        extension="model",
+        datetime_arg=datetime,
+        metadata=metadata,
+    )
 
     model_pickle: ModelPickle = {
         "model": model,

@@ -37,6 +37,7 @@ from math import floor
 from pathlib import Path
 from typing import List, Union
 
+import matplotlib.pyplot as plt
 import numpy as np
 from mne import Epochs
 from mne.epochs import make_fixed_length_epochs
@@ -44,13 +45,17 @@ from mne.io.base import BaseRaw
 from mne.io.cnt import read_raw_cnt
 from pandas import DataFrame, set_option
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 from preprocess_preprocess_df import df_replace_values
-from utils_env import FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ, NOTCH_FILTER_HZ, NUM_USERS, SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET, channels_good, driving_states, feature_names, get_brainwave_bands
+from utils_env import (FATIGUE_STR, FREQ, LOW_PASS_FILTER_RANGE_HZ,
+                       NOTCH_FILTER_HZ, NUM_USERS,
+                       SIGNAL_DURATION_SECONDS_DEFAULT, SIGNAL_OFFSET,
+                       channels_good, driving_states, feature_names,
+                       get_brainwave_bands)
 from utils_feature_extraction import FeatureExtractor
 from utils_file_saver import save_df
-from utils_functions import get_cnt_filename, glimpse_df, is_arg_default, serialize_functions
+from utils_functions import (get_cnt_filename, glimpse_df, is_arg_default,
+                             serialize_functions)
 from utils_paths import PATH_DATAFRAME, PATH_DATASET_CNT
 from utils_signal import SignalPreprocessor
 

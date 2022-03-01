@@ -8,10 +8,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from pandas._config.config import set_option
 from pandas.core.frame import DataFrame
-from sklearn.metrics import RocCurveDisplay, accuracy_score, f1_score, roc_auc_score
+from sklearn.metrics import (RocCurveDisplay, accuracy_score, f1_score,
+                             roc_auc_score)
 from tabulate import tabulate
 
-from utils_file_saver import get_decorated_filepath, get_model_basename, load_model, save_figure
+from utils_file_saver import (get_decorated_filepath, get_model_basename,
+                              load_model, save_figure)
 from utils_functions import get_timestamp, stdout_to_file
 from utils_paths import PATH_FIGURE, PATH_REPORT
 
@@ -32,15 +34,6 @@ for filepath in filepaths:
     model, y_trues, y_preds = model_pickle["model"], model_pickle["y_trues"], model_pickle["y_preds"]
     num_of_fits = len(y_trues)
     model_name: str = type(model.estimator).__name__
-
-    # TODO: check if preds are the same?
-    # print(y_preds[0])
-    # print(y_preds[1])
-    # print(y_preds[2])
-
-    # TODO: check if predictons are okay
-    # print(y_trues[11])
-    # print(y_preds[11])
 
     """Caculate metrics and add them to the table"""
     accuracies = list(map(lambda x: accuracy_score(x[0], x[1]), zip(y_trues, y_preds)))
