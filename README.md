@@ -92,38 +92,38 @@ Optional:
 
 ### Receiver operating characteristic (ROC)
 
-| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.0000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.9928) |
+| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.993) |
 | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| ![](data/figures/randomforestclassifier-1.0000-roc-2022-02-22-01-21-48-max_features_22___n_estimators_500.png)                          | ![](data/figures/svc-0.9928-roc-2022-02-22-01-21-48-c_100___gamma_0.03125.png)               |
+| ![](data/figures/randomforestclassifier-1.0000-roc-2022-03-02-12-34-35-max_features_22___n_estimators_500.png)                          | ![](data/figures/svc-0.9992-roc-2022-03-02-12-34-34-c_100___gamma_0.03125.png)               |
 
-| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.9892) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.9861) |
+| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.989) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.986) |
 | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| ![](data/figures/kneighborsclassifier-0.9892-roc-2022-02-22-01-21-48-weights_uniform.png)                                            | ![](data/figures/mlpclassifier-0.9861-roc-2022-02-22-01-21-49-alpha_0.001___learning_rate_constant.png)                     |
+| ![](data/figures/kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png)                                            | ![](data/figures/mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png)                     |
 
 
 ## Metrics - Leave one driver out (LOO)
 
 ### Model comparison
 
-| Model name             | F1 score | Accuracy | Area under curve |
-| ---------------------- | -------- | -------- | ---------------- |
-| RandomForestClassifier | 0.530038 | 0.502361 | 0.502361         |
-| KNeighborsClassifier   | 0.483793 | 0.466389 | 0.466389         |
-| SVC                    | 0.440617 | 0.385972 | 0.385972         |
-| MLPClassifier          | 0.409977 | 0.399167 | 0.399167         |
+| Model name             |   F1 score |   Accuracy |   Area under curve |
+|------------------------|------------|------------|--------------------|
+| KNeighborsClassifier   |   0.462041 |   0.4425   |           0.4425   |
+| RandomForestClassifier |   0.35129  |   0.365278 |           0.365278 |
+| MLPClassifier          |   0.346792 |   0.385556 |           0.385556 |
+| SVC                    |   0.321702 |   0.384722 |           0.384722 | 
 
 ![](data/figures/model-compare-leaveoneout-2022-02-23-02-16-09-.png)
 
 
 ### Receiver operating characteristic (ROC)
 
-| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.5025) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.3860) |
+| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.365) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.385) |
 | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| ![](data/figures/randomforestclassifier-0.5024-roc-2022-02-23-02-16-08-max_features_22___n_estimators_500.png)                          | ![](data/figures/svc-0.3860-roc-2022-02-23-02-16-09-c_0.5___gamma_0.01.png)                  |
+| ![](data/figures/randomforestclassifier-leaveoneout-0.3653-roc-2022-03-02-12-34-43-max_features_22___n_estimators_500.png)                          | ![](data/figures/svc-leaveoneout-0.3847-roc-2022-03-02-12-34-41-c_100___gamma_0.001.png)                  |
 
-| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.4664) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.3992) |
+| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.443) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.386) |
 | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| ![](data/figures/kneighborsclassifier-0.4664-roc-2022-02-23-02-16-07-weights_uniform.png)                                            | ![](data/figures/mlpclassifier-0.3992-roc-2022-02-23-02-16-08-alpha_0.001___learning_rate_constant.png)                     |
+| ![](data/figures/kneighborsclassifier-leaveoneout-0.4425-roc-2022-03-02-12-34-42-weights_uniform.png)                                            | ![](data/figures/mlpclassifier-leaveoneout-0.3856-roc-2022-03-02-12-34-42-alpha_0.001___learning_rate_constant.png)                     |
 
 
 
@@ -164,7 +164,6 @@ N preprocess procedures (N <1, +>)
 in most cases N = 5 (standard, AL, AH, BL, BH)
 num of cols = 1050
 ```
-
 
 Total number of columns is product (multiplying) of feature (7), channels (30) and preprocess procedure (N)
 

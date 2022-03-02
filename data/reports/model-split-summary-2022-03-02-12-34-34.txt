@@ -1,0 +1,30 @@
+Driver 0 F1 0.9991818925552222, Acc 0.9991666666666666, AUC 0.9991716180217386
+svc-0.9992-roc-2022-03-02-12-34-34-c_100___gamma_0.03125.png
+Saved file:
+data/figures/svc-0.9992-roc-2022-03-02-12-34-34-c_100___gamma_0.03125.png
+
+Driver 0 F1 0.9825145711906743, Acc 0.9825, AUC 0.9825797733192869
+kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png
+Saved file:
+data/figures/kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png
+
+Driver 0 F1 1.0, Acc 1.0, AUC 1.0
+randomforestclassifier-1.0000-roc-2022-03-02-12-34-35-max_features_22___n_estimators_500.png
+Saved file:
+data/figures/randomforestclassifier-1.0000-roc-2022-03-02-12-34-35-max_features_22___n_estimators_500.png
+
+Driver 0 F1 0.9944812362030905, Acc 0.9944444444444445, AUC 0.9944441975198898
+mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png
+Saved file:
+data/figures/mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png
+
+| Model name             |   F1 score |   Accuracy |   Area under curve |
+|------------------------|------------|------------|--------------------|
+| RandomForestClassifier |   1        |   1        |           1        |
+| SVC                    |   0.999182 |   0.999167 |           0.999172 |
+| MLPClassifier          |   0.994481 |   0.994444 |           0.994444 |
+| KNeighborsClassifier   |   0.982515 |   0.9825   |           0.98258  | 
+
+model-compare-2022-03-02-12-34-35-.png
+Saved file:
+data/figures/model-compare-2022-03-02-12-34-35-.png
