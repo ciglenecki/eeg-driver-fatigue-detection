@@ -13,9 +13,17 @@ Implement steps described in the research paper and produce similar results
 **Paper**: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 
 
-## ⬇️ Requirements
+## ⬇️ [Requirements](requirements.txt)
 
-[requirements.txt](requirements.txt)
+Create [Python virtual environment](https://docs.python.org/3/library/venv.html#:~:text=A%20virtual%20environment%20is%20a,part%20of%20your%20operating%20system.):
+```bash
+[ ! -d "venv" ] && (echo "Creating python3 virtual environment"; python3 -m venv venv)
+```
+
+Install required packages:
+```bash
+pip install -r requirements.txt
+```
 
 
 ## 📋 Todo:
@@ -72,16 +80,16 @@ Optional:
 - [ ] Visualize weight-based topographies average
 
 
-# 🖼️ Figures
+## 🖼️ Figures
 
 ### 3 compontent (x,y, color) T-SNE of the dataset
 
 ![](data/figures/data_tsne.png)
 
 
-## Metrics - 50:50 train test split
+### Metrics - 50:50 train test split
 
-### Model comparison
+#### Model comparison
 
 | Model name             | F1 score | Accuracy | Area under curve |
 | ---------------------- | -------- | -------- | ---------------- |
@@ -93,7 +101,7 @@ Optional:
 ![](data/figures/model-compare-2022-02-22-01-21-49-.png)
 
 
-### Receiver operating characteristic (ROC)
+#### Receiver operating characteristic (ROC)
 
 | [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.999) |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -104,9 +112,9 @@ Optional:
 | ![](data/figures/kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png)                                           | ![](data/figures/mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png)                     |
 
 
-## Metrics - Leave one driver out (LOO)
+### Metrics - Leave one driver out (LOO)
 
-### Model comparison
+#### Model comparison
 
 | Model name             | F1 score | Accuracy | Area under curve |
 | ---------------------- | -------- | -------- | ---------------- |
@@ -118,7 +126,7 @@ Optional:
 ![](data/figures/model-compare-leaveoneout-2022-02-23-02-16-09-.png)
 
 
-### Receiver operating characteristic (ROC)
+#### Receiver operating characteristic (ROC)
 
 | [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.365) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.385) |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -130,7 +138,7 @@ Optional:
 
 
 
-## Dataframe structure
+## 🏗️ Dataframe structure
 
 ### Rows
 Each row is defined by a tripplet:
