@@ -1,21 +1,24 @@
 # Driver fatigue detection through multiple entropy fusion analysis in an EEG-based system
 
-## https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 <p align="center">
 	<img src="readme-pics/header_image.png"></img>
 </p>
 
 ## Assignment
-Implement steps described in the research paper and produce similar results.
 
 **Grade: 40/40**
 
-# Requirements
+Implement steps described in the research paper and produce similar results
+
+**Paper**: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
+
+
+## ⬇️ Requirements
 
 [requirements.txt](requirements.txt)
 
 
-# Todo:
+## 📋 Todo:
 
 ### Utils:
 - [x] Create report file saver and loader for easy and reproducible way to check results
@@ -69,7 +72,7 @@ Optional:
 - [ ] Visualize weight-based topographies average
 
 
-# Figures
+# 🖼️ Figures
 
 ### 3 compontent (x,y, color) T-SNE of the dataset
 
@@ -127,9 +130,9 @@ Optional:
 
 
 
-# Dataframe structure
+## Dataframe structure
 
-## Rows
+### Rows
 Each row is defined by a tripplet:
 1. **driver** (driver_id)
 2. **epoch** (epoch_id)
@@ -144,7 +147,7 @@ driving_states (len(driving_states)=2)
 12 * 300 * 2 = 7200 rows
 ```
 
-## Columns
+### Columns
 Each feature column is defined by a tripplet:
 1. **feature** (`mean`, approximate entropy (`AE`), standard deviation (`std`)...)
 2. **channel** (`FC4`, `T6`, `P3`...) - electrodes on the cap which driver wears during the driving session
@@ -181,7 +184,7 @@ For each epoch (row), all **columns** are caculated.
 | 3   |           1 |         0 |        0 |         3.18712 |   3.18712 | ... |      1.4759e-23 |  1.4759e-23 | ... |
 | 4   |           1 |         0 |        1 |         2.81654 |   2.81654 | ... |     1.27735e-23 | 1.27735e-23 | ... |
 
-# Dataset notes
+## 📝 Dataset notes
 
 EEG data:
 - .cnt files were created by a 40-channel Neuroscan amplifier including the EEG data in two states in the process of driving.
@@ -198,12 +201,12 @@ Entropy data (not used):
 		- 1 represents the fatigue state
 		- 0 represents the normal state
 
-# Reserach paper notes
-## Goal
+## 📝 Reserach paper notes
+### Goal
 analyze the multiple entropy fusion method and evaluate several channel regions to effectively detect a driver’s fatigue state based on electroencephalogram (EEG) records
 
 
-## Data:
+### Data:
 - collected by attaching electrodes to driver’s
 - non-fatigue data: driver was driving for 20 minutes. Last 5 minutes are captured as non-fatigue
 - fatigue data: driver was driving for 40-60 minutes. Last 5 minutes are captured as fatigue data. 
@@ -213,11 +216,11 @@ analyze the multiple entropy fusion method and evaluate several channel regions 
 	- 5 * 60 = 300 * 1 = 300 epoch for one participant
 	- total 3600 fatigue units and 3600 normal units 
 
-## Electrode cap:
+### Electrode cap:
 - 32 channels (30 effective and 2 reference channels)
 
 
-## Entropies:
+### Entropies:
 - PE - special entropy - calculated by applying the Shannon function to the normalized power spectrum based on the peaks of a Fourier transform
 - AE - Approximate entropy - calculated in time domain without phase-space reconstruction of signal (short-length time series data) [41]
 - SE - Sample entropy - similar to AE. Se is less sensitive to changes in data length with larger values corresponding to greater complexity or irregularity in the data [41]
@@ -235,22 +238,22 @@ Features were normalized to [-1, 1] using min-max normalization:
 2. The min-max normalization of each feature xi, i = 1,. . .,n, is computed as follows:
 
 
-## 4 classifiers
+### 4 classifiers
 1. Support vector machine (SVM)
 2. Back propagation neural network (BP)
 3. Random forest (RF)
 4. K-nearest neighbor (KNN)
 
-## SVM Parameters
+### SVM Parameters
 With leave-one-out (LOO) cross-validation parameters :
 1. c=-1 - the penalty parameter
 2. g=-5 - the kernel parameter
 3. AR order 10.
 
-## Entropy combining
+### Entropy combining
 Combining multiple entropies always yields better accuracy.
 
-## Significant electrodes
+### Significant electrodes
 
 Significant electrodes were chosen from 30 electrodes.
 1. Calculate Acc(i) of single i electrode using multiple entropy fusion method based on training data by SVM classifier
@@ -261,7 +264,7 @@ Pick 10 electrodes with biggest weight. These 10 electrodes produce 4 clusters/r
 - A gives the best prediction results and even better prediction compared when all electrodes were used for a prediction
 
 
-# Notes to self:
+## 📝 Notes to self:
 
 1. Many channels are flatlined during the driving process and spike during some moments
 2. In addition each BCIT dataset includes 4 additional EOG channels placed vertically above the right eye (veou), vertically below the right eye (veol), horizontally on the outside of the right eye (heor), and horizontally on the outside of the left eye (heol)
