@@ -1,6 +1,6 @@
 """
-Normalized the dataframe.
-Features will be scaled to [0,1]
+=== IGNORE THIS FILE ===
+File used for testing things out
 """
 
 import argparse
@@ -19,8 +19,7 @@ from scipy import stats
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.model_selection import (GridSearchCV, LeaveOneGroupOut,
-                                     train_test_split)
+from sklearn.model_selection import GridSearchCV, LeaveOneGroupOut, train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
 from utils_env import training_columns_regex

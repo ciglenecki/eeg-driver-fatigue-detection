@@ -8,12 +8,12 @@
 
 **Grade: 40/40**
 
-Implement steps described in the research paper and produce similar results
+Implement steps described in the research paper and produce similar results.
 
 **Paper**: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188756
 
 
-## ⬇️ [Requirements](requirements.txt)
+## ⬇️ Setup
 
 Create [Python virtual environment](https://docs.python.org/3/library/venv.html#:~:text=A%20virtual%20environment%20is%20a,part%20of%20your%20operating%20system.):
 ```bash
@@ -25,6 +25,15 @@ Install required packages:
 pip install -r requirements.txt
 ```
 
+## 📁 Directory structure
+
+| Directory                   | Description              |
+| --------------------------- | ------------------------ |
+| [data](./data/)             | dataset                  |
+| [models](./models/)         | saved and trained models |
+| [references](./references/) | research paper           |
+| [reports](./reports/)       | model's stats, figures   |
+| [src](./src/)               | python source code       |
 
 ## 📋 Todo:
 
