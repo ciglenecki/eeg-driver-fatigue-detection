@@ -93,7 +93,7 @@ Optional:
 
 ### 3 compontent (x,y, color) T-SNE of the dataset
 
-![](data/figures/data_tsne.png)
+![](reports/figures/data_tsne.png)
 
 
 ### Metrics - 50:50 train test split
@@ -107,18 +107,18 @@ Optional:
 | MLPClassifier          | 0.994481 | 0.994444 | 0.994444         |
 | KNeighborsClassifier   | 0.982515 | 0.9825   | 0.98258          |
 
-![](data/figures/model-compare-2022-02-22-01-21-49-.png)
+![](reports/figures/model-compare-2022-02-22-01-21-49-.png)
 
 
 #### Receiver operating characteristic (ROC)
 
 | [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.999) |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| ![](data/figures/randomforestclassifier-1.0000-roc-2022-03-02-12-34-35-max_features_22___n_estimators_500.png)                         | ![](data/figures/svc-0.9992-roc-2022-03-02-12-34-34-c_100___gamma_0.03125.png)              |
+| ![](reports/figures/randomforestclassifier-1.0000-roc-2022-03-02-12-34-35-max_features_22___n_estimators_500.png)                         | ![](reports/figures/svc-0.9992-roc-2022-03-02-12-34-34-c_100___gamma_0.03125.png)              |
 
 | [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.983) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.994) |
 | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| ![](data/figures/kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png)                                           | ![](data/figures/mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png)                     |
+| ![](reports/figures/kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png)                                           | ![](reports/figures/mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png)                     |
 
 
 ### Metrics - Leave one driver out (LOO)
@@ -132,18 +132,18 @@ Optional:
 | MLPClassifier          | 0.346792 | 0.385556 | 0.385556         |
 | SVC                    | 0.321702 | 0.384722 | 0.384722         |
 
-![](data/figures/model-compare-leaveoneout-2022-02-23-02-16-09-.png)
+![](reports/figures/model-compare-leaveoneout-2022-02-23-02-16-09-.png)
 
 
 #### Receiver operating characteristic (ROC)
 
 | [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 0.365) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.385) |
 | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| ![](data/figures/randomforestclassifier-leaveoneout-0.3653-roc-2022-03-02-12-34-43-max_features_22___n_estimators_500.png)             | ![](data/figures/svc-leaveoneout-0.3847-roc-2022-03-02-12-34-41-c_100___gamma_0.001.png)    |
+| ![](reports/figures/randomforestclassifier-leaveoneout-0.3653-roc-2022-03-02-12-34-43-max_features_22___n_estimators_500.png)             | ![](reports/figures/svc-leaveoneout-0.3847-roc-2022-03-02-12-34-41-c_100___gamma_0.001.png)    |
 
 | [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.443) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.386) |
 | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| ![](data/figures/kneighborsclassifier-leaveoneout-0.4425-roc-2022-03-02-12-34-42-weights_uniform.png)                               | ![](data/figures/mlpclassifier-leaveoneout-0.3856-roc-2022-03-02-12-34-42-alpha_0.001___learning_rate_constant.png)        |
+| ![](reports/figures/kneighborsclassifier-leaveoneout-0.4425-roc-2022-03-02-12-34-42-weights_uniform.png)                               | ![](reports/figures/mlpclassifier-leaveoneout-0.3856-roc-2022-03-02-12-34-42-alpha_0.001___learning_rate_constant.png)        |
 
 
 

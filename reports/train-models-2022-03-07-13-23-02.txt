@@ -1,0 +1,24 @@
+{'df': 'data/dataframes/complete-clean-2022-02-26-is_complete_dataset_true___brains_true___reref_false.pickle', 'output_report': PosixPath('/home/matej/projects/eeg-driver-fatigue-detection/reports'), 'strategies': ['split']} 
+
+TRAIN AVG 1.0 SVC
+TEST AVG 0.9980646944982029 SVC
+Model          f1    accuracy    C    gamma
+-------  --------  ----------  ---  -------
+SVC      0.998065    0.998056  100  0.03125 
+
+0.998048 (+/-0.002838) for {'C': 100, 'gamma': 0.03125}
+0.998048 (+/-0.002838) for {'C': 500, 'gamma': 0.03125}
+0.998048 (+/-0.002838) for {'C': 1000, 'gamma': 0.03125}
+0.994974 (+/-0.005184) for {'C': 100, 'gamma': 0.01}
+0.994974 (+/-0.005184) for {'C': 500, 'gamma': 0.01}
+0.994974 (+/-0.005184) for {'C': 1000, 'gamma': 0.01}
+0.987423 (+/-0.007312) for {'C': 500, 'gamma': 0.001}
+0.987404 (+/-0.005086) for {'C': 1000, 'gamma': 0.001}
+0.982439 (+/-0.006238) for {'C': 100, 'gamma': 0.001}
+0.982171 (+/-0.017258) for {'C': 0.5, 'gamma': 0.03125}
+0.912382 (+/-0.012349) for {'C': 0.5, 'gamma': 0.01}
+0.776516 (+/-0.017339) for {'C': 0.5, 'gamma': 0.001}
+svc-0.9981-split-2022-03-07-13-23-02-c_100___gamma_0.03125.model
+Saved file:
+/home/matej/projects/eeg-driver-fatigue-detection/models/svc-0.9981-split-2022-03-07-13-23-02-c_100___gamma_0.03125.model
+
