@@ -110,6 +110,18 @@ Optional:
 ![](reports/figures/model-compare-2022-02-22-01-21-49-.png)
 
 
+#### Receiver operating characteristic (ROC)
+
+| [RandomForestClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) (AUC = 1.000) | [SVM](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) (AUC = 0.999) |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| ![](reports/figures/randomforestclassifier-1.0000-roc-2022-03-02-12-34-35-max_features_22___n_estimators_500.png)                         | ![](reports/figures/svc-0.9992-roc-2022-03-02-12-34-34-c_100___gamma_0.03125.png)              |
+
+| [KNeighborsClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html) (AUC = 0.983) | [MLPClassifier](https://scikit-learn.org/stable/modules/generated/sklearn.neural_network.MLPClassifier.html) (AUC = 0.994) |
+| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| ![](reports/figures/kneighborsclassifier-0.9826-roc-2022-03-02-12-34-34-weights_uniform.png)                                           | ![](reports/figures/mlpclassifier-0.9944-roc-2022-03-02-12-34-35-alpha_0.05___learning_rate_constant.png)                     |
+
+
+
 
 ## 🏗️ Dataframe structure
 
