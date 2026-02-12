@@ -27,3 +27,4 @@ model_knn = GridSearchCV(KNeighborsClassifier(), knn_parameters, return_train_sc
 
 if __name__ == "__main__":
     pass
+# update

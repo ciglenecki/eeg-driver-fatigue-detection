@@ -24,3 +24,4 @@ print("Maximum values for columns", sorted(list((df.max()))))
 print("Cols with none", df.loc[:, isnull_any(df)])
 
 glimpse_df(df)
+# update
