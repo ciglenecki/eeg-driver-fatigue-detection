@@ -19,3 +19,4 @@ PATH_FIGURE = Path(PATH_REPORT, "figures")
 if __name__ == "__main__":
     pass
 # update
+

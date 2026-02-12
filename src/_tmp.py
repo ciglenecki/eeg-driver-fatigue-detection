@@ -94,3 +94,4 @@ if __name__ == "__main__":
         # save_figure(Path("/home/matej/2-fer/uuzop/eeg-driver-fatigue-detection/fig.png"), {})
         print(col_name, np.std(col))
 # update
+

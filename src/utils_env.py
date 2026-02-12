@@ -40,3 +40,4 @@ training_columns_regex = "|".join(channels_good)
 # [PE_FP1, PE_FP2, ... , PE_C3, AE_FP1, AE_FP2, ..., FE_C3]
 entropy_channel_combinations = ["{}_{}".format(entropy, channel) for entropy in entropy_names for channel in channels_good]
 # update
+

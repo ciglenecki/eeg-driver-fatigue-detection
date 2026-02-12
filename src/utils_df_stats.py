@@ -25,3 +25,4 @@ print("Cols with none", df.loc[:, isnull_any(df)])
 
 glimpse_df(df)
 # update
+

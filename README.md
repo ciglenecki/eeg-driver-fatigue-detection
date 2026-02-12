@@ -264,3 +264,4 @@ Pick 10 electrodes with biggest weight. These 10 electrodes produce 4 clusters/r
 3. `ipython kernel install --driver --name=eeg` to use venv in jupyter
 4. Two different libs (EntropyHub and Antropy) produce the same result for sample entropy
 5. Applying filter before and after converting to epochs gives different results
+
